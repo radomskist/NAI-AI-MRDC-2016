@@ -1,6 +1,5 @@
 #include "main.h"
 
-
 // OpenGL Variables
 GLuint textureId;                           // ID of the texture to contain Kinect RGB Data
 GLubyte colorData[WIDTH * HEIGHT * 4];      // BGRA array containing the texture data
@@ -20,16 +19,20 @@ std::vector<cv::Point3f> queue;
 
 int cycles = 0;
 
+
 bool initKinect() {
 	kinect = new Kinect();
 	return kinect->isInitialized();
 }
 
+float loop = 0;
 void drawKinectData() {
 	// Get Data From the Kinect
 	kinect->getFrameData(Kinect::IMAGE_COLOR, colorData);
 	kinect->getDepthFrameData(depthData);
-	if (kinect->mapColorFrameToDepthFrame(depthData, mapData)) objectSegmentation();
+	if (kinect->mapColorFrameToDepthFrame(depthData, mapData) && loop++ > 10) {
+		objectSegmentation();
+	}
 
 	glBindTexture(GL_TEXTURE_2D, textureId);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, WIDTH, HEIGHT, GL_BGRA_EXT, GL_UNSIGNED_BYTE, (GLvoid*) colorData);
@@ -48,13 +51,13 @@ void drawKinectData() {
 
 int main(int argc, char* argv[]) {
 	if (!init(argc, argv)) return 1;
-	pointCloud.reserve(WIDTH * HEIGHT);
-	for (int x = 0; x < HEIGHT; x++) {
-		for (int y = 0; y < WIDTH; y++) {
-			pointCloud.push_back(cv::Point3f());
-		}
-	}
-	if (!initKinect()) return 1;
+	//pointCloud.reserve(WIDTH * HEIGHT);
+	//for (int x = 0; x < HEIGHT; x++) {
+		//for (int y = 0; y < WIDTH; y++) {
+			//pointCloud.push_back(cv::Point3f());
+		//}
+	//}
+	if (!initKinect()) return 99999;
 
 
 	// Initialize textures
@@ -105,128 +108,89 @@ void populatePointCloud() {
 	std::cout << "Generate Point Cloud: " << microseconds << " ms\n";
 }
 
+// get a CV_8U matrix from a Kinect depth frame 
+cv::Mat *GetDepthImage(USHORT *depthData, int width, int height) {
+	const int imageSize = width * height;
+	cv::Mat *out = new cv::Mat(height, width, CV_8U);
+	// map the values to the depth range
+	for (int i = 0; i < imageSize; i++) {
+		// get the lower 8 bits
+		USHORT depth = depthData[i];
+		//if (depth >= kLower && depth <= kUpper)
+		//{
+			//float y = c * (depth - kLower);
+			//out->at<byte>(i) = (byte) y;
+		//}
+		//else
+		//{
+			out->at<byte>(i) = 0;
+		//}
+	}
+	return out;
+}
+
+// get a CV_8UC4 (RGB) Matrix from Kinect RGB frame
+cv::Mat *GetColorImage(unsigned char *bytes, int width, int height) {
+	const unsigned int img_size = width * height * 4;
+	cv::Mat *out = new cv::Mat(height, width, CV_8UC4);
+
+	// copy data
+	memcpy(out->data, bytes, img_size);
+
+	return out;
+}
+
+void applyGaussianBlur(GLubyte *bytes) {
+	const unsigned int img_size = WIDTH * HEIGHT * 4; // Calculate amount of size required
+	cv::Mat mat(HEIGHT, WIDTH, CV_8UC4); // Create a Mat
+	cv::Mat dest(HEIGHT, WIDTH, CV_8UC3);
+	memcpy(mat.data, bytes, img_size); // Copy the data
+
+	cv::cvtColor(mat, mat, CV_BGRA2BGR);
+	// Apply the blur
+	//cv::GaussianBlur(mat,
+		//mat,
+		//cv::Size(3, 3),
+		//3);
+
+	cv::medianBlur(mat, mat, 3);
+	cv::bilateralFilter(mat, dest, 7, 5, 5);
+	cv::cvtColor(dest, mat, CV_BGR2BGRA);
+
+	memcpy(bytes, mat.data, img_size);
+}
+
 
 //GLubyte data[WIDTH * HEIGHT * 4];
 void objectSegmentation() {
-	if (cycles++ < 10) return;
 	// Start Clock to measure time method takes
 	auto start = std::chrono::high_resolution_clock::now();
+
+	applyGaussianBlur(colorData);
 
 	// Populate the point cloud
-	populatePointCloud();
+	ObjectSegmentor<WIDTH, HEIGHT> segmentor(colorData, depthData);
+	segmentor.findObjects();
 
-	// Set all the points as unsearched
-	checkedStatus.reset();
-	queue.clear();
+	std::cout << "Buckets Found: " << segmentor.numberOfBuckets() << std::endl;
 
-	// Add the starting point to the queue
-	queue.push_back(cv::Point3f(330, 220, getDistanceOfPixel(330, 220)));
+	std::vector<cv::Point3f> points;
+	
+	cv::Point3f p;
+	int r, g, b;
+	for (int i = 0; i < segmentor.buckets.size(); i++) {
+		points = segmentor.buckets[i].points;
+		r = rand() % 256;
+		g = rand() % 256;
+		b = rand() % 256;
+		for (int j = 0; j < points.size(); j++) {
+			p = points[j];
 
-	// Set Search Point
-	cv::Point3f searchPoint = queue.back();
-
-
-	std::cout << "Search Point: " << queue.back() << std::endl;
-
-	// Turn the search Pixel Yellow
-	colorData[(((int) searchPoint.y * WIDTH) + (int) searchPoint.x) * 4] = 0;       // B
-	colorData[(((int) searchPoint.y * WIDTH) + (int) searchPoint.x) * 4 + 1] = 255; // G
-	colorData[(((int) searchPoint.y * WIDTH) + (int) searchPoint.x) * 4 + 2] = 255; // R
-
-	// Make yellow spot larger
-	colorData[(((int) searchPoint.y * WIDTH) + (int) (searchPoint.x + 1)) * 4] = 0;     // B
-	colorData[(((int) searchPoint.y * WIDTH) + (int) (searchPoint.x + 1)) * 4 + 1] = 255;   // G
-	colorData[(((int) searchPoint.y * WIDTH) + (int) (searchPoint.x + 1)) * 4 + 2] = 255;   // R
-
-	colorData[(((int) searchPoint.y * WIDTH) + (int) (searchPoint.x - 1)) * 4] = 0;     // B
-	colorData[(((int) searchPoint.y * WIDTH) + (int) (searchPoint.x - 1)) * 4 + 1] = 255;   // G
-	colorData[(((int) searchPoint.y * WIDTH) + (int) (searchPoint.x - 1)) * 4 + 2] = 255;   // R
-
-	colorData[(((int) (searchPoint.y + 1) * WIDTH) + (int) searchPoint.x) * 4] = 0;     // B
-	colorData[(((int) (searchPoint.y + 1) * WIDTH) + (int) searchPoint.x) * 4 + 1] = 255;   // G
-	colorData[(((int) (searchPoint.y + 1) * WIDTH) + (int) searchPoint.x) * 4 + 2] = 255;   // R
-
-	colorData[(((int) (searchPoint.y - 1) * WIDTH) + (int) searchPoint.x) * 4] = 0;     // B
-	colorData[(((int) (searchPoint.y - 1) * WIDTH) + (int) searchPoint.x) * 4 + 1] = 255;   // G
-	colorData[(((int) (searchPoint.y - 1) * WIDTH) + (int) searchPoint.x) * 4 + 2] = 255;   // R
-
-
-	// Start Clock to measure time search takes
-	auto start_create_tree = std::chrono::high_resolution_clock::now();
-
-
-	// KdTree with 4 random trees
-	cv::flann::KDTreeIndexParams indexParams(NUM_SEARCH_TREES);
-	cv::flann::Index kdtree(cv::Mat(pointCloud).reshape(1), indexParams);
-
-
-	// Get the total time in ms the search took
-	auto elapsed_create_tree = std::chrono::high_resolution_clock::now() - start_create_tree;
-	long long create_tree_microseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_create_tree).count();
-
-	// Print out the elpsed time of the method
-	std::cout << "Creating Tree: " << create_tree_microseconds << " ms\n";
-
-	std::vector<float> query;
-	//query.reserve(3);
-	query.push_back(searchPoint.x);
-	query.push_back(searchPoint.y);
-	query.push_back(searchPoint.z);
-
-
-	std::cout << "Searching for Nearest Neighbors" << std::endl;
-	queue.reserve(POINTS_IN_CLOUD);
-
-	int count = 0;
-	while (!checkedStatus.all() && queue.size() > 0 && count < MAX_LOOPS) {
-		//if (queue.size() % 1000 == 0) std::cout << "Queue Size: " << queue.size() << std::endl;
-		//std::cout << "Loop #" << count << std::endl;
-
-		searchPoint = queue.back();		// Get the new search point
-		queue.pop_back();				// Remove searchPoint from the queue
-
-		query.clear();			// Clear the query vector
-		indices.clear();		// Clear the indicies
-		dists.clear();			// Clear the distances
-
-		// Add the searchPoint to the query
-		query.push_back(searchPoint.x);
-		query.push_back(searchPoint.y);
-		query.push_back(searchPoint.z);
-
-		//std::cout << "Search Point: " << searchPoint << std::endl;
-
-		kdtree.radiusSearch(query, indices, dists, SEARCH_RADIUS, MAX_RESULTS, cv::flann::SearchParams(NUM_SEARCHES));
-
-
-		//int j = 0;
-		cv::Point3f point;
-		for (int i = 0; i < indices.size(); i++) {
-			if (dists[i] > 0 && checkedStatus[indices[i]] == 0) {
-				//std::cout << indices[i] << "\t";
-				point = pointCloud.at(indices[i]);
-
-
-				// Turn the pixel black
-				colorData[(((int) point.y * WIDTH) + (int) point.x) * 4] = 0;     // B
-				colorData[(((int) point.y * WIDTH) + (int) point.x) * 4 + 1] = 0; // G
-				colorData[(((int) point.y * WIDTH) + (int) point.x) * 4 + 2] = 0; // R
-				queue.push_back(point);
-				checkedStatus[indices[i]] = 1;
-				//j++;
-			}
+			colorData[(((int) p.y * WIDTH) + (int) p.x) * 4] = b;		// B
+			colorData[(((int) p.y * WIDTH) + (int) p.x) * 4 + 1] = g;	// G
+			colorData[(((int) p.y * WIDTH) + (int) p.x) * 4 + 2] = r;	// R
 		}
-		//std::cout << "Size: " << j << std::endl;
-
-		//std::cout << "Queue Size: " << queue.size() << std::endl;
-
-		count++;
 	}
-
-
-	// Release the Kd-Tree
-	kdtree.release();
-
 
 	// Get the total time in ms the method took
 	auto elapsed = std::chrono::high_resolution_clock::now() - start;
@@ -237,92 +201,8 @@ void objectSegmentation() {
 }
 
 
-//GLubyte data[WIDTH * HEIGHT * 4];
-void objectSegmentationOld() {
-	// Start Clock to measure time method takes
-	auto start = std::chrono::high_resolution_clock::now();
 
-
-	int x, y;
-	// select 3 random points
-	Point p1, p2, p3;
-
-	//x = rand() % WIDTH;
-	//y = rand() % HEIGHT;
-	//x = 80-250;
-	//y = 50-290;
-	x = 315;
-	y = 225;
-	p1 = Point(x, y, getDistanceOfPixel(x, y));
-	std::cout << getDistanceOfPixel(x, y) << "\t";
-
-	//x = rand() % WIDTH;
-	//y = rand() % HEIGHT;
-	x = 325;
-	y = 220;
-	p2 = Point(x, y, getDistanceOfPixel(x, y));
-	std::cout << getDistanceOfPixel(x, y) << "\t";
-
-	//x = rand() % WIDTH;
-	//y = rand() % HEIGHT;
-	x = 320;
-	y = 230;
-	p3 = Point(x, y, getDistanceOfPixel(x, y));
-	std::cout << getDistanceOfPixel(x, y) << "\t";
-
-	Plane plane = Plane(p1, p2, p3);
-
-	double sum = 0;
-	double tot = 0;
-
-	for (x = 0; x < WIDTH; x++) {
-		for (y = 0; y < HEIGHT; y++) {
-			double d = plane.distanceFromPlane(&Point(x, y, getDistanceOfPixel(x, y)));
-			tot++;
-			sum += d;
-			if (d < DISTANCE_THRESHOLD) { // Set to Black
-				int offset = ((y * WIDTH) + x) * 4;
-				colorData[offset] = 0;      // B
-				colorData[offset + 1] = 0;  // G
-				colorData[offset + 2] = 0;  // R
-			}
-			/*else {    // Set to White
-			colorData[offset] = 255;
-			colorData[offset + 1] = 255;
-			colorData[offset + 2] = 255;
-			}*/
-		}
-	}
-	//std::cout << sum / tot << "\t";
-
-	x = p1.getX();
-	y = p1.getY();
-	colorData[((y * WIDTH) + x) * 4] = 0;       // B
-	colorData[((y * WIDTH) + x) * 4 + 1] = 255; // G
-	colorData[((y * WIDTH) + x) * 4 + 2] = 255; // R
-
-	x = p2.getX();
-	y = p2.getY();
-	colorData[((y * WIDTH) + x) * 4] = 0;       // B
-	colorData[((y * WIDTH) + x) * 4 + 1] = 255; // G
-	colorData[((y * WIDTH) + x) * 4 + 2] = 255; // R
-
-	x = p3.getX();
-	y = p3.getY();
-	colorData[((y * WIDTH) + x) * 4] = 0;       // B
-	colorData[((y * WIDTH) + x) * 4 + 1] = 255; // G
-	colorData[((y * WIDTH) + x) * 4 + 2] = 255; // R
-
-
-	// Get the total time in ms the method took
-	auto elapsed = std::chrono::high_resolution_clock::now() - start;
-	long long microseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
-
-	// Print out the elpsed time of the method
-	std::cout << "Elapsed Time: " << microseconds << " ms\n";
-}
-
-inline int getDistanceOfPixel(int x, int y) {
+int getDistanceOfPixel(int x, int y) {
 	//int offset = (y * WIDTH) + x;
 
 	return depthData[(y * WIDTH) + x];

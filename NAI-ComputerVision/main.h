@@ -11,12 +11,14 @@
 // OpenCV Libraries
 #include <opencv2/core/core.hpp>
 #include <opencv2/flann/flann.hpp>
+#include <opencv2\imgproc\imgproc.hpp>
 
 // Custom Libraries
 #include "glut.h"
 #include "Kinect.h"
-#include "Point.h"
-#include "Plane.h"
+#include "ObjectSegmentor.h"
+//#include "Point.h"
+//#include "Plane.h"
 
 
 #define WIDTH 640
@@ -46,6 +48,7 @@ void getKinectDataColor(GLubyte* dest);
 void getKinectDataDepth(GLubyte* dest);
 void drawKinectData();
 void objectSegmentation();
+void populatePointCloud();
 
 int getDistanceOfPixel(int x, int y);
 

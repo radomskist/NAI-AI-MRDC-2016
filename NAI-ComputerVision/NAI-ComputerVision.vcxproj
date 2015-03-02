@@ -80,8 +80,10 @@
     <ClInclude Include="glut.h" />
     <ClInclude Include="Kinect.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="ObjectSegmentor.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Point.h" />
+    <ClInclude Include="PointCloud.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
