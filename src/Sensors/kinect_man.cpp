@@ -73,14 +73,5 @@ bool kinectman::ProcessImages() {
 	if(nfmap[libfreenect2::Frame::Depth]->data == NULL)
 		return false;
 
-	for(int i = 0; i < 512*424; i++) {
-		unsigned char bob = (nfmap[libfreenect2::Frame::Depth]->data[i*4+2] + nfmap[libfreenect2::Frame::Depth]->data[i*4+3])/2;
-		nfmap[libfreenect2::Frame::Depth]->data[i*4] = bob;
-		nfmap[libfreenect2::Frame::Depth]->data[i*4+1] = bob;
-		nfmap[libfreenect2::Frame::Depth]->data[i*4+2] = bob;
-		nfmap[libfreenect2::Frame::Depth]->data[i*4+3] = bob;
-	}
-		std::cout << "DISTANCE: " << (int)nfmap[libfreenect2::Frame::Depth]->data[(512 * 212 + 256)*4] << std::endl;
-
 	return true;
 }
