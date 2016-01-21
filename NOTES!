@@ -1,0 +1,11 @@
+TODO: Log amount of time it takes for processes?
+
+Needs to be run as root or will not open kinect due to privilage.
+
+Seems to have issues running in usb 3.0
+
+HSV vs RGB
+
+SEPERATE DRAWING FROM IMAGE PROCESSING!!!!!
+
+Swap spots of offset? Make one row have an offset one scan, then the next scan it wont have it. That way it'll cover twice the spots.
