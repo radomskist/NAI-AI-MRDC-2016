@@ -1,6 +1,7 @@
 #ifndef _NAIBRAIN_MAIN
 #define _NAIBRAIN_MAIN
 #include "Sensors/kinect_man.h"
+#include "Memory/world_map.h"
 
 enum SensorFlags {
 	KRGB = 0x01,	//Kinect rgb
@@ -17,6 +18,7 @@ class naibrain {
 	private:
 		kinectman* kinect_manager;
 		std::vector<unsigned char *> Images;
+		world_map worldmap;
 };
 
 #endif

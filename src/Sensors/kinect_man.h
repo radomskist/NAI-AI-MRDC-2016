@@ -6,7 +6,7 @@
 #include "config.h"
 #include "Sensors/img_base.h"
 #include "Sensors/img_depth.h"
-#include "Memory/obj_base.h"
+#include "Memory/objects.hpp"
 #include "utils/nexcep.hpp"
 
 /*Standard libraries*/
@@ -21,12 +21,9 @@
 #include <libfreenect2/libfreenect2.hpp>
 #include <libfreenect2/frame_listener_impl.h>
 #include <libfreenect2/packet_pipeline.h>
-#include <libfreenect2/registration.h>
 
 
 /****************************************************************
-   AUTHOR:		Steven Radomski
-
    FUNCTION:	This will manage all the kinect processes
 
    NOTES:		N/A
@@ -58,7 +55,7 @@ class kinectman {
 		libfreenect2::Freenect2 *f2init;
 
 		/*image processing objects*/
-		imgd depth_proc;	
+		imgd depth_proc;
 };
 
 #endif

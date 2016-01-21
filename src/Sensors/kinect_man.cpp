@@ -68,7 +68,7 @@ unsigned char *kinectman::GetRGBImg() {
 
 bool kinectman::ProcessImages() {
 	nailist->release(nfmap);
-	nailist->waitForNewFrame(nfmap); // wait .16 seconds for a frame
+	nailist->waitForNewFrame(nfmap);
 
 	if(nfmap[libfreenect2::Frame::Depth]->data == NULL)
 		return false;
