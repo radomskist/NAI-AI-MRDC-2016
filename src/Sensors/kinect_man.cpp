@@ -1,6 +1,5 @@
 #include "Sensors/kinect_man.h"
 
-
 kinectman::kinectman() {
 	/*********************
 	Initializing freenect
@@ -17,7 +16,7 @@ kinectman::kinectman() {
 	}
 
 	//Initializing the freenect2 pipeline
-	f2pipe = new libfreenect2::CpuPacketPipeline();
+	f2pipe = new libfreenect2::CpuPacketPipeline;
 
 	if(f2pipe == NULL) {
 		clean();
@@ -72,6 +71,10 @@ bool kinectman::ProcessImages() {
 
 	if(nfmap[libfreenect2::Frame::Depth]->data == NULL)
 		return false;
+	
+	float *bobpoint = (float *)&nfmap[libfreenect2::Frame::Depth]->data;
+
+	std::cout << bobpoint[512*212 + 256] << std::endl;
 
 	return true;
 }

@@ -9,6 +9,10 @@ world_map::~world_map() {
 	
 }
 
+void addobjs(std::vector<obj_base> &add_obj) {
+	
+}
+
 bool world_map::findpathtoobj(std::string name) {
 	
 }

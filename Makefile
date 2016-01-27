@@ -4,7 +4,7 @@ OPTS = -std=c++11
 
 #Libraries
 DLIBS =  -Wl,-Bdynamic -lusb-1.0 -lSDL2 -lGL -lfreenect2
-INCS = -I./include -I./src/
+INCS = -I./include -I./src/ -I./include/libfreenect2
 
 #Directories
 LDIR = -L./depends -L./depends/libusb/lib -Wl,-rpath=./depends/libusb/lib -Wl,-rpath=./depends

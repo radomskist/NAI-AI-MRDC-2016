@@ -2,7 +2,6 @@
 
 naibrain::naibrain() {
 	kinect_manager = 0;
-
 	//Initializing kinect manager
 	try {
 		kinect_manager = new kinectman();
@@ -18,12 +17,16 @@ naibrain::~naibrain() {
 	delete kinect_manager;
 }
 
+bool naibrain::KStatus() {
+	return kinect_manager;
+}
+
 std::vector<unsigned char *> &naibrain::GetImages(unsigned int imgmask) {
 	Images.clear();
+
 	//Processing kinect
 	if((imgmask & (KRGB | KDEP)) && kinect_manager != NULL) 
 		if(kinect_manager->ProcessImages()) {
-
 			if(imgmask & KDEP && kinect_manager->GetDepthImg())
 				Images.push_back(kinect_manager->GetDepthImg());
 

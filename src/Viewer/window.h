@@ -1,20 +1,22 @@
+#ifndef _NAI_VIEWERBASE
+#define _NAI_VIEWERBASE
+
 /*SDL headers for windows*/
 #include <SDL2/SDL.h>
 #include <iostream>
 
-class testwin {
+class basewin {
 	public:
-		testwin();
-		~testwin();
+		basewin();
+		~basewin();
 		void setimg(unsigned char *);
 		bool IsRunning();
 
-	private:
+	protected:
+		unsigned int width;
+		unsigned int height;
+
 		SDL_Window* win;
-
-		/*Pointer to opengl win*/
-		SDL_Renderer *rendcam; //List of renderers
-		SDL_Texture *textcam;
-
-		unsigned int width, height;
 };
+
+#endif

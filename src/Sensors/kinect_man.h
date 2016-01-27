@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "config.h"
 #include "Sensors/img_base.h"
 #include "Sensors/img_depth.h"
 #include "Memory/objects.hpp"
@@ -56,6 +55,8 @@ class kinectman {
 
 		/*image processing objects*/
 		imgd depth_proc;
+
+		unsigned char *depthhold;
 };
 
 #endif
