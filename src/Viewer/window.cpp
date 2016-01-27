@@ -34,6 +34,7 @@ bool testwin::IsRunning() {
 }
 
 void testwin::setimg(unsigned char * updimg) {
+
 	SDL_UpdateTexture(textcam,
 		NULL,
 		updimg,

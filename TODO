@@ -1,0 +1,32 @@
+THINGS THAT CAN BE DONE RIGHT AWAY:
+Kinect RGB
+	-This should get pretty decently developed asap
+
+OpenGL context
+	-Also asap, it will be needed for a lot of things
+		+Kinect GL computations
+		+Rendering the map (The reason we're not using OpenCV, also OpenCV is said to be slow on nvidia cards)
+
+Arduino Laptop communication
+	-Needed for issuing commands
+
+Web camera
+	-Not a priority, but should be easy to do for anyone who wants somewhere to start
+
+Viewer on remote laptop
+	-Not a priority, but we need to see what the robots doing when our main laptop is on the robot
+
+
+THINGS THAT NEED SOMETHING FROM ABOVE DONE FIRST: 
+Memory map
+	+It's pretty much developed to the point where we need the kinect data to progress more, unless we use dummy objects
+
+OpenGL 3d rendering of memory map
+	+Needs OpenGL context
+	-Will make pathfinding debugging really easy
+	-Good to show off on the viewer
+
+THINGS THAT CANT BE DONE FOR A WHILE:
+Path finding
+	+Can't be done until Kinect + Memory + Arduino is at a workable state, unless we use a map full of dummy objects which requires the opengl 3d rendering anyways
+

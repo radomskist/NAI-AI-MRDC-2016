@@ -1,3 +1,6 @@
+#ifndef _NAI_VIEWERTEST
+#define _NAI_VIEWERTEST
+
 /*SDL headers for windows*/
 #include <SDL2/SDL.h>
 #include <iostream>
@@ -18,3 +21,5 @@ class testwin {
 
 		unsigned int width, height;
 };
+
+#endif

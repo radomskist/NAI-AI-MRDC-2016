@@ -13,10 +13,13 @@ class world_map {
 		world_map();
 		~world_map();
 
+		//std::vector<2d_obj> GetObjsinview(perspective data) //This will be an optimization feature to check for objects ahead of time
+		void addobjs(std::vector<obj_base>&);
 		bool findpathtoobj(std::string);
 		bool searchat(obj_point);
 
 	private:
+		std::vector<obj_cube> entities_list;
 		std::vector<obj_plane> plane_list;
 
 };
