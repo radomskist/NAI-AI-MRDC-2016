@@ -3,8 +3,10 @@
 /*SDL headers for windows*/
 #include <SDL2/SDL.h>
 #include "Viewer/window.h"
-#include "naibrain.h"
 #include "Viewer/NaiGL.h"
+#include "Viewer/testwin.h"
+
+#include "naibrain.h"
 int main()
 	{
 	/*TODO: The window needs to be moved to the viewer
@@ -33,8 +35,12 @@ int main()
 	}
 	//If no kinect load opengl fake map
 	else {
-		naigl MemWin();
-		
+		naigl MemWin;
+
+		while(MemWin.IsRunning()) {
+
+
+		}
 		
 	}
 

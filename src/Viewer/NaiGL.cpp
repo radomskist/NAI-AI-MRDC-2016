@@ -1,17 +1,19 @@
 #include "Viewer/NaiGL.h"
 
 naigl::naigl() {
-
+	width = 512;
+	height = 424;
 	//TODO: Make work with multiple windows
-	nglwin = SDL_CreateWindow( "Memory Map",
+	win = SDL_CreateWindow( "Memory Map",
 		0,
 		0,
-		512,
-		424,
+		width,
+		height,
 		SDL_WINDOW_OPENGL );
 
-	nglcont = SDL_GL_CreateContext(nglwin);
+	nglcont = SDL_GL_CreateContext(win);
 }
+
 
 naigl::~naigl() {
 
