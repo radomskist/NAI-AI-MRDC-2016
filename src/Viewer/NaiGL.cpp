@@ -21,6 +21,9 @@ naigl::naigl() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	SDL_GL_SwapWindow(win);
 
+	glewExperimental = GL_TRUE; 
+	glewInit();
+
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
@@ -30,10 +33,8 @@ naigl::naigl() {
 	glDepthFunc(GL_LEQUAL);
 	glDepthRange(0.0f, 1.0f);
 
-	std::cout << "Segfaultin" << std::endl;
 	//Vertex array
 	glGenVertexArrays(1, &naivao);
-	std::cout << "Segfaultin2" << std::endl;
 	glBindVertexArray(naivao);
 
 	//Vertex buffer
