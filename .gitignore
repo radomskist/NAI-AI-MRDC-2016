@@ -3,3 +3,7 @@ depends/*
 obj/*
 include/*
 NaiBrain
+
+!include/.gitkeep
+!depends/libfreenect2/.gitkeep
+!depends/libusb/.gitkeep

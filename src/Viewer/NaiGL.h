@@ -18,7 +18,9 @@ class naigl : public basewin {
 		void draw();
 		void addplanes(std::vector<obj_plane> &);
 	private:
+		void shaderinit();
 		SDL_GLContext nglcont;
+		GLuint naishader;
 
 		GLuint naivao;
 
