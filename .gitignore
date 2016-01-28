@@ -4,5 +4,5 @@ obj/*
 include/*
 NaiBrain
 
-!depends/
-!include/
+!depends
+!include
