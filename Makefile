@@ -8,7 +8,7 @@ SLIBS = -Wl,-Bstatic -lGLEW
 INCS = -I./include -I./src/ -I./include/libfreenect2
 
 #Directories
-LDIR = -L./depends -L./depends/libusb -L./depends/libfreenect2 -Wl,-rpath=./depends/libusb/lib -Wl,-rpath=./depends
+LDIR = -L./depends -L./depends/libusb -L./depends/libfreenect2 -Wl,-rpath=./depends/lib -Wl,-rpath=./depends/libfreenect2
 SRCS = $(shell find src -name '*.cpp')
 DIRS = $(shell find src -type d | sed './src/./g' ) 
 OBJS = $(patsubst src/%.cpp,obj/%.o,$(SRCS))
