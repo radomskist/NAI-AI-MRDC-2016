@@ -3,7 +3,8 @@ CC   = g++
 OPTS = -std=c++11
 
 #Libraries
-DLIBS =  -Wl,-Bdynamic -lusb-1.0 -lSDL2 -lGL -lfreenect2
+DLIBS =  -Wl,-Bdynamic -lusb-1.0 -lGL -lSDL2 -lfreenect2
+SLIBS = -Wl,-Bstatic -lGLEW
 INCS = -I./include -I./src/ -I./include/libfreenect2
 
 #Directories
@@ -14,7 +15,7 @@ OBJS = $(patsubst src/%.cpp,obj/%.o,$(SRCS))
 
 
 NaiBrain: $(OBJS)
-	$(CC) $(LDIR) $(OPTS) $(OBJS) $(DLIBS) $(INCS) -o $@ -Wl,-as-needed 
+	$(CC) $(LDIR) $(OPTS) $(OBJS) $(SLIBS) $(DLIBS) $(INCS) -o $@ -Wl,-as-needed 
 
 obj/%.o: src/%.cpp
 	-mkdir -p $(dir $@)
