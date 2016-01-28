@@ -3,3 +3,6 @@ depends/*
 obj/*
 include/*
 NaiBrain
+
+!depends/
+!include/
