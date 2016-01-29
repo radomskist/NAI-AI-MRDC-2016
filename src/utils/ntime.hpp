@@ -21,3 +21,12 @@ inline int GetMilli()
 
 	return tv.tv_usec * 1000;
 	}
+
+inline int GetSec()
+	{
+
+	timeval tv;
+	gettimeofday(&tv, 0);
+
+	return tv.tv_sec;
+	}

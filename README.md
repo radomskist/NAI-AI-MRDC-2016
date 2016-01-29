@@ -2,25 +2,22 @@
 
 ##Requires:
 Open Kinect 2:
-
 https://github.com/OpenKinect/libfreenect2
-
 http://openkinect.org/wiki/Main_Page
 
 
 ###Requires for now, but will be removed when the viewer is seperated from robot
 SDL 2:
-
 https://www.libsdl.org/download-2.0.php
-
 https://www.libsdl.org/
 
 GLEW:
-
+http://glew.sourceforge.net/install.html
 http://glew.sourceforge.net/
 
-http://glew.sourceforge.net/install.html
-
+GLM:
+https://github.com/g-truc/glm
+http://glm.g-truc.net/0.9.7/index.html
 
 
 ##Special folders

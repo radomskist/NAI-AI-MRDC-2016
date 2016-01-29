@@ -1,6 +1,7 @@
 #ifndef _NAI_OPENGL
 #define _NAI_OPENGL
 
+#include "utils/ntime.hpp"
 #include "Viewer/window.h"
 #include "Memory/objects.hpp"
 
@@ -12,6 +13,7 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <SDL2/SDL_opengl.h>
@@ -21,6 +23,7 @@ class naigl : public basewin {
 		naigl();
 		~naigl();
 
+		void spin();
 		void draw();
 		void addplanes(std::vector<obj_plane> &);
 	private:
@@ -34,6 +37,7 @@ class naigl : public basewin {
 		//Math nerd stuff
 		glm::mat4 proj;
 		glm::mat4 view;
+		GLint viewuni;
 
 };
 
