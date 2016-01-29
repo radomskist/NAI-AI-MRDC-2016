@@ -13,14 +13,16 @@ testwin::testwin() {
 		throw "Window failed to create";
 	}
 
+	SDL_SetWindowFullscreen(win, SDL_WINDOW_FULLSCREEN);
+
 	rendcam = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 
 	/*intiailizing SDL texture*/
 	textcam = SDL_CreateTexture(rendcam,
 		SDL_PIXELFORMAT_ARGB8888,
 		SDL_TEXTUREACCESS_STREAMING,
-		width,
-		height);
+		512,
+		424);
 }
 
 void testwin::setimg(unsigned char * updimg) {
@@ -28,7 +30,7 @@ void testwin::setimg(unsigned char * updimg) {
 	SDL_UpdateTexture(textcam,
 		NULL,
 		updimg,
-		width*4);
+		512*4);
 
 	SDL_UnlockTexture(textcam);
 	SDL_RenderClear(rendcam);

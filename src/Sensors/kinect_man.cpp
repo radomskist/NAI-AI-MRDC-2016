@@ -72,9 +72,9 @@ bool kinectman::ProcessImages() {
 	if(nfmap[libfreenect2::Frame::Depth]->data == NULL)
 		return false;
 	
-	float *bobpoint = (float *)&nfmap[libfreenect2::Frame::Depth]->data;
-
-	std::cout << bobpoint[512*212 + 256] << std::endl;
+	//float *bobpoint = (float *)&nfmap[libfreenect2::Frame::Depth]->data;
+	
+	//std::cout << bobpoint[512*212 + 256] << std::endl;
 
 	return true;
 }
