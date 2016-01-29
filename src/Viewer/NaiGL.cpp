@@ -1,9 +1,50 @@
 #include "Viewer/NaiGL.h"
 
+const GLchar* fragmenttest = {"#version 330 core\n"
+	"out vec4 color;\n"
+
+	"in VS_OUT\n"
+	"{ vec4 color;\n"
+	"} fs_in;\n"
+
+	"void main()\n"
+	"{\n"
+	"color = fs_in.color;"
+	"}"
+};
+//NOTE: TAKEN FROM THE SUPER BIBLE
+
+const GLchar* shadertest = {"#version 330 core\n"
+"in vec4 position;\n"
+
+"out VS_OUT\n"
+"{"
+" vec4 color; \n"
+"} vs_out;"
+
+"uniform mat4 view;\n"
+"void main()\n"
+	"{\n"
+
+		"const vec4 colors[] = vec4[3](vec4(1.0,0.0,0.0,1.0), vec4(0.0,1.0,0.0,1.0), vec4(0.0, 0.0, 1.0, 1.0));\n"
+
+		"gl_Position.xyzw =  view * position.xyzw;"
+
+		"vs_out.color.x = sin(gl_Position.w / 6.25);\n"
+		"vs_out.color.y = sin(gl_Position.w / 15.5);\n"
+		"vs_out.color.z = sin(gl_Position.w / 39);"				
+		"}"
+};
+
+
+
 naigl::naigl() {
 	width = 512;
 	height = 424;
 	//TODO: Make sub window
+
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 2 ); 
 
 	win = SDL_CreateWindow( "Memory Map",
 		0,
@@ -25,7 +66,7 @@ naigl::naigl() {
 	glewInit();
 
 	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	//glCullFace(GL_BACK); TODO: renable later
 	glFrontFace(GL_CCW);
 
 	glEnable(GL_DEPTH_TEST);
@@ -54,6 +95,26 @@ naigl::naigl() {
 	
 	//Creating our shaders
 	shaderinit();
+
+	const float test[18] = {-1.0,-1.0,-1.0,
+		1.0,-1.0,-1.0,
+		1.0,1.0,-1.0,
+
+		1.0,1.0,-1.0,
+		-1.0,1.0,-1.0,
+		-1.0,-1.0,-1.0};
+
+
+	GLint viewuni;
+	viewuni = glGetUniformLocation(naishader, "view");
+	//Disabled for now
+	//glUniformMatrix4fv(viewuni, 1, 	0,  matrix);
+
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(float)*18, test,GL_DYNAMIC_DRAW);
+
+	//draw();
+
+
 }
 
 
@@ -63,7 +124,7 @@ void naigl::addplanes(std::vector<obj_plane> &) {
 }
 
 void naigl::draw() {
-	glDrawArrays(GL_TRIANGLES,0,36);
+	glDrawArrays(GL_TRIANGLES,0,sizeof(float)*18);
 	glFlush();
 	SDL_GL_SwapWindow(win);
 
@@ -75,44 +136,6 @@ naigl::~naigl() {
 
 
 void naigl::shaderinit() {
-	/*
-	TODO: Finish
-	const GLchar const* shadertest = {"#version 330 core\n"
-	"in vec4 position;\n"
-
-	"out VS_OUT\n"
-	"{"
-	" vec4 color; \n"
-	"} vs_out;"
-
-	"uniform mat4 view;\n"
-	"void main()\n"
-		"{\n"
-
-			"const vec4 colors[] = vec4[3](vec4(1.0,0.0,0.0,1.0), vec4(0.0,1.0,0.0,1.0), vec4(0.0, 0.0, 1.0, 1.0));\n"
-
-			"gl_Position.xyzw =  view * position.xyzw;"
-
-			"vs_out.color.x = sin(gl_Position.w / 6.25);\n"
-			"vs_out.color.y = sin(gl_Position.w / 15.5);\n"
-			"vs_out.color.z = sin(gl_Position.w / 39);"				
-			"}"
-	};
-
-	//NOTE: TAKEN FROM THE SUPER BIBLE
-	const GLchar const* fragmenttest = {"#version 330 core\n"
-		"out vec4 color;\n"
-
-		"in VS_OUT\n"
-		"{ vec4 color;\n"
-		"} fs_in;\n"
-
-		"void main()\n"
-		"{\n"
-		"color = fs_in.color;"
-		"}"
-	};
-
 	GLuint shaderobj;
 	GLuint fragshadeobj;
 
@@ -120,15 +143,14 @@ void naigl::shaderinit() {
 
 	glShaderSource(shaderobj,
 		1, 
-		shadertest,
+		&shadertest,
 		NULL);
 
 	glCompileShader(shaderobj);
-
 	fragshadeobj = glCreateShader(GL_FRAGMENT_SHADER);  
 		glShaderSource(fragshadeobj, 
 		1,
-		fragmenttest,
+		&fragmenttest,
 		NULL);
 
 	glCompileShader(fragshadeobj); 
@@ -162,6 +184,6 @@ void naigl::shaderinit() {
 	glLinkProgram(naishader); 
 
 	glUseProgram(naishader); 
-	*/
+	
 
 }
