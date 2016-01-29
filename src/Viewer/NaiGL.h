@@ -38,6 +38,7 @@ class naigl : public basewin {
 		glm::mat4 proj;
 		glm::mat4 view;
 		GLint viewuni;
+		std::vector<GLfloat> planeverts;
 
 };
 
