@@ -65,11 +65,11 @@ naigl::naigl() {
 	glewExperimental = GL_TRUE; 
 	glewInit();
 
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_BACK); TODO: renable later
 	glFrontFace(GL_CCW);
 
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LEQUAL);
 	glDepthRange(0.0f, 1.0f);
@@ -79,9 +79,11 @@ naigl::naigl() {
 	glBindVertexArray(naivao);
 
 	//Vertex buffer
+	glEnableVertexAttribArray(0);
+
 	glGenBuffers(1, &planebuffer);
 	glGenBuffers(1, &planebuffer);
-		glBindBuffer(GL_ARRAY_BUFFER,
+	glBindBuffer(GL_ARRAY_BUFFER,
 		planebuffer);
 
 	glVertexAttribPointer(0,
@@ -90,33 +92,41 @@ naigl::naigl() {
 		GL_FALSE,
 		0,
 		NULL);
-
-	glEnableVertexAttribArray(0);
 	
+	glViewport(0,0,width,height);
+
 	//Creating our shaders
 	shaderinit();
 
-	const float test[18] = {-1.0,-1.0,-1.0,
-		1.0,-1.0,-1.0,
-		1.0,1.0,-1.0,
+	//Ground
+	//4 feet * 11 squares * 100
+	float test[18] = {
+		4400.0f, 4400.0f, 0.0f,
+		4400.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
 
-		1.0,1.0,-1.0,
-		-1.0,1.0,-1.0,
-		-1.0,-1.0,-1.0};
+		0.0f, 4400.0f, 0.0f,
+		4400.0f, 4400.0f, 0.0f,
+		0.0f, 0.0f, 0.0f,
+		};
 
-
-	GLint viewuni;
 	viewuni = glGetUniformLocation(naishader, "view");
-	//Disabled for now
-	//glUniformMatrix4fv(viewuni, 1, 	0,  matrix);
-
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(float)*18, test,GL_DYNAMIC_DRAW);
-
-	//draw();
-
+	proj = glm::perspective(45.0f, (float)width / (float)height, 0.1f, 10000.f); 
+	glBufferData(GL_ARRAY_BUFFER, sizeof(test), test, GL_DYNAMIC_DRAW);
 
 }
 
+void naigl::spin() {
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	view = glm::translate(glm::mat4(1), glm::vec3(0.0f, -1000.0f, -2400.0f));
+	view = glm::rotate(view, 40.0f, glm::vec3(1.0f,0.0f,0.0f));
+	view = glm::rotate(view, -40.0f, glm::vec3(0.0f,0.0f,1.0f));
+
+	view = proj * view;
+	glUniformMatrix4fv(viewuni, 1, 	0,  glm::value_ptr(view));
+	draw(); 
+}
 
 void naigl::addplanes(std::vector<obj_plane> &) {
 	

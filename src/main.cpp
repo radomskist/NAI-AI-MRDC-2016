@@ -38,7 +38,7 @@ int main()
 		naigl MemWin;
 
 		while(MemWin.IsRunning()) {
-
+			MemWin.spin();
 
 		}
 		

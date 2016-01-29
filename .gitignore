@@ -4,6 +4,7 @@ obj/*
 include/*
 NaiBrain
 
-!include/.gitkeep
-!depends/libfreenect2/.gitkeep
+!include/GL/.gitkeep
+!include/glm/.gitkeep
+!include/libfreenect2/.gitkeep
 !depends/libusb/.gitkeep

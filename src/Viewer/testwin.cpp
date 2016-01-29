@@ -13,7 +13,7 @@ testwin::testwin() {
 		throw "Window failed to create";
 	}
 
-	SDL_SetWindowFullscreen(win, SDL_WINDOW_FULLSCREEN);
+	//SDL_SetWindowFullscreen(win, SDL_WINDOW_FULLSCREEN);
 
 	rendcam = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 
