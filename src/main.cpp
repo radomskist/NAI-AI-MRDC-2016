@@ -36,6 +36,15 @@ int main()
 	//If no kinect load opengl fake map
 	else {
 		naigl MemWin;
+		std::vector<obj_plane> newplanes;
+		obj_plane newplane = obj_plane(0,0);
+		newplane.x1.x = 400; newplane.x1.y = 400; newplane.x1.z = 400;
+		newplane.x2.x = 400; newplane.x2.y = 400; newplane.x2.z = 0;
+		newplane.y1.x = 800; newplane.y1.y = 400; newplane.y1.z = 400;
+		newplane.y2.x = 800; newplane.y2.y = 400; newplane.y2.z = 0;
+
+		newplanes.push_back(newplane);
+		MemWin.addplanes(newplanes);
 
 		while(MemWin.IsRunning()) {
 			MemWin.spin();

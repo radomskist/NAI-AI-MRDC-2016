@@ -1,4 +1,15 @@
 #include "Viewer/NaiGL.h"
+//Ground
+//4 feet * 11 squares * 100
+const float ground[18] = {
+	4400.0f, 4400.0f, 0.0f,
+	4400.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 0.0f,
+
+	0.0f, 4400.0f, 0.0f,
+	4400.0f, 4400.0f, 0.0f,
+	0.0f, 0.0f, 0.0f,
+	};
 
 const GLchar* fragmenttest = {"#version 330 core\n"
 	"out vec4 color;\n"
@@ -39,8 +50,8 @@ const GLchar* shadertest = {"#version 330 core\n"
 
 
 naigl::naigl() {
-	width = 512;
-	height = 424;
+	width = 640;
+	height = 480;
 	//TODO: Make sub window
 
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
@@ -69,7 +80,7 @@ naigl::naigl() {
 	//glCullFace(GL_BACK); TODO: renable later
 	glFrontFace(GL_CCW);
 
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LEQUAL);
 	glDepthRange(0.0f, 1.0f);
@@ -98,43 +109,64 @@ naigl::naigl() {
 	//Creating our shaders
 	shaderinit();
 
-	//Ground
-	//4 feet * 11 squares * 100
-	float test[18] = {
-		4400.0f, 4400.0f, 0.0f,
-		4400.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,
-
-		0.0f, 4400.0f, 0.0f,
-		4400.0f, 4400.0f, 0.0f,
-		0.0f, 0.0f, 0.0f,
-		};
-
 	viewuni = glGetUniformLocation(naishader, "view");
 	proj = glm::perspective(45.0f, (float)width / (float)height, 0.1f, 10000.f); 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(test), test, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, int(sizeof(float)*3*4*1000), 0, GL_DYNAMIC_DRAW);
 
 }
 
 void naigl::spin() {
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	view = glm::translate(glm::mat4(1), glm::vec3(0.0f, -1000.0f, -2400.0f));
-	view = glm::rotate(view, 40.0f, glm::vec3(1.0f,0.0f,0.0f));
-	view = glm::rotate(view, -40.0f, glm::vec3(0.0f,0.0f,1.0f));
+	//view = glm::translate(glm::mat4(1), glm::vec3(0.0f, 1000.0f, 2400.0f));
+	view = glm::rotate(glm::mat4(1), -0.79f , glm::vec3(1.0f,0.0f,0.0f));
+	view = glm::rotate(view, 0.79f , glm::vec3(0.0f,0.0f,1.0f));
+	view = glm::translate(view, glm::vec3(500.0f, 500.0f, -2000.0f));
+	//view = glm::rotate(view, 2.36f, glm::vec3(0.0f,0.0f,1.0f));
 
 	view = proj * view;
 	glUniformMatrix4fv(viewuni, 1, 	0,  glm::value_ptr(view));
 	draw(); 
 }
 
-void naigl::addplanes(std::vector<obj_plane> &) {
+void naigl::addplanes(std::vector<obj_plane> &add_newplane) {
+	for(int i = 0; i < add_newplane.size(); i++){
 	
-	
-}
+		obj_plane newplane = add_newplane[i];
+		//Triangle 1
+		planeverts.push_back(newplane.x1.x);
+		planeverts.push_back(newplane.x1.y);
+		planeverts.push_back(newplane.x1.z);
+
+		planeverts.push_back(newplane.y1.x);
+		planeverts.push_back(newplane.y1.y);
+		planeverts.push_back(newplane.y1.z);
+
+		planeverts.push_back(newplane.y2.x);
+		planeverts.push_back(newplane.y2.y);
+		planeverts.push_back(newplane.y2.z);
+
+
+		//Triangle 2
+		planeverts.push_back(newplane.x1.x);
+		planeverts.push_back(newplane.x1.y);
+		planeverts.push_back(newplane.x1.z);
+
+		planeverts.push_back(newplane.y2.x);
+		planeverts.push_back(newplane.y2.y);
+		planeverts.push_back(newplane.y2.z);
+
+		planeverts.push_back(newplane.x2.x);
+		planeverts.push_back(newplane.x2.y);
+		planeverts.push_back(newplane.x2.z);
+	}
+
+	glBufferSubData(GL_ARRAY_BUFFER,0, sizeof(ground), ground);
+	glBufferSubData(GL_ARRAY_BUFFER,sizeof(ground), sizeof(float)*planeverts.size(), &planeverts[0]);
+	draw();
+}	
 
 void naigl::draw() {
-	glDrawArrays(GL_TRIANGLES,0,sizeof(float)*18);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	glDrawArrays(GL_TRIANGLES,0,sizeof(ground) + sizeof(float)*planeverts.size());
 	glFlush();
 	SDL_GL_SwapWindow(win);
 
