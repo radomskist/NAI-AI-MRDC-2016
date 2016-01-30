@@ -1,5 +1,6 @@
 #ifndef _NAIBRAIN_MAIN
 #define _NAIBRAIN_MAIN
+#include "Sensors/webcam.h"
 #include "Sensors/kinect_man.h"
 #include "Memory/world_map.h"
 #include "Memory/path_finding.h"
@@ -23,6 +24,7 @@ class naibrain {
 		kinectman* kinect_manager;
 		std::vector<unsigned char *> Images;
 		world_map wmap;
+		nwebc bcwebcam;
 };
 
 #endif

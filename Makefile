@@ -3,7 +3,7 @@ CC   = g++
 OPTS = -std=c++11
 
 #Libraries
-DLIBS =  -Wl,-Bdynamic -lusb-1.0 -lGL -lSDL2 -lfreenect2
+DLIBS =  -Wl,-Bdynamic -lusb-1.0 -lGL -lSDL2 -lfreenect2 -lopencv_core -lopencv_highgui
 SLIBS = -Wl,-Bstatic -lGLEW
 INCS = -I./include -I./src/ -I./include/libfreenect2
 

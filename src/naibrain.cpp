@@ -2,6 +2,7 @@
 
 naibrain::naibrain() : pfind(&wmap) {
 	kinect_manager = 0;
+	nwebc bcwebcam;
 	//Initializing kinect manager
 	try {
 		kinect_manager = new kinectman();
