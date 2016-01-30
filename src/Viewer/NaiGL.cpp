@@ -23,6 +23,19 @@ const GLchar* fragmenttest = {"#version 330 core\n"
 	"color = fs_in.color;"
 	"}"
 };
+
+const GLchar* frag2 = {"#version 330 core\n"
+	"out vec4 color;\n"
+
+	"in VS_OUT\n"
+	"{ vec4 color;\n"
+	"} fs_in;\n"
+
+	"void main()\n"
+	"{\n"
+	"color = vec4(1.0,1.0,1.0,1.0);"
+	"}"
+};
 //NOTE: TAKEN FROM THE SUPER BIBLE
 
 const GLchar* shadertest = {"#version 330 core\n"
@@ -41,9 +54,9 @@ const GLchar* shadertest = {"#version 330 core\n"
 
 		"gl_Position.xyzw =  view * position.xyzw;"
 
-		"vs_out.color.x = sin(gl_Position.w / 6.25);\n"
-		"vs_out.color.y = sin(gl_Position.w / 15.5);\n"
-		"vs_out.color.z = sin(gl_Position.w / 39);"				
+		"vs_out.color.x = .2 + sin(gl_Position.w / 6.25);\n"
+		"vs_out.color.y = .2 + sin(gl_Position.w / 1.5);\n"
+		"vs_out.color.z = .2 + sin(gl_Position.w / 39);"				
 		"}"
 };
 
@@ -69,6 +82,7 @@ naigl::naigl() {
 	SDL_GL_MakeCurrent(win,
 		nglcont);
 
+	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL); 
 	glClearColor(.2,.2,.2,1);
 	glClear(GL_COLOR_BUFFER_BIT);
 	SDL_GL_SwapWindow(win);
@@ -78,24 +92,22 @@ naigl::naigl() {
 
 	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_BACK); TODO: renable later
-	glFrontFace(GL_CCW);
+	//glFrontFace(GL_CCW);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LEQUAL);
 	glDepthRange(0.0f, 1.0f);
 
-	//Vertex array
+
+	/*Plane buffer*/
 	glGenVertexArrays(1, &naivao);
 	glBindVertexArray(naivao);
-
-	//Vertex buffer
 	glEnableVertexAttribArray(0);
-
-	glGenBuffers(1, &planebuffer);
 	glGenBuffers(1, &planebuffer);
 	glBindBuffer(GL_ARRAY_BUFFER,
 		planebuffer);
+	glBufferData(GL_ARRAY_BUFFER, int(sizeof(float)*3*4*1000), 0, GL_DYNAMIC_DRAW);
 
 	glVertexAttribPointer(0,
 		3,
@@ -103,29 +115,52 @@ naigl::naigl() {
 		GL_FALSE,
 		0,
 		NULL);
-	
+
+	/*pathbuffer*/
+	glGenVertexArrays(1, &naivaopath);
+	glBindVertexArray(naivaopath);
+	glEnableVertexAttribArray(0);
+	glGenBuffers(1, &pathbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER,
+		pathbuffer);
+	glLineWidth(5.0f); //Sadly can't make as wide as NAI
+
+	glVertexAttribPointer(0,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		NULL);
+
 	glViewport(0,0,width,height);
 
 	//Creating our shaders
 	shaderinit();
 
 	viewuni = glGetUniformLocation(naishader, "view");
-	proj = glm::perspective(45.0f, (float)width / (float)height, 0.1f, 10000.f); 
-	glBufferData(GL_ARRAY_BUFFER, int(sizeof(float)*3*4*1000), 0, GL_DYNAMIC_DRAW);
+	proj = glm::perspective(1.57f, (float)width / (float)height, 1.5f, 100000.f); 
 
 }
 
-void naigl::spin() {
-	//view = glm::translate(glm::mat4(1), glm::vec3(0.0f, 1000.0f, 2400.0f));
-	view = glm::rotate(glm::mat4(1), -0.79f , glm::vec3(1.0f,0.0f,0.0f));
-	view = glm::rotate(view, 0.79f , glm::vec3(0.0f,0.0f,1.0f));
-	view = glm::translate(view, glm::vec3(500.0f, 500.0f, -2000.0f));
-	//view = glm::rotate(view, 2.36f, glm::vec3(0.0f,0.0f,1.0f));
+void naigl::setpath(std::vector<obj_point> set_newpath) {
 
-	view = proj * view;
-	glUniformMatrix4fv(viewuni, 1, 	0,  glm::value_ptr(view));
-	draw(); 
+	std::vector<float> newpath;
+	glBindVertexArray(naivaopath);
+	glBindBuffer(GL_ARRAY_BUFFER,
+		pathbuffer);
+
+	pathlength = set_newpath.size();
+	for(int i = 0; i < pathlength; i++) {
+		obj_point newpoint = set_newpath[i];
+		newpath.push_back(newpoint.x);
+		newpath.push_back(newpoint.y);
+		newpath.push_back(200);
+	}
+	pathlength = newpath.size();
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*pathlength, &newpath[0], GL_DYNAMIC_DRAW);
+	draw();
 }
+
 
 void naigl::addplanes(std::vector<obj_plane> &add_newplane) {
 	for(int i = 0; i < add_newplane.size(); i++){
@@ -158,18 +193,38 @@ void naigl::addplanes(std::vector<obj_plane> &add_newplane) {
 		planeverts.push_back(newplane.x2.y);
 		planeverts.push_back(newplane.x2.z);
 	}
-
+	
+	glBindVertexArray(naivao);
+	glBindBuffer(GL_ARRAY_BUFFER,
+		planebuffer);
 	glBufferSubData(GL_ARRAY_BUFFER,0, sizeof(ground), ground);
 	glBufferSubData(GL_ARRAY_BUFFER,sizeof(ground), sizeof(float)*planeverts.size(), &planeverts[0]);
 	draw();
 }	
 
 void naigl::draw() {
+	view = glm::rotate(glm::mat4(1), -0.59f , glm::vec3(1.0f,0.0f,0.0f));
+	view = glm::rotate(view, 0.99f , glm::vec3(0.0f,0.0f,1.0f));
+	view = glm::translate(view, glm::vec3(00.0f, -600.0f, -1500.0f));
+	view = proj * view;
+
+	glUniformMatrix4fv(viewuni, 1, 	0,  glm::value_ptr(view));
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-	glDrawArrays(GL_TRIANGLES,0,sizeof(ground) + sizeof(float)*planeverts.size());
+
+	glBindVertexArray(naivao);
+	glBindBuffer(GL_ARRAY_BUFFER,
+		planebuffer);
+	glDrawArrays(GL_TRIANGLES,0, sizeof(ground) + sizeof(float)*planeverts.size());
+
+	//glDisable(GL_DEPTH_TEST); Lets you see through walls
+	glBindVertexArray(naivaopath);
+	glBindBuffer(GL_ARRAY_BUFFER,
+		pathbuffer);
+	glDrawArrays(GL_LINE_STRIP,0, pathlength/3);
+	//glEnable(GL_DEPTH_TEST);
+
 	glFlush();
 	SDL_GL_SwapWindow(win);
-
 }
 naigl::~naigl() {
 	SDL_GL_DeleteContext(nglcont); 

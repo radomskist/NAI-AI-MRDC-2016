@@ -23,9 +23,11 @@ class naigl : public basewin {
 		naigl();
 		~naigl();
 
-		void spin();
 		void draw();
 		void addplanes(std::vector<obj_plane> &);
+		void setpath(std::vector<obj_point> );
+
+
 	private:
 		void shaderinit();
 		SDL_GLContext nglcont;
@@ -33,6 +35,9 @@ class naigl : public basewin {
 
 		GLuint naivao;
 		GLuint planebuffer;
+		GLuint naivaopath;
+		GLuint pathbuffer;
+		int pathlength;
 
 		//Math nerd stuff
 		glm::mat4 proj;

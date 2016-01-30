@@ -1,6 +1,6 @@
 #include "naibrain.h"
 
-naibrain::naibrain() {
+naibrain::naibrain() : pfind(&wmap) {
 	kinect_manager = 0;
 	//Initializing kinect manager
 	try {
@@ -19,6 +19,14 @@ naibrain::~naibrain() {
 
 bool naibrain::KStatus() {
 	return kinect_manager;
+}
+
+world_map &naibrain::GetMap() {
+	return wmap;
+}
+
+std::vector<obj_point> naibrain::GetPath(obj_point point) {
+	return pfind.gotopoint(point);
 }
 
 std::vector<unsigned char *> &naibrain::GetImages(unsigned int imgmask) {
