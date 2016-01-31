@@ -13,8 +13,10 @@ class path_finding {
 
 
 	private:
+		//Coard pathfinding
 		std::vector<obj_point> coarsepathfind(obj_point);
 		float grid[11][11];
+
 		world_map *wmap;
 
 	};

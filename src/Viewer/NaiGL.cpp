@@ -41,10 +41,51 @@ const GLchar* wallshader = {"#version 330 core\n"
 };
 
 
+bool naigl::GetKeys() {
+	SDL_Event event;
+	//Checking for ESC key to close program
+	while( SDL_PollEvent( &event ) )
+		if(event.key.keysym.sym == SDLK_ESCAPE)
+			return false;
+
+		/*camerarot*/
+		else if(event.key.keysym.sym == SDLK_UP)
+			urotation -= .1f;
+		else if(event.key.keysym.sym == SDLK_DOWN)
+			urotation += .1f;
+		else if(event.key.keysym.sym == SDLK_LEFT)
+			lrotation -=  .1f;
+		else if(event.key.keysym.sym == SDLK_RIGHT)
+			lrotation += .1f;
+
+		/*camerapos*/
+		else if(event.key.keysym.sym == SDLK_w)
+			ypos -= 100.0f;
+		else if(event.key.keysym.sym == SDLK_s)
+			ypos += 100.0f;
+		else if(event.key.keysym.sym == SDLK_a)
+			xpos -= 100.0f;
+		else if(event.key.keysym.sym == SDLK_d)
+			xpos += 100.0f;
+
+		/*Line depth test*/
+		else if(event.key.keysym.sym == SDLK_f && event.type == SDL_KEYDOWN)
+			linedepth = !linedepth;
+
+
+	return true;
+}
+
 
 naigl::naigl() {
+	xpos = -600.0f;
+	ypos = 0.0f;
 	width = 640;
 	height = 480;
+	urotation = -0.59f;
+	lrotation = 0.99f;
+	linedepth = false;
+
 	//TODO: Make sub window
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 2 ); 
@@ -189,8 +230,8 @@ inline void easypush(std::vector<float> &push, obj_point &point) {
 	push.push_back(point.x);
 	push.push_back(point.y);
 	push.push_back(point.z);
-
 }
+
 void naigl::addents(std::vector<obj_cube> &add_objs) {
 
 	std::vector<float> cubeverts;
@@ -286,7 +327,6 @@ void naigl::addents(std::vector<obj_cube> &add_objs) {
 			cubecolorverts.push_back(add_objs[i].color[0]);
 			cubecolorverts.push_back(add_objs[i].color[1]);
 			cubecolorverts.push_back(add_objs[i].color[2]);
-
 		}
 	}
 
@@ -341,12 +381,11 @@ void naigl::addplanes(std::vector<obj_plane> &add_newplane) {
 }	
 
 void naigl::draw() {
-
-	view = glm::rotate(glm::mat4(1), -0.59f , glm::vec3(1.0f,0.0f,0.0f));
-	view = glm::rotate(view, 0.99f , glm::vec3(0.0f,0.0f,1.0f));
-	view = glm::translate(view, glm::vec3(00.0f, -600.0f, -1500.0f));
+	view = glm::rotate(glm::mat4(1), urotation, glm::vec3(1.0f,0.0f,0.0f));
+	view = glm::rotate(view, lrotation, glm::vec3(0.0f,0.0f,1.0f));
+	view = glm::translate(view, glm::vec3(ypos, xpos, -1500.0f));
 	view = proj * view;
-
+	
 	glUniformMatrix4fv(viewuni, 1, 	0,  glm::value_ptr(view));
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
@@ -356,11 +395,14 @@ void naigl::draw() {
 	glBindVertexArray(naivaoobj);
 	glDrawArrays(GL_TRIANGLES,0, sizeof(float)*cubevertslen);
 
-	//glDisable(GL_DEPTH_TEST); //TODO ADD BUTTON TO TOGGLE!
+	if(linedepth)
+		glDisable(GL_DEPTH_TEST);
 	// Lets you see through walls
 	glBindVertexArray(naivaopath);
 	glDrawArrays(GL_LINE_STRIP,0, pathlength/3);
-	//glEnable(GL_DEPTH_TEST);
+
+	if(linedepth)
+		glEnable(GL_DEPTH_TEST);
 
 	glFlush();
 	SDL_GL_SwapWindow(win);

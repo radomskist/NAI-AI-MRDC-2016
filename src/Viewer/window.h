@@ -10,7 +10,7 @@ class basewin {
 		basewin();
 		~basewin();
 		void setimg(unsigned char *);
-		bool IsRunning();
+		virtual bool GetKeys();
 
 	protected:
 		unsigned int width;
