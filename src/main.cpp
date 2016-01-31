@@ -39,7 +39,10 @@ int main()
 		world_map wmap = mainbrain.GetMap();
 		wmap.gentest();	
 		MemWin.addplanes(wmap.GetPlanes());
-		obj_point newpoint(500,500,0);
+		std::vector<obj_cube> addcube;
+		addcube.push_back(wmap.GetRobot());
+		MemWin.addents(addcube);
+		obj_point newpoint(2000,2000,0);
 		MemWin.setpath(mainbrain.GetPath(newpoint));
 
 		while(MemWin.IsRunning()) {

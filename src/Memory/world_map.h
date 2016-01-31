@@ -19,8 +19,10 @@ class world_map {
 		std::vector<obj_plane> &GetPlanes();
 		void addobjs(std::vector<obj_base>&);
 		void gentest();
+		obj_cube &GetRobot();
 
 	private:
+		obj_cube robot;
 		std::vector<obj_cube> entities_list;
 		std::vector<obj_plane> plane_list;
 

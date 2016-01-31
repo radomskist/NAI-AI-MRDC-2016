@@ -1,11 +1,9 @@
 #include "Sensors/webcam.h"
 
 nwebc::nwebc() {
-    cv::VideoCapture cap (-1);
-
-    if (!cap.isOpened())
-         std::cout << "Cam initialize failed" << std::endl;
-    else std::cout << "Cam initialized" << std::endl;
+   // cv::VideoCapture cap(-1);
+	//cv::OutputArray img;
+    //cap.read(img);
 
 }
 
