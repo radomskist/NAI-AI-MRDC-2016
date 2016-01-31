@@ -77,7 +77,7 @@ struct obj_plane : public obj_base {
 		}
 
 		float slopex, slopey; //Slope will be important for quick comparisons!
-		obj_point x1,x2,y1,y2;
+		obj_point p[4];
 
 
 };
@@ -103,7 +103,9 @@ struct obj_cube : public obj_base {
 		}
 
 		std::vector<std::string> tags; //dataname and tag
-		obj_point p1,p2,p3,p4,p5,p6;
+		obj_point pos;
+		float width, height;
+		float color[3];
 		
 	private:
 		std::string name;

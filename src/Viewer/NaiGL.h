@@ -26,6 +26,7 @@ class naigl : public basewin {
 		void draw();
 		void addplanes(std::vector<obj_plane> &);
 		void setpath(std::vector<obj_point> );
+		void addents(std::vector<obj_cube> &);
 
 
 	private:
@@ -34,17 +35,22 @@ class naigl : public basewin {
 		GLuint naishader;
 
 		GLuint naivao;
-		GLuint planebuffer;
+		GLuint planebuffer[2];
 		GLuint naivaopath;
 		GLuint pathbuffer;
+
+		GLuint naivaoobj;
+		GLuint objbuffer[2];
+
 		int pathlength;
+		int cubevertslen;
 
 		//Math nerd stuff
 		glm::mat4 proj;
 		glm::mat4 view;
 		GLint viewuni;
 		std::vector<GLfloat> planeverts;
-
+		std::vector<GLfloat> planecolors;
 };
 
 #endif
