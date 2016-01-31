@@ -4,7 +4,7 @@ basewin::basewin() {
 
 }
 
-bool basewin::IsRunning() {
+bool basewin::GetKeys() {
 	SDL_Event event;
 	//Checking for ESC key to close program
 	while( SDL_PollEvent( &event ) )

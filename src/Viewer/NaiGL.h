@@ -27,7 +27,7 @@ class naigl : public basewin {
 		void addplanes(std::vector<obj_plane> &);
 		void setpath(std::vector<obj_point> );
 		void addents(std::vector<obj_cube> &);
-
+		bool GetKeys();
 
 	private:
 		void shaderinit();
@@ -48,7 +48,9 @@ class naigl : public basewin {
 		//Math nerd stuff
 		glm::mat4 proj;
 		glm::mat4 view;
+		float urotation, lrotation, xpos, ypos;
 		GLint viewuni;
+		bool linedepth;
 		std::vector<GLfloat> planeverts;
 		std::vector<GLfloat> planecolors;
 };

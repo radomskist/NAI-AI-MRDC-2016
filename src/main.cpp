@@ -26,7 +26,7 @@ int main()
 	if(mainbrain.KStatus()) {
 		testwin test_win;
 
-		while(test_win.IsRunning()) {
+		while(test_win.GetKeys()) {
 			imageref = mainbrain.GetImages(KDEP);
 
 			if(!imageref.empty()) 
@@ -45,7 +45,8 @@ int main()
 		obj_point newpoint(2000,2000,0);
 		MemWin.setpath(mainbrain.GetPath(newpoint));
 
-		while(MemWin.IsRunning()) {
+		//TODO: limit to framerate
+		while(MemWin.GetKeys()) {
 			MemWin.draw();
 
 		}
