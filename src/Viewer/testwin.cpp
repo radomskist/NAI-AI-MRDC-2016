@@ -1,8 +1,9 @@
 #include "Viewer/testwin.h"
 
-testwin::testwin() {
-	width = 512;
-	height = 424;
+testwin::testwin(unsigned int set_width, unsigned int set_height, unsigned int set_depth) {
+	width = set_width;
+	height = set_height;
+	depth = set_depth;
 	//Initializing the winodw
 	win = SDL_CreateWindow("TEST", //name
 		0, 0, //pos x,y
@@ -18,19 +19,26 @@ testwin::testwin() {
 	rendcam = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 
 	/*intiailizing SDL texture*/
-	textcam = SDL_CreateTexture(rendcam,
-		SDL_PIXELFORMAT_ARGB8888,
-		SDL_TEXTUREACCESS_STREAMING,
-		512,
-		424);
+	if(depth == 4)
+			textcam = SDL_CreateTexture(rendcam,
+			SDL_PIXELFORMAT_ARGB8888,
+			SDL_TEXTUREACCESS_STREAMING,
+			width,
+			height);
+	else
+		textcam = SDL_CreateTexture(rendcam,
+			SDL_PIXELFORMAT_YVYU,
+			SDL_TEXTUREACCESS_STREAMING,
+			width,
+			height);
 }
 
-void testwin::setimg(unsigned char * updimg) {
+void testwin::setimg(nimg * updimg) {
 
 	SDL_UpdateTexture(textcam,
 		NULL,
-		updimg,
-		512*4);
+		updimg->data,
+		width*depth);
 
 	SDL_UnlockTexture(textcam);
 	SDL_RenderClear(rendcam);

@@ -40,3 +40,15 @@ http://opencv.org/
 Create a depends folder in the main directory to have libraries such as libusb and freenect2 in them.
 
 Create a include folder in the main directory and copy the freenect2, libusb, GLM, and glew headers into their respective folders.
+
+
+###Arguments
+-ct = webcam test, uses webcame display as window
+-kin = kinect display, if there is a kinect connected it'll use this. Default option
+-mem = memory map, uses the memory map. Used when all other options fail.
+
+###Memory map controls:
+WASD, move north, south, west and east respectively.
+Arrow keys = rotate camera
+f = toggle path clipping
+esc = close program

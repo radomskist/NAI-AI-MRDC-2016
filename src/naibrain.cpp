@@ -2,7 +2,8 @@
 
 naibrain::naibrain() : pfind(&wmap) {
 	kinect_manager = 0;
-	nwebc bcwebcam;
+
+	std::cout << camcount() << std::endl;
 	//Initializing kinect manager
 	try {
 		kinect_manager = new kinectman();
@@ -12,6 +13,22 @@ naibrain::naibrain() : pfind(&wmap) {
 		delete kinect_manager;
 		kinect_manager = NULL; //just incase
 	}
+
+	//Initializing webcam
+	try {
+		bcwebcam = new nwebc(0);
+	}
+	catch (nfail &e) {
+		std::cout << "Webcam initialization failed: " << e.what() << std::endl;
+		delete bcwebcam;
+		bcwebcam = NULL; //just incase
+	}
+}
+
+/*this hack is literally the only way to get the camera count*/
+int naibrain::camcount() {
+	//VideoCapture capture( CV_CAP_DSHOW );
+	//capture.VI.listDevices();
 }
 
 naibrain::~naibrain() {
@@ -30,7 +47,7 @@ std::vector<obj_point> naibrain::GetPath(obj_point point) {
 	return pfind.gotopoint(point);
 }
 
-std::vector<unsigned char *> &naibrain::GetImages(unsigned int imgmask) {
+std::vector<nimg*>  &naibrain::GetImages(unsigned int imgmask) {
 	Images.clear();
 
 	//Processing kinect
@@ -42,6 +59,11 @@ std::vector<unsigned char *> &naibrain::GetImages(unsigned int imgmask) {
 			if(imgmask & KRGB && kinect_manager->GetRGBImg())
 				Images.push_back(kinect_manager->GetRGBImg());
 		}
+
+	//Processing webcams
+	if((imgmask & BCCAM) && bcwebcam != NULL) {
+		Images.push_back(bcwebcam->GetImg());
+	}
 
 	return Images;
 

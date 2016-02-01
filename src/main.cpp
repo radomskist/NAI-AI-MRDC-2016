@@ -7,7 +7,7 @@
 #include "Viewer/testwin.h"
 
 #include "naibrain.h"
-int main()
+int main(int argc, char** argv)
 	{
 	/*TODO: The window needs to be moved to the viewer
 	  *	which is a seperate program so we can see what the robot
@@ -21,10 +21,28 @@ int main()
 	//This is temporary until we seperate the viewer from
 	//Main program
 	//Starting main loop
-	std::vector<unsigned char *> imageref;
-	//If kinect is connected, work on kinect debugging
-	if(mainbrain.KStatus()) {
-		testwin test_win;
+
+	bool areargs = argc > 1;
+	std::string arg1;
+	if(areargs)
+		arg1 = argv[1];
+
+	if((areargs && (arg1 == "-ct"))) {
+		std::vector<nimg *> imageref;
+		imageref = mainbrain.GetImages(BCCAM);
+		testwin test_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
+
+		while(test_win.GetKeys()) {
+			imageref = mainbrain.GetImages(BCCAM);
+
+			if(!imageref.empty()) 
+				test_win.setimg(imageref.front());
+		}
+	}
+	else if((areargs == (arg1 == "-kin")) && mainbrain.KStatus()) {
+		std::vector<nimg *> imageref;
+		imageref = mainbrain.GetImages(KDEP);
+		testwin test_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
 
 		while(test_win.GetKeys()) {
 			imageref = mainbrain.GetImages(KDEP);
@@ -33,7 +51,6 @@ int main()
 				test_win.setimg(imageref.front());
 		}
 	}
-	//If no kinect load opengl fake map
 	else {
 		naigl MemWin;
 		world_map wmap = mainbrain.GetMap();
@@ -50,7 +67,7 @@ int main()
 			MemWin.draw();
 
 		}
-		
+
 	}
 
 	//Closing program
