@@ -46,8 +46,6 @@ class kinectman {
 
 		/*whether or not freenect is connected*/
 		bool nectfailed;
-		nimg kdepth;
-		nimg krgb;
 
 		/*freenect values*/
  		libfreenect2::Freenect2Device *f2dev;
@@ -58,6 +56,10 @@ class kinectman {
 
 		/*image processing objects*/
 		imgd depth_proc;
+
+		/*Frame objects*/
+		nimg kdepth;
+		nimg krgb;
 
 };
 

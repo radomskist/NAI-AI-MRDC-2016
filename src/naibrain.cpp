@@ -15,7 +15,7 @@ naibrain::naibrain() : pfind(&wmap) {
 
 	//Initializing webcam
 	try {
-		bcwebcam = new nwebc(0);
+		bcwebcam = new nwebc(1);
 	}
 	catch (nfail &e) {
 		std::cout << "Webcam initialization failed: " << e.what() << std::endl;

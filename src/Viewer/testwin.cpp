@@ -19,22 +19,17 @@ testwin::testwin(unsigned int set_width, unsigned int set_height, unsigned int s
 	rendcam = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 
 	/*intiailizing SDL texture*/
-	if(depth == 4)
-			textcam = SDL_CreateTexture(rendcam,
-			SDL_PIXELFORMAT_ARGB8888,
-			SDL_TEXTUREACCESS_STREAMING,
-			width,
-			height);
-	else
-		textcam = SDL_CreateTexture(rendcam,
-			SDL_PIXELFORMAT_RGB888,
-			SDL_TEXTUREACCESS_STREAMING,
-			width,
-			height);
+	textcam = SDL_CreateTexture(rendcam,
+		SDL_PIXELFORMAT_ARGB8888,
+		SDL_TEXTUREACCESS_STREAMING,
+		width,
+		height);
+
 }
 
 void testwin::setimg(nimg * updimg) {
 
+	/*Creating a texture out of the image so SDL can render it*/
 	SDL_UpdateTexture(textcam,
 		NULL,
 		updimg->data,

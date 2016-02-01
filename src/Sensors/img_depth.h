@@ -30,7 +30,6 @@ class imgd : public imgb {
 	private:
 		bool recurscan(unsigned char *, float *, int, int*, bool);
 		void configimg(int,unsigned int,unsigned int,float);
-		float linearize(unsigned short);
 
 		/*image processing*/
 		unsigned int height; /*resolution*/

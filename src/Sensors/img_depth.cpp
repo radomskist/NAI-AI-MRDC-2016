@@ -48,12 +48,6 @@ void imgd::configimg(int pixjumpx, unsigned int set_width, unsigned int set_heig
 	}
 }
 
-float imgd::linearize(unsigned short lthis) {
-	//TODO: load points into array ahead of time
-	return (1.0 / (lthis * -0.0030711016 + 3.3309495161));
-	}
-
-
 void imgd::ProcessImg(unsigned char *depthbuff) {
 
 	/*clearing list of points from previous scan*/
@@ -64,7 +58,7 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 
 	/*loading points*/
 	for(int i = 0; i < checktot; i++) {
-		cpixlist[i].value = linearize(depthbuff[imcheckpos[i]]);
+		cpixlist[i].value = depthbuff[imcheckpos[i]];
 		}
 
 	/*starting the scan*/
