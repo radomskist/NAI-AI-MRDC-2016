@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 	if(areargs)
 		arg1 = argv[1];
 
-	if((areargs == (arg1 == "-ct"))) {
+	if((areargs && (arg1 == "-ct"))) {
 		std::vector<nimg *> imageref;
 		imageref = mainbrain.GetImages(BCCAM);
 		testwin test_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
