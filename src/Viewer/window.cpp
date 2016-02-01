@@ -16,7 +16,7 @@ bool basewin::GetKeys() {
 
 
 basewin::~basewin() {
-
+	//delete win; compiler bitches about this
 
 }
 

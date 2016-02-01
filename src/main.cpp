@@ -5,6 +5,7 @@
 #include "Viewer/window.h"
 #include "Viewer/NaiGL.h"
 #include "Viewer/testwin.h"
+#include "Viewer/opencvwin.h"
 
 #include "naibrain.h"
 int main(int argc, char** argv)
@@ -14,31 +15,34 @@ int main(int argc, char** argv)
 	  *	is doing, seeing, thinking, etc while it's out in the field
 	  *	but it is useful for now.
 	*/
+
     SDL_Init( SDL_INIT_EVERYTHING );
 
 	naibrain mainbrain;
-
-	//This is temporary until we seperate the viewer from
-	//Main program
-	//Starting main loop
 
 	bool areargs = argc > 1;
 	std::string arg1;
 	if(areargs)
 		arg1 = argv[1];
 
+
+	//Starting main loop
+
+	/*Test camera argument loop*/
 	if((areargs && (arg1 == "-ct"))) {
 		std::vector<nimg *> imageref;
 		imageref = mainbrain.GetImages(BCCAM);
-		testwin test_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
+		opencvwin opencv_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
 
-		while(test_win.GetKeys()) {
+		while(opencv_win.GetKeys()) {
 			imageref = mainbrain.GetImages(BCCAM);
 
 			if(!imageref.empty()) 
-				test_win.setimg(imageref.front());
+				opencv_win.setimg(imageref.front());
 		}
 	}
+
+	/*Test kinect argument loop*/
 	else if(mainbrain.KStatus() && (areargs == ((arg1 == "-kdep") || (arg1 == "-krgb")))) {
 		int kmode;
 		if(!areargs || (arg1 != "-krgb"))//default
@@ -57,6 +61,8 @@ int main(int argc, char** argv)
 				test_win.setimg(imageref.front());
 		}
 	}
+
+	/*Memory window argument loops*/
 	else {
 		naigl MemWin;
 		world_map wmap = mainbrain.GetMap();
