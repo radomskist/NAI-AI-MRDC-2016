@@ -7,6 +7,7 @@
 #include "Sensors/img_depth.h"
 #include "Memory/objects.hpp"
 #include "utils/nexcep.hpp"
+#include "utils/nimg.h"
 
 /*Standard libraries*/
 #include <vector>
@@ -35,8 +36,8 @@ class kinectman {
 		kinectman();
 		~kinectman();
 
-		unsigned char * GetDepthImg();
-		unsigned char * GetRGBImg();
+		nimg *GetDepthImg();
+		nimg *GetRGBImg();
 
 		bool ProcessImages(); //Proccess the images and sets the buffer values
 
@@ -45,6 +46,8 @@ class kinectman {
 
 		/*whether or not freenect is connected*/
 		bool nectfailed;
+		nimg kdepth;
+		nimg krgb;
 
 		/*freenect values*/
  		libfreenect2::Freenect2Device *f2dev;

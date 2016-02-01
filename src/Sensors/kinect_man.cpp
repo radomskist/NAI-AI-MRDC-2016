@@ -40,6 +40,13 @@ kinectman::kinectman() {
 	f2dev->setIrAndDepthFrameListener(nailist);
 	f2dev->start();
 
+	kdepth.width = 512;
+	kdepth.height = 424;
+	kdepth.depth = 4;
+
+	krgb.width = 1920;
+	krgb.height = 1080;
+	krgb.depth = 4;
 	std::cout << "\nNaiEye: Video initialized!" << std::endl;
 }
 
@@ -57,12 +64,12 @@ kinectman::~kinectman() {
 
 }
 
-unsigned char *kinectman::GetDepthImg() {
-	return nfmap[libfreenect2::Frame::Depth]->data;
+nimg *kinectman::GetDepthImg() {
+	return &kdepth;
 }
 
-unsigned char *kinectman::GetRGBImg() {
-	return nfmap[libfreenect2::Frame::Color]->data;
+nimg *kinectman::GetRGBImg() {
+	return &krgb;
 }
 
 bool kinectman::ProcessImages() {
@@ -71,7 +78,8 @@ bool kinectman::ProcessImages() {
 
 	if(nfmap[libfreenect2::Frame::Depth]->data == NULL)
 		return false;
-	
+	krgb.data = nfmap[libfreenect2::Frame::Color]->data;
+	kdepth.data = nfmap[libfreenect2::Frame::Depth]->data;
 	//float *bobpoint = (float *)&nfmap[libfreenect2::Frame::Depth]->data;
 	
 	//std::cout << bobpoint[512*212 + 256] << std::endl;
