@@ -59,7 +59,6 @@ class kinectman {
 		/*image processing objects*/
 		imgd depth_proc;
 
-		unsigned char depthhold[512*424*4];
 };
 
 #endif

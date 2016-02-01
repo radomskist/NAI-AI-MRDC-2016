@@ -27,7 +27,7 @@ testwin::testwin(unsigned int set_width, unsigned int set_height, unsigned int s
 			height);
 	else
 		textcam = SDL_CreateTexture(rendcam,
-			SDL_PIXELFORMAT_YVYU,
+			SDL_PIXELFORMAT_RGB888,
 			SDL_TEXTUREACCESS_STREAMING,
 			width,
 			height);

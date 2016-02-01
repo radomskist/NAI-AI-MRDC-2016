@@ -11,9 +11,6 @@ nwebc::nwebc(int index) {
 	camimg.width = cap->get(CV_CAP_PROP_FRAME_WIDTH);
 	camimg.height = cap->get(CV_CAP_PROP_FRAME_HEIGHT);
 	camimg.depth = 3;
-
-	cap->set(CV_CAP_PROP_SATURATION , 100);
-
 		
 }
 

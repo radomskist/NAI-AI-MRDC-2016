@@ -78,11 +78,23 @@ bool kinectman::ProcessImages() {
 
 	if(nfmap[libfreenect2::Frame::Depth]->data == NULL)
 		return false;
+
 	krgb.data = nfmap[libfreenect2::Frame::Color]->data;
-	kdepth.data = nfmap[libfreenect2::Frame::Depth]->data;
-	//float *bobpoint = (float *)&nfmap[libfreenect2::Frame::Depth]->data;
-	
-	//std::cout << bobpoint[512*212 + 256] << std::endl;
+	float *datahold = (float *)&nfmap[libfreenect2::Frame::Depth]->data;
+
+	if(kdepth.data)
+		delete kdepth.data;
+
+	kdepth.data = new unsigned char[512*424*4];
+	unsigned char normalized;
+
+	for(int i = 0; i < 217088;i++) {
+		normalized = datahold[i] /((4500.0 - 500.0)/(255));
+		kdepth.data[i*4] = normalized;
+		kdepth.data[i*4 + 1] = normalized;
+		kdepth.data[i*4 + 2] = normalized;
+		}
+	//depth_proc.ProcessImg(nfmap[libfreenect2::Frame::Depth]->data);
 
 	return true;
 }
