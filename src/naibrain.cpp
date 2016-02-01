@@ -3,7 +3,6 @@
 naibrain::naibrain() : pfind(&wmap) {
 	kinect_manager = 0;
 
-	std::cout << camcount() << std::endl;
 	//Initializing kinect manager
 	try {
 		kinect_manager = new kinectman();
@@ -25,12 +24,6 @@ naibrain::naibrain() : pfind(&wmap) {
 	}
 }
 
-/*this hack is literally the only way to get the camera count*/
-int naibrain::camcount() {
-	//VideoCapture capture( CV_CAP_DSHOW );
-	//capture.VI.listDevices();
-}
-
 naibrain::~naibrain() {
 	delete kinect_manager;
 }
@@ -43,8 +36,8 @@ world_map &naibrain::GetMap() {
 	return wmap;
 }
 
-std::vector<obj_point> naibrain::GetPath(obj_point point) {
-	return pfind.gotopoint(point);
+path_finding &naibrain::GetPfind(){
+	return pfind;
 }
 
 std::vector<nimg*>  &naibrain::GetImages(unsigned int imgmask) {

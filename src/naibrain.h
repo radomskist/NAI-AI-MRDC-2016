@@ -17,17 +17,17 @@ class naibrain {
 	public:
 		naibrain();
 		~naibrain();
-		std::vector<nimg*> &GetImages(unsigned int);
-		world_map &GetMap();
-		std::vector<obj_point> GetPath(obj_point);
+		std::vector<nimg*> &GetImages(unsigned int); /*get list of images from specified flags*/
+		world_map &GetMap(); /*Get world map*/
+		path_finding &GetPfind(); /*Get path to a point from path find object*/
 		bool KStatus(); /*returns whether or not kinect is working*/
-		int camcount();
+
 	private:
-		path_finding pfind;
-		kinectman* kinect_manager;
-		std::vector<nimg*> Images;
-		world_map wmap;
-		nwebc *bcwebcam;
+		path_finding pfind; /*path find object*/
+		kinectman* kinect_manager; /*kinect manager object*/
+ 		std::vector<nimg*> Images; /*List of images from sensors*/
+		world_map wmap; /*world map object*/
+		nwebc *bcwebcam; /*webcam object*/
 };
 
 #endif

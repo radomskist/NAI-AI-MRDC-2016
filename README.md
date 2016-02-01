@@ -27,7 +27,7 @@ https://github.com/g-truc/glm
 http://glm.g-truc.net/0.9.7/index.html
 
 
-OpenCV:
+OpenCV (3.1):
 
 http://opencv.org/downloads.html
 
@@ -44,11 +44,18 @@ Create a include folder in the main directory and copy the freenect2, libusb, GL
 
 ###Arguments
 -ct = webcam test, uses webcame display as window
--kin = kinect display, if there is a kinect connected it'll use this. Default option
+
+-kdep = kinect depth display, if there is a kinect connected it'll use this by default.
+
+-krgb = kinect rgb display.
+
 -mem = memory map, uses the memory map. Used when all other options fail.
 
 ###Memory map controls:
 WASD, move north, south, west and east respectively.
+
 Arrow keys = rotate camera
+
 f = toggle path clipping
+
 esc = close program

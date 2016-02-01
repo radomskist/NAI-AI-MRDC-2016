@@ -39,13 +39,19 @@ int main(int argc, char** argv)
 				test_win.setimg(imageref.front());
 		}
 	}
-	else if((areargs == (arg1 == "-kin")) && mainbrain.KStatus()) {
+	else if(mainbrain.KStatus() && (areargs == ((arg1 == "-kdep") || (arg1 == "-krgb")))) {
+		int kmode;
+		if(!areargs || (arg1 != "-krgb"))//default
+			kmode = KDEP;
+		else
+			kmode = KRGB;
+
 		std::vector<nimg *> imageref;
-		imageref = mainbrain.GetImages(KDEP);
+		imageref = mainbrain.GetImages(kmode);
 		testwin test_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
 
 		while(test_win.GetKeys()) {
-			imageref = mainbrain.GetImages(KDEP);
+			imageref = mainbrain.GetImages(kmode);
 
 			if(!imageref.empty()) 
 				test_win.setimg(imageref.front());
@@ -60,7 +66,7 @@ int main(int argc, char** argv)
 		addcube.push_back(wmap.GetRobot());
 		MemWin.addents(addcube);
 		obj_point newpoint(2000,2000,0);
-		MemWin.setpath(mainbrain.GetPath(newpoint));
+		MemWin.setpath(mainbrain.GetPfind().gotopoint(newpoint));
 
 		//TODO: limit to framerate
 		while(MemWin.GetKeys()) {
