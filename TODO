@@ -8,10 +8,11 @@ Path finding
 Arduino Laptop communication
 	-Needed for issuing commands
 
+ALMOST DONE:
 Web camera
-	-Not a priority, but should be easy to do for anyone who wants somewhere to start
-
-NOT DOING:
+	-Identification needs to be done
+	-Need to make sure we use the correct camera
+	-Crashes when kinect is used
 
 Viewer on remote laptop
 	Kyle suggested using a remote screen viewer, which makes things easier.

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "utils/nimg.h"
 #include "Sensors/img_base.h"
 #include <vector>
 #include <math.h>
@@ -29,13 +30,9 @@ class imgd : public imgb {
 
 	private:
 		bool recurscan(unsigned char *, float *, int, int*, bool);
-		void configimg(int,unsigned int,unsigned int,float);
+		void configimg(int,unsigned int, unsigned int, float);
 
 		/*image processing*/
-		unsigned int height; /*resolution*/
-		unsigned int width;
-		unsigned int pixtot; /*total number of pixels in image*/
-
 		unsigned int pixwidth; /*amount of checking pixels per row/col*/
 		unsigned int pixheight;
 		unsigned int checktot;/*total number of checking pixels*/

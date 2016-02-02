@@ -4,8 +4,7 @@
 #include <SDL2/SDL.h>
 #include "Viewer/window.h"
 #include "Viewer/NaiGL.h"
-#include "Viewer/testwin.h"
-#include "Viewer/opencvwin.h"
+#include "Viewer/imgwin.h"
 
 #include "naibrain.h"
 int main(int argc, char** argv)
@@ -32,7 +31,7 @@ int main(int argc, char** argv)
 	if((areargs && (arg1 == "-ct"))) {
 		std::vector<nimg *> imageref;
 		imageref = mainbrain.GetImages(BCCAM);
-		opencvwin opencv_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
+		imgwin opencv_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
 
 		while(opencv_win.GetKeys()) {
 			imageref = mainbrain.GetImages(BCCAM);
@@ -52,7 +51,7 @@ int main(int argc, char** argv)
 
 		std::vector<nimg *> imageref;
 		imageref = mainbrain.GetImages(kmode);
-		testwin test_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
+		imgwin test_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
 
 		while(test_win.GetKeys()) {
 			imageref = mainbrain.GetImages(kmode);

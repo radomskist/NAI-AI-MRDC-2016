@@ -5,10 +5,10 @@
 #include "Viewer/window.h"
 #include "utils/nimg.h"
 
-class opencvwin : public basewin {
+class imgwin : public basewin {
 	public:
-		opencvwin(unsigned int, unsigned int, unsigned int);
-		~opencvwin();
+		imgwin(unsigned int, unsigned int, unsigned int);
+		~imgwin();
 		void setimg(nimg *);
 
 	private:
