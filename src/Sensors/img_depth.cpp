@@ -4,33 +4,31 @@ using namespace std;
 imgd::imgd() {
 	/*Initializing image processing variables*/
 	//TODO MAKE LOADABLE BY CONFIG FILE!
-	configimg(4,512,424,0.95f);
+	configimg(4,512,424,0.94f);
 
 }
 imgd::~imgd() {
 
 
 }
-void imgd::configimg(int pixjumpx, unsigned int set_width, unsigned int set_height, float gapsize) {
+void imgd::configimg(int pixjumpx, unsigned int width, unsigned int height, float gapsize) {
 	/*CONFIGURABLE VARIABLES*/
-	height = set_height; /*resolution*/
-	width = set_width;
-	pixtot = height * width;
 
 	/*figuring out how much space (in dots) should be between edge
 	and dots*/
+	unsigned int pixtot = width * height;
 	pixjumpx *= 2;
 	int gapx = (width - (width * gapsize)) / pixjumpx; /*X gap in pixels*/
 	int gapy =  (height - (height * gapsize)) / pixjumpx; /*y gap in jumps*/
 
 	/*Getting how many dots should be per row and collumn*/
 	pixwidth = width / pixjumpx - gapx*2;
-	pixheight = height / pixjumpx  - gapy*2;
-	//pixpercol -= pixpercol / (gapx*2); /*taking spaces from gapx into account*/
+	pixheight = height / pixjumpx  - gapy*3;
+	//pixwidth -= pixwidth / (gapx*2); /*taking spaces from gapx into account*/
 	checktot = pixwidth * pixheight;
 
 	/*adjusting jump pixels for calculations*/
-	//pixjumpx *= 3; /*multiplying pixel distance by 3*/
+	//pixjumpx *= 2; /*multiplying pixel distance by 3*/
 	int pixjumpy = width * pixjumpx; /*moving the width over the amount of times we jump down*/
 
 	imcheckpos = new unsigned int[pixtot];
@@ -44,9 +42,11 @@ void imgd::configimg(int pixjumpx, unsigned int set_width, unsigned int set_heig
 		/*Calculating positions of pixels to check*/
 		int ret_int = ((cpixlist[i].y*gapx*2 + (i+gapx))*pixjumpx /*indent*/ + (cpixlist[i].y + gapy) * pixjumpy /*jump down each time*/ + ((cpixlist[i].y % 2) * ( pixjumpx / 2)));
 
-		imcheckpos[i] = (checktot < ret_int) ? ret_int*3 : 0; /*add to array if in range, else set to 0*/
+		imcheckpos[i] = (checktot < ret_int) ? ret_int*4 : 0; /*add to array if in range, else set to 0*/
 	}
 }
+
+
 
 void imgd::ProcessImg(unsigned char *depthbuff) {
 

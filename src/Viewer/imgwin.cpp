@@ -1,6 +1,6 @@
-#include "Viewer/opencvwin.h"
+#include "Viewer/imgwin.h"
 
-opencvwin::opencvwin(unsigned int set_width, unsigned int set_height, unsigned int set_depth) {
+imgwin::imgwin(unsigned int set_width, unsigned int set_height, unsigned int set_depth) {
 	ctssurf = 0;
 	textcam = 0;
 	width = set_width;
@@ -19,12 +19,12 @@ opencvwin::opencvwin(unsigned int set_width, unsigned int set_height, unsigned i
 	rendcam = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 }
 
-void opencvwin::setimg(nimg * updimg) {
+void imgwin::setimg(nimg * updimg) {
 
 	ctssurf = SDL_CreateRGBSurfaceFrom(updimg->data,
 		updimg->width, updimg->height,
-		24, //8 bits * 3 channels
-		updimg->width*3, //width * channels
+		8 * updimg->depth, //8 bits * 3 channels
+		updimg->width * updimg->depth, //width * channels
 		0, 0, 0, 0);
 
 
@@ -41,7 +41,7 @@ void opencvwin::setimg(nimg * updimg) {
 
 }
 
-opencvwin::~opencvwin() {
+imgwin::~imgwin() {
 
 }
 

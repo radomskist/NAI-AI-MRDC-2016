@@ -87,7 +87,7 @@ bool kinectman::ProcessImages() {
 	krgb.data = nfmap[libfreenect2::Frame::Color]->data;
 
 	//Casting data to a float, which is what it's suppose to be
-	float *datahold = (float *)&nfmap[libfreenect2::Frame::Depth]->data;
+	float *datahold = (float *)&nfmap[libfreenect2::Frame::Depth]->data[4];
 
 	unsigned char normalized;
 	unsigned resolution = kdepth.width * kdepth.height;
@@ -96,12 +96,11 @@ bool kinectman::ProcessImages() {
 	for(int i = 0; i < resolution; i++) {
 		////normalize kinect range to 255
 		normalized = datahold[i] / 15.68627451f; //(4500.0f - 500.0f)/(255)
-		for(int j = 0; j < 3; j++) //3 because ignoring alpha channel in the case that it's 4
+		for(int j = 0; j < 4; j++) //3 because ignoring alpha channel in the case that it's 4
 			kdepth.data[i*kdepth.depth + j] = normalized;
-
 		}
 
-	//depth_proc.ProcessImg(kdepth.data);
+	depth_proc.ProcessImg(kdepth.data);
 
 	return true;
 }
