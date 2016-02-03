@@ -18,8 +18,8 @@
    NOTES:		N/A
 
 ****************************************************************/
-struct cpixstr {float value; unsigned int pos; int x, y;bool added;}; /*structure for pixels being checked*/
-struct cplane {float originx, originy; float slopex,slopey; std::vector<cpixstr> points; unsigned char r,g,b;}; /*structure for pixels being checked*/
+struct cpixstr {float value; unsigned int pos; int x, y; bool added;}; /*structure for pixels being checked*/
+struct cplane {float slopex,slopey; std::vector<cpixstr> points; unsigned char r,g,b; bool added;}; /*structure for pixels being checked*/
 
 class imgd : public imgb {
 	public:
@@ -29,7 +29,7 @@ class imgd : public imgb {
 		void ProcessImg(unsigned char *);
 
 	private:
-		bool recurscan(unsigned char *, float *, int, int*, bool);
+		bool recurscan(float &, unsigned char, int, int&, bool, std::vector<cpixstr> &);
 		void configimg(int,unsigned int, unsigned int, float);
 
 		/*image processing*/
