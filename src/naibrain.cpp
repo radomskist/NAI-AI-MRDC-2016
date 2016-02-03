@@ -19,7 +19,6 @@ naibrain::naibrain() : pfind(&wmap) {
 	}
 	catch (nfail &e) {
 		std::cout << "Webcam initialization failed: " << e.what() << std::endl;
-		delete bcwebcam;
 		bcwebcam = NULL; //just incase
 	}
 }
