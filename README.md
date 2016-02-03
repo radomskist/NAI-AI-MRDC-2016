@@ -43,7 +43,7 @@ Create a include folder in the main directory and copy the freenect2, libusb, GL
 
 
 ###Arguments
--ct = webcam test, uses webcame display as window
+-ct = webcam test, uses webcam display as window
 
 -kdep = kinect depth display, if there is a kinect connected it'll use this by default.
 
