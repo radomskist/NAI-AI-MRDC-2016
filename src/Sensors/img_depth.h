@@ -18,7 +18,7 @@
    NOTES:		N/A
 
 ****************************************************************/
-struct cpixstr {float value; unsigned int pos; int x, y; bool added;}; /*structure for pixels being checked*/
+struct cpixstr {unsigned char value; unsigned int pos; int x, y; bool added;}; /*structure for pixels being checked*/
 struct cplane {float slopex,slopey; std::vector<cpixstr> points; unsigned char r,g,b; bool added;}; /*structure for pixels being checked*/
 
 class imgd : public imgb {

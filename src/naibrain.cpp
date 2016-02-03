@@ -15,12 +15,10 @@ naibrain::naibrain() : pfind(&wmap) {
 
 	//Initializing webcam
 	try {
-		bcwebcam = NULL;
-		//bcwebcam = new nwebc(1);
+		bcwebcam = naiwebc::createwebcam("USB Camera (046d:08ad)");
 	}
 	catch (nfail &e) {
 		std::cout << "Webcam initialization failed: " << e.what() << std::endl;
-		delete bcwebcam;
 		bcwebcam = NULL; //just incase
 	}
 }
@@ -55,9 +53,8 @@ std::vector<nimg*>  &naibrain::GetImages(unsigned int imgmask) {
 		}
 
 	//Processing webcams
-	if((imgmask & BCCAM) && bcwebcam != NULL) {
+	if((imgmask & BCCAM) && bcwebcam != NULL)
 		Images.push_back(bcwebcam->GetImg());
-	}
 
 	return Images;
 

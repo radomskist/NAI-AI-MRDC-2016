@@ -6,6 +6,7 @@ struct nfail : std::exception {
 	nfail(const char * set_error) {
 		errorm = set_error;
 	}
+
 	const char *errorm;
 	const char* what() {return errorm;}
 };
