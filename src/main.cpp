@@ -5,6 +5,7 @@
 #include "Viewer/window.h"
 #include "Viewer/NaiGL.h"
 #include "Viewer/imgwin.h"
+#include <fstream>
 
 #include "naibrain.h"
 int main(int argc, char** argv)
@@ -31,6 +32,11 @@ int main(int argc, char** argv)
 	if((areargs && (arg1 == "-ct"))) {
 		std::vector<nimg *> imageref;
 		imageref = mainbrain.GetImages(BCCAM);
+		if(imageref.empty()) {
+			std::cout << "No webcam" << std::endl;
+			return -12;
+		}
+
 		imgwin opencv_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
 
 		while(opencv_win.GetKeys()) {
@@ -58,6 +64,49 @@ int main(int argc, char** argv)
 
 			if(!imageref.empty()) 
 				test_win.setimg(imageref.front());
+		}
+	}
+
+	/*kinect image process test*/
+	else if(areargs && (arg1 == "-kimg")) {
+
+		nimg imgref;
+		imgref.width = 512;
+		imgref.height = 424;
+		imgref.depth = 4;
+
+		imgwin test_win(imgref.width, imgref.height, imgref.depth);
+
+		char *b = new char[512*424*5];
+		imgref.data = new unsigned char[512*424*4];
+		std::fstream fileopen ("f.bmp", std::ios::in | std::ios::binary);
+
+		if(!fileopen.is_open())
+			std::cout << "ERROR" << std::endl;
+
+		fileopen.seekg (0, std::ios::end);
+		int n = fileopen.tellg();
+		fileopen.seekg (0, std::ios::beg);
+
+		fileopen.seekg(0, std::ios::beg);
+		fileopen.read(b, n);
+
+		for(int i = 0; i < 512*424; i++) {
+			imgref.data[i*4] = b[i*4 + 72];
+			imgref.data[i*4+1] = b[i*4 + 72];
+			imgref.data[i*4+2] = b[i*4 + 72];
+			imgref.data[i*4 + 3] = b[i*4 + 72];
+		}
+		imgd depthtest;
+
+		depthtest.ProcessImg(imgref.data);
+		test_win.setimg(&imgref);
+
+		delete b;
+		delete imgref.data;
+
+		while(test_win.GetKeys()) { 
+
 		}
 	}
 
