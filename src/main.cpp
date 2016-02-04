@@ -30,7 +30,8 @@ int main(int argc, char** argv)
 
 	/*Test camera argument loop*/
 	if((areargs && (arg1 == "-ct"))) {
-		std::vector<nimg *> imageref;
+		std::vector<nimg*> imageref;
+
 		imageref = mainbrain.GetImages(BCCAM);
 		if(imageref.empty()) {
 			std::cout << "No webcam" << std::endl;
@@ -44,6 +45,7 @@ int main(int argc, char** argv)
 
 			if(!imageref.empty()) 
 				opencv_win.setimg(imageref.front());
+
 		}
 	}
 
@@ -55,7 +57,7 @@ int main(int argc, char** argv)
 		else
 			kmode = KRGB;
 
-		std::vector<nimg *> imageref;
+		std::vector<nimg*> imageref;
 		imageref = mainbrain.GetImages(kmode);
 		imgwin test_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
 
@@ -77,7 +79,7 @@ int main(int argc, char** argv)
 
 		imgwin test_win(imgref.width, imgref.height, imgref.depth);
 
-		char *b = new char[512*424*5];
+		char *b = new char[512*424*4];
 		imgref.data = new unsigned char[512*424*4];
 		std::fstream fileopen ("f.bmp", std::ios::in | std::ios::binary);
 

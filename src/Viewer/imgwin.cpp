@@ -38,7 +38,6 @@ void imgwin::setimg(nimg * updimg) {
 		NULL);
 
 	SDL_RenderPresent(rendcam);
-
 }
 
 imgwin::~imgwin() {

@@ -33,7 +33,6 @@ nwebc *naiwebc::createwebcam(std::string ofname) {
 
 
 nwebc::nwebc(int index) {
-
 	cap = new cv::VideoCapture(index);
 
     if(!cap->isOpened()) {
@@ -55,5 +54,6 @@ nimg *nwebc::GetImg() {
     cap->read(img);
 	camimg.data = img.data;
 	return &camimg;
-
 }
+
+
