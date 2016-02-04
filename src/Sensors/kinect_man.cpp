@@ -16,7 +16,12 @@ kinectman::kinectman() {
 	}
 
 	//Initializing the freenect2 pipeline
-	f2pipe = new libfreenect2::OpenGLPacketPipeline;
+	#ifdef LIBFREENECT2_WITH_OPENGL_SUPPORT
+		f2pipe = new libfreenect2::OpenGLPacketPipeline;
+	#else
+		f2pipe = new libfreenect2::CpuPacketPipeline;
+		std::cout << "ERROR! OPENGL DID NOT COMPILE WITH THE FREENECT2 LIBRARY BEING USED!" << std::endl;
+	#endif
 
 	if(f2pipe == NULL) {
 		clean();
@@ -95,12 +100,11 @@ bool kinectman::ProcessImages() {
 	//Converting the float into a proper RGB image (rather than 4 split up parts of one float)
 	for(int i = 0; i < resolution; i++) {
 		////normalize kinect range to 255
-		normalized = datahold[i] / 15.68627451f; //(4500.0f - 500.0f)/(255)
+		normalized = datahold[i] * 0.06375f; //(4500.0f - 500.0f)/(255)
 		for(int j = 0; j < 4; j++) //3 because ignoring alpha channel in the case that it's 4
 			kdepth.data[i*kdepth.depth + j] = normalized;
-		}
-
-	depth_proc.ProcessImg(kdepth.data);
+	}
+	//depth_proc.ProcessImg(kdepth.data);
 
 	return true;
 }

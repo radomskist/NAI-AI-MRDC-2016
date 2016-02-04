@@ -11,8 +11,6 @@ Arduino Laptop communication
 ALMOST DONE:
 Web camera
 	-Identification needs to be done
-	-Need to make sure we use the correct camera
-	-Crashes when kinect is used
 
 Viewer on remote laptop
 	Kyle suggested using a remote screen viewer, which makes things easier.
