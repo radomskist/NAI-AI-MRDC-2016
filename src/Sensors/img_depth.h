@@ -18,10 +18,10 @@
    NOTES:		N/A
 
 ****************************************************************/
-struct cpixstr {unsigned char value; unsigned int pos; int x, y; bool added;}; /*structure for pixels being checked*/
-struct ctwopix {float slope; cpixstr points[3]; bool right;}; /*structure 2pixels being checked*/
+struct cpixstr {unsigned char value; unsigned int pos; int x, y;}; /*structure for pixels being checked*/
+struct ctwopix {float slope; cpixstr points[2]; bool added;}; /*structure 2pixels being checked*/
 
-struct cplane {float slopex,slopey; std::vector<cpixstr> points; unsigned char r,g,b; bool added;}; /*structure for pixels being checked*/
+struct cplane {float slopex,slopey; std::vector<cpixstr> points; unsigned char r,g,b, minx,maxx,miny,maxy; bool added;}; /*structure for pixels being checked*/
 
 class imgd : public imgb {
 	public:
@@ -31,8 +31,16 @@ class imgd : public imgb {
 		void ProcessImg(unsigned char *);
 
 	private:
-		bool recurscan(float &, unsigned char, int, int&, bool, std::vector<cpixstr> &) {};
-		void configimg(int,unsigned int, unsigned int, float);
+		void addtoplane(ctwopix&, ctwopix&); /*add two twopix to a plane*/
+		inline int checktwopoints(unsigned int, unsigned int); /*check two twopicks*/
+		inline void throughforeground(unsigned int, unsigned int); /*See if the plane continues behind foreground*/
+	
+		void processpoint(unsigned int,cplane&); /*do process function on a point*/
+
+		void configimg(int,unsigned int, unsigned int, float); /*configure scanning space*/
+
+		int recurscan(float &, unsigned char, int, int&, bool, std::vector<cpixstr> &) {};
+
 
 		/*image processing*/
 		unsigned int pixwidth; /*amount of checking pixels per row/col*/
@@ -40,9 +48,13 @@ class imgd : public imgb {
 		unsigned int checktot;/*total number of checking pixels*/
 		unsigned int *imcheckpos; /*Array storing location of checking pixels*/
 
+		/*twopix values*/
+		int tptot;
+		int tpwidth;
+
 		cpixstr *cpixlist;
 		std::vector<cplane> cplanelist;
-		std::vector<ctwopix> twopixarray;
+		ctwopix* twopixarray;
 		bool checkswitch; /*check if value has been added to lits*/
 		const int iteration;
 

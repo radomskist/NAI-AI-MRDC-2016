@@ -1,6 +1,6 @@
 # Compiler
 CC   = g++
-OPTS = -std=c++11
+OPTS = -std=c++11 -ffast-math
 
 #Libraries
 DLIBS =  -Wl,-Bdynamic -lusb-1.0 -lGL -lSDL2 -lfreenect2 -lopencv_core -lopencv_videoio -lopencv_imgproc
