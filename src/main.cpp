@@ -79,7 +79,7 @@ int main(int argc, char** argv)
 
 		imgwin test_win(imgref.width, imgref.height, imgref.depth);
 
-		char *b = new char[512*424*4 + 72];
+		char *b = new char[512*424*4];
 		imgref.data = new unsigned char[512*424*4];
 		std::fstream fileopen ("f.bmp", std::ios::in | std::ios::binary);
 
@@ -97,10 +97,10 @@ int main(int argc, char** argv)
 			imgref.data[i*4] = b[i*4 + 72];
 			imgref.data[i*4+1] = b[i*4 + 72];
 			imgref.data[i*4+2] = b[i*4 + 72];
-			imgref.data[i*4 + 3] = b[i*4 + 72];
+			//imgref.data[i*3 + 3] = b[i*4 + 72];
 		}
-
 		imgd depthtest;
+
 		depthtest.ProcessImg(imgref.data);
 		test_win.setimg(&imgref);
 

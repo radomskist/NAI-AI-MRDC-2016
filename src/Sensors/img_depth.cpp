@@ -45,7 +45,7 @@ void imgd::configimg(int pixjumpx, unsigned int width, unsigned int height, floa
 		cpixlist[i].y = i / pixwidth + 1;
 		cpixlist[i].pos = i;
 		/*Calculating positions of pixels to check*/
-		int ret_int = ((cpixlist[i].y*gapx*2 + (i+gapx))*pixjumpx + (cpixlist[i].y + gapy) * pixjumpy); /*Indent (removed for now) + ((cpixlist[i].y % 2) * ( pixjumpx / 2))*/
+		int ret_int = ((cpixlist[i].y*gapx*2 + (i+gapx))*pixjumpx + (cpixlist[i].y + gapy) * pixjumpy);
 
 		if(checktot < ret_int) 
 			imcheckpos[i] = ret_int*4;
@@ -60,8 +60,11 @@ void imgd::configimg(int pixjumpx, unsigned int width, unsigned int height, floa
 	tpwidth = pixwidth/2;
 	twopixarray = new ctwopix[tptot];
 
-	for(int i = 0; i < tptot; i++)
+	for(int i = 0; i < tptot; i++) {
+		twopixarray[i].points[0] = &cpixlist[i*2];
+		twopixarray[i].points[1] = &cpixlist[i*2 + 1];
 		twopixarray[i].added = !checkswitch;
+	}
 
 	if(tpwidth % 2 != 0)
 		tpwidth--;
@@ -70,8 +73,15 @@ void imgd::configimg(int pixjumpx, unsigned int width, unsigned int height, floa
 /*checking two points*/
 int imgd::checktwopoints(unsigned int first, unsigned int second) {
 	float testslope = twopixarray[second].slope - twopixarray[first].slope;
-	if(testslope > 0.5f) //Tolerance
+	std::cout << twopixarray[second].points[0]->x << ":  " << twopixarray[second].slope << " - " << twopixarray[first].slope << " = " << testslope << std::endl;
+
+	//TODO: Noise check
+	if(fabs(testslope) <= 1) { //Tolerance
+		
+		
 		return 1;
+	}
+
 
 	//Seeing if foreground or background
 	if(twopixarray[second].slope > twopixarray[first].slope)
@@ -84,19 +94,46 @@ int imgd::checktwopoints(unsigned int first, unsigned int second) {
 void imgd::ProcessImg(unsigned char *depthbuff) {
 	cplanelist.clear();
 
+/*	OpenCv smoothing didn't work. Might try later
+	cv::Mat img(512, 424, CV_8UC4, depthbuff);
+	cv::Mat newimg;
+	cv::Mat outimg;
+	img.convertTo(newimg, CV_8UC3);
+
+	try {
+		cv::bilateralFilter(newimg, outimg, 9, 150,150);
+		}
+	catch(std::exception &e) {
+		std::cout << e.what()  << std::endl;
+	}
+	int resolution = 512*424;
+
+	for(int i = 0; i < resolution; i++) {
+		depthbuff[i*4] = outimg.data[i*4];
+		depthbuff[i*4+1] = outimg.data[i*4];
+		depthbuff[i*4+2] = outimg.data[i*4];
+		depthbuff[i*4+3] = 255;
+	}*/
+
 	/*loading points*/
 	for(int i = 0; i < checktot; i++) 
 		cpixlist[i].value = depthbuff[imcheckpos[i]];
 
+	/*calculating slopes*/
+	for(int i = 0; i < tpwidth; i++)
+		twopixarray[i].slope = twopixarray[i].points[0]->value - (twopixarray[i].points[1]->value - twopixarray[i].points[0]->value)*twopixarray[i].points[0]->x;
+
+
+
 	/*calling the process function on each point*/
-	for(int i = 0; i < tptot; i++) {
+//	for(int i = 0; i < tptot; i++) {
 		cplane newc;
+		processpoint(0,newc,false);
 
-		processpoint(i,newc);
-
-		if(newc.points.size() > 5); //What's considered a plane(more than this many pixels)
+		if(newc.points.size() > 5) //What's considered a plane(more than this many pixels)
 			cplanelist.push_back(newc);
-	}
+
+	//}
 
 	//Redrawing the planes
 	for(std::vector<cplane>::iterator j = cplanelist.begin(); j != cplanelist.end(); j++) {
@@ -128,10 +165,10 @@ void imgd::addtoplane(ctwopix &newpoints, ctwopix &newpointstwo) {
 			j->slopex = newpoints.slope;
 
 			j->points.clear();
-			j->points.push_back(newpoints.points[0]);
-			j->points.push_back(newpoints.points[1]);
-			j->points.push_back(newpointstwo.points[0]);
-			j->points.push_back(newpointstwo.points[1]);
+			j->points.push_back(*newpoints.points[0]);
+			j->points.push_back(*newpoints.points[1]);
+			j->points.push_back(*newpointstwo.points[0]);
+			j->points.push_back(*newpointstwo.points[1]);
 
 			planeexist = true;
 			break;
@@ -144,10 +181,10 @@ void imgd::addtoplane(ctwopix &newpoints, ctwopix &newpointstwo) {
 		newc.slopex = newpoints.slope;
 
 		newc.points.clear();
-		newc.points.push_back(newpoints.points[0]);
-		newc.points.push_back(newpoints.points[1]);
-		newc.points.push_back(newpointstwo.points[0]);
-		newc.points.push_back(newpointstwo.points[1]);
+		newc.points.push_back(*newpoints.points[0]);
+		newc.points.push_back(*newpoints.points[1]);
+		newc.points.push_back(*newpointstwo.points[0]);
+		newc.points.push_back(*newpointstwo.points[1]);
 
 		/*setting planes color*/
 		int seed = cplanelist.size() * 6;
@@ -163,38 +200,59 @@ void imgd::addtoplane(ctwopix &newpoints, ctwopix &newpointstwo) {
 }
 
 
-void imgd::processpoint(unsigned int point, cplane& setplane) {
+void imgd::processpoint(unsigned int point, cplane& setplane, bool set_added) {
 	if(twopixarray[point].added == checkswitch)
 		return;
 	
+	checkswitch = checkswitch;
 	bool added = false;
-	/*checking up*/
+
+	/*checking up
 	if(twopixarray[point].points[0].y > 1) {
-		if(checktwopoints(point, point - tpwidth) == 1) {
-		processpoint(point - tpwidth,setplane);
-		added = true;
+		int flag = checktwopoints(point, point - tpwidth);
+		if(flag == 1) {
+			processpoint(point - tpwidth,setplane, true);
+			added = true;
+		}
+	}*/
+
+	/*checking right*/
+	if((twopixarray[point].points[1]->x)/2 < tpwidth - 2) {
+		int flag = checktwopoints(point, point + 1);
+		if(flag == 1) {
+			processpoint(point + 1 ,setplane, true);
+			added = true;
 		}
 	}
 
-	/*checking right*/
-	if(twopixarray[point].points[1].x < pixwidth - 2) {
-		checktwopoints(point, point + 1);
-		processpoint(point - tpwidth,setplane);
-		added = true;
-	}
+	/*checking down
+	if(twopixarray[point].points[0].y < pixheight - 2) {
+		int flag = checktwopoints(point, point + tpwidth);
+		if(flag == 1) {
+			processpoint(point + tpwidth,setplane,true);
+			added = true;
+		}
+	}*/
 
-	/*checking down*/
-	if(twopixarray[point].points[1].y < pixheight - 1) {
-		checktwopoints(point, point + tpwidth);
-		processpoint(point - tpwidth,setplane);
-		added = true;
-	}
-
-	/*checking left*/
+	/*checking left
 	if(twopixarray[point].points[0].x > 1) {
-		checktwopoints(point, point - 1);
-		processpoint(point - tpwidth,setplane);
-		added = true;
+		int flag = checktwopoints(point, point - 1);
+		if(flag == 1) {
+			processpoint(point - 1,setplane, true);
+			added = true;
+		}
+	}*/
+
+	/*seeing if being added to plane*/
+	if(!added)
+		added = set_added;
+
+	/*if still not added*/
+	if(!added)
+		checkswitch = !checkswitch;
+	else {
+		setplane.points.push_back(*twopixarray[point].points[0]);
+		setplane.points.push_back(*twopixarray[point].points[1]);
 	}
 }
 

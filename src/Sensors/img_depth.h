@@ -9,6 +9,7 @@
 #include <math.h>
 #include <cstdlib>
 #include <iostream>
+#include <opencv2/imgproc/imgproc.hpp>
 
 /****************************************************************
    AUTHOR:		Steven Radomski
@@ -19,7 +20,7 @@
 
 ****************************************************************/
 struct cpixstr {unsigned char value; unsigned int pos; int x, y;}; /*structure for pixels being checked*/
-struct ctwopix {float slope; cpixstr points[2]; bool added;}; /*structure 2pixels being checked*/
+struct ctwopix {float slope; cpixstr *points[2]; bool added;}; /*structure 2pixels being checked*/
 
 struct cplane {float slopex,slopey; std::vector<cpixstr> points; unsigned char r,g,b, minx,maxx,miny,maxy; bool added;}; /*structure for pixels being checked*/
 
@@ -35,7 +36,7 @@ class imgd : public imgb {
 		inline int checktwopoints(unsigned int, unsigned int); /*check two twopicks*/
 		inline void throughforeground(unsigned int, unsigned int); /*See if the plane continues behind foreground*/
 	
-		void processpoint(unsigned int,cplane&); /*do process function on a point*/
+		void processpoint(unsigned int,cplane&, bool); /*do process function on a point*/
 
 		void configimg(int,unsigned int, unsigned int, float); /*configure scanning space*/
 
