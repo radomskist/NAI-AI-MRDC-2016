@@ -75,12 +75,12 @@ int main(int argc, char** argv)
 		nimg imgref;
 		imgref.width = 512;
 		imgref.height = 424;
-		imgref.depth = 4;
+		imgref.depth = 3;
 
 		imgwin test_win(imgref.width, imgref.height, imgref.depth);
 
-		char *b = new char[512*424*4];
-		imgref.data = new unsigned char[512*424*4];
+		char *b = new char[512*424*3];
+		imgref.data = new unsigned char[512*424*3];
 		std::fstream fileopen ("f.bmp", std::ios::in | std::ios::binary);
 
 		if(!fileopen.is_open())
@@ -94,9 +94,9 @@ int main(int argc, char** argv)
 		fileopen.read(b, n);
 
 		for(int i = 0; i < 512*424; i++) {
-			imgref.data[i*4] = b[i*4 + 72];
-			imgref.data[i*4+1] = b[i*4 + 72];
-			imgref.data[i*4+2] = b[i*4 + 72];
+			imgref.data[i*3] = b[i*3+54];
+			imgref.data[i*3+1] = b[i*3+54];
+			imgref.data[i*3+2] = b[i*3+54];
 			//imgref.data[i*3 + 3] = b[i*4 + 72];
 		}
 		imgd depthtest;

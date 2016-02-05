@@ -48,7 +48,7 @@ kinectman::kinectman() {
 	//Initializing frames with their respective resolutions
 	kdepth.width = 512;
 	kdepth.height = 424;
-	kdepth.depth = 4;
+	kdepth.depth = 3;
 	kdepth.data = new unsigned char[kdepth.width * kdepth.height * kdepth.depth];
 
 
@@ -101,10 +101,10 @@ bool kinectman::ProcessImages() {
 	for(int i = 0; i < resolution; i++) {
 		////normalize kinect range to 255
 		normalized = datahold[i] * 0.06375f; //(4500.0f - 500.0f)/(255)
-		for(int j = 0; j < 4; j++) //3 because ignoring alpha channel in the case that it's 4
+		for(int j = 0; j < kdepth.depth; j++) //3 because ignoring alpha channel in the case that it's 4
 			kdepth.data[i*kdepth.depth + j] = normalized;
 	}
-	//depth_proc.ProcessImg(kdepth.data);
+	depth_proc.ProcessImg(kdepth.data);
 
 	return true;
 }

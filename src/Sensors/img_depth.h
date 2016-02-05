@@ -9,6 +9,7 @@
 #include <math.h>
 #include <cstdlib>
 #include <iostream>
+#include <opencv2/photo.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 /****************************************************************
@@ -32,16 +33,6 @@ class imgd : public imgb {
 		void ProcessImg(unsigned char *);
 
 	private:
-		void addtoplane(ctwopix&, ctwopix&); /*add two twopix to a plane*/
-		inline int checktwopoints(unsigned int, unsigned int); /*check two twopicks*/
-		inline void throughforeground(unsigned int, unsigned int); /*See if the plane continues behind foreground*/
-	
-		void processpoint(unsigned int,cplane&, bool); /*do process function on a point*/
-
-		void configimg(int,unsigned int, unsigned int, float); /*configure scanning space*/
-
-		int recurscan(float &, unsigned char, int, int&, bool, std::vector<cpixstr> &) {};
-
 
 		/*image processing*/
 		unsigned int pixwidth; /*amount of checking pixels per row/col*/
@@ -52,6 +43,7 @@ class imgd : public imgb {
 		/*twopix values*/
 		int tptot;
 		int tpwidth;
+		int tpheight;
 
 		cpixstr *cpixlist;
 		std::vector<cplane> cplanelist;
