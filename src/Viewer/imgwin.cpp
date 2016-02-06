@@ -27,7 +27,6 @@ void imgwin::setimg(nimg * updimg) {
 		updimg->width * updimg->depth, //width * channels
 		0, 0, 0, 0);
 
-
 	textcam = SDL_CreateTextureFromSurface(rendcam, 
 		ctssurf);
 

@@ -2,204 +2,103 @@
 using namespace std;
 
 imgd::imgd() : 	iteration(3) {
-	/*Initializing image processing variables*/
-	//TODO MAKE LOADABLE BY CONFIG FILE!
-	/*Has to be multiple of 2*/
-	configimg(2,512,424,0.9f); /*range 50-95*/
+	cv::SimpleBlobDetector::Params params;
+	params.minDistBetweenBlobs = 0.0f;
+	params.filterByInertia = false;
+	params.filterByConvexity = false;
+	params.filterByColor = false;
+	params.filterByCircularity = false;
+	params.filterByArea = true;
+	params.filterByInertia = true;
 
+	params.minArea = 1.0f;
+	params.maxArea = 200.0f;
+	params.minInertiaRatio = 0.3;
+	params.maxInertiaRatio = 1.0;
+	blob_detector = cv::SimpleBlobDetector::create(params);
+
+	kdepth.width = 512;
+	kdepth.height = 424;
+	kdepth.depth = 3;
+	kdepth.data = new unsigned char[kdepth.width * kdepth.height * kdepth.depth];
 
 }
+
 imgd::~imgd() {
 
 
 }
 
-/*CONFIGURABLE VARIABLES*/
-void imgd::configimg(int pixjumpx, unsigned int width, unsigned int height, float gapsize) {
-
-
-	/*figuring out how much space (in dots) should be between edge
-	and dots*/
-	unsigned int pixtot = width * height;
-	float aspect = width / height;
-
-	pixjumpx *= 2;
-	int gapx = (width - (width * gapsize)) / pixjumpx; /*X gap in pixels*/
-	int gapy =  gapx / aspect; /*y gap in jumps*/
-
-	/*Getting how many dots should be per row and collumn*/
-	pixwidth = width / pixjumpx - gapx*2;
-	pixheight = (height / pixjumpx  - gapy*3);
-	//pixwidth -= pixwidth / (gapx*8); /*taking spaces from gapx into account*/
-	checktot = pixwidth * pixheight;
-
-	/*adjusting jump pixels for calculations*/
-	int pixjumpy = width * pixjumpx; /*moving the width over the amount of times we jump down*/
-
-	imcheckpos = new unsigned int[pixtot];
-	cpixlist = new cpixstr[pixtot];
-
-	for(int i = 0; i < checktot; i++) {
-		/*generating pixlist*/
-		cpixlist[i].x = i % pixwidth + 1;
-		cpixlist[i].y = i / pixwidth + 1;
-		cpixlist[i].pos = i;
-		/*Calculating positions of pixels to check*/
-		int ret_int = ((cpixlist[i].y*gapx*2 + (i+gapx))*pixjumpx + (cpixlist[i].y + gapy) * pixjumpy); /*Indent (removed for now) + ((cpixlist[i].y % 2) * ( pixjumpx / 2))*/
-
-		if(checktot < ret_int) 
-			imcheckpos[i] = ret_int*4;
-		else {
-			checktot = i;
-			break;
-		}
-	}
-
-	/*doing twopix resolution*/
-	tptot = checktot/2;
-	tpwidth = pixwidth/2;
-	twopixarray = new ctwopix[tptot];
-
-	for(int i = 0; i < tptot; i++)
-		twopixarray[i].added = !checkswitch;
-
-	if(tpwidth % 2 != 0)
-		tpwidth--;
-}
-
-/*checking two points*/
-int imgd::checktwopoints(unsigned int first, unsigned int second) {
-	float testslope = twopixarray[second].slope - twopixarray[first].slope;
-	if(testslope > 0.5f) //Tolerance
-		return 1;
-
-	//Seeing if foreground or background
-	if(twopixarray[second].slope > twopixarray[first].slope)
-		return 2;
-	
-	return 0;
-}
 
 /*Two pixel slope check suggested by Joel*/
 void imgd::ProcessImg(unsigned char *depthbuff) {
-	cplanelist.clear();
 
-	/*loading points*/
-	for(int i = 0; i < checktot; i++) 
-		cpixlist[i].value = depthbuff[imcheckpos[i]];
+	//Casting data to a float, which is what it's suppose to be (instead of what it gives you for some reason)
+	float *datahold = (float *)&depthbuff[4];
 
-	/*calling the process function on each point*/
-	for(int i = 0; i < tptot; i++) {
-		cplane newc;
+	unsigned char normalized;
+	unsigned resolution = kdepth.width * kdepth.height;
+	unsigned char *stuff = new unsigned char[resolution];
 
-		processpoint(i,newc);
-
-		if(newc.points.size() > 5); //What's considered a plane(more than this many pixels)
-			cplanelist.push_back(newc);
+	for(int i = 0; i < resolution; i++) {
+		////normalize kinect range to 255
+		normalized = datahold[i] * 0.06375f; //(4500.0f - 500.0f)/(255)
+		stuff[i] = normalized;
 	}
 
-	//Redrawing the planes
-	for(std::vector<cplane>::iterator j = cplanelist.begin(); j != cplanelist.end(); j++) {
-		if(j->added != checkswitch)
-			break;
+	vector<cv::KeyPoint> keypoints;
+	vector<cv::Vec4i> lines;
 
-		for(std::vector<cpixstr>::iterator k = j->points.begin(); k != j->points.end(); k++){
+	cv::Mat img(424, 512, CV_8UC1, stuff);
+	cv::Mat outimg(424, 512, CV_8UC1);
+	cv::Mat outimg2 = cv::Mat::zeros(424,512, CV_8UC1);
 
-			depthbuff[imcheckpos[k->pos]] = j->r;
-			depthbuff[imcheckpos[k->pos] + 1] = j->g;
-			depthbuff[imcheckpos[k->pos] + 2] = j->b;
+	try {
+		cv::morphologyEx(img, outimg, cv::MORPH_OPEN, cv::Mat()); //Phasing out blobs
+		cv::morphologyEx(outimg, img, cv::MORPH_CLOSE, cv::Mat()); //Closing gaps
+
+		//blob_detector->detect(img, keypoints); //Detecting remainders
+		cv::Canny(img, outimg, 30, 30, 3); //Detecting edges
+
+		//for(int i = 0; i < keypoints.size(); i++)
+		//	cv::circle(outimg, keypoints[i].pt, keypoints[i].size, cv::Scalar(0,0,0),-1); //Removing them
+		cv::HoughLinesP(outimg, lines, 5, CV_PI/180, 80, 100, 30);
+		//cv::dilate(outimg, outimg, cv::Mat(), cv::Point(0,0));
+
+		for(int i = 0; i < lines.size(); i++ ) {
+		    cv::Point pt1(lines[i][0],lines[i][1]), pt2(lines[i][2],lines[i][3]);
+		    cv::line(outimg2, pt1, pt2, cv::Scalar(255,255,255), 3, 8);
 		}
 	}
+	catch(std::exception &e) {
+		std::cout << e.what()  << std::endl;
+	}
 
-	checkswitch = !checkswitch;	
-}
-
-
-void imgd::addtoplane(ctwopix &newpoints, ctwopix &newpointstwo) {
-	bool planeexist = false;
-	newpoints.added = checkswitch;
-	newpointstwo.added = checkswitch;
-
-	/*Searching for a plane with a matching slope*/
-	for(std::vector<cplane>::iterator j = cplanelist.begin(); j != cplanelist.end(); j++) 
-		/*if we get to empty slope place this in it*/
-		 if(j->added != checkswitch) {
-			j->added = checkswitch;
-			j->slopex = newpoints.slope;
-
-			j->points.clear();
-			j->points.push_back(newpoints.points[0]);
-			j->points.push_back(newpoints.points[1]);
-			j->points.push_back(newpointstwo.points[0]);
-			j->points.push_back(newpointstwo.points[1]);
-
-			planeexist = true;
-			break;
+	//Converting the float into a proper RGB image (rather than 4 split up parts of one float)
+	for(int i = 0; i < resolution; i++) {
+		if(!outimg.data[i]) {
+			kdepth.data[i*3] = img.data[i];
+			kdepth.data[i*3 + 1] = img.data[i];
+			kdepth.data[i*3 + 2] = img.data[i];
 		}
-
-	/*generating a new plane*/				
-	if(!planeexist) {
-		cplane newc;
-		newc.added = checkswitch;
-		newc.slopex = newpoints.slope;
-
-		newc.points.clear();
-		newc.points.push_back(newpoints.points[0]);
-		newc.points.push_back(newpoints.points[1]);
-		newc.points.push_back(newpointstwo.points[0]);
-		newc.points.push_back(newpointstwo.points[1]);
-
-		/*setting planes color*/
-		int seed = cplanelist.size() * 6;
-		srand(seed);
-		newc.r = rand()%(255-1)+1;
-		srand(seed+1);
-		newc.b = rand()%(255-1)+1;
-		srand(seed+2);
-		newc.g = rand()%(255-1)+1;
-
-		cplanelist.push_back(newc);
-	}
-}
-
-
-void imgd::processpoint(unsigned int point, cplane& setplane) {
-	if(twopixarray[point].added == checkswitch)
-		return;
-	
-	bool added = false;
-	/*checking up*/
-	if(twopixarray[point].points[0].y > 1) {
-		if(checktwopoints(point, point - tpwidth) == 1) {
-		processpoint(point - tpwidth,setplane);
-		added = true;
+		else if(outimg2.data[i]) {
+			kdepth.data[i*3] = 0;
+			kdepth.data[i*3+1] = 255;
+			kdepth.data[i*3+2] = 0;
 		}
-	}
+		else {
+			kdepth.data[i*3] = 255;
+			kdepth.data[i*3+1] = 0;
+			kdepth.data[i*3+2] = 0;
+		}
+		
 
-	/*checking right*/
-	if(twopixarray[point].points[1].x < pixwidth - 2) {
-		checktwopoints(point, point + 1);
-		processpoint(point - tpwidth,setplane);
-		added = true;
 	}
-
-	/*checking down*/
-	if(twopixarray[point].points[1].y < pixheight - 1) {
-		checktwopoints(point, point + tpwidth);
-		processpoint(point - tpwidth,setplane);
-		added = true;
-	}
-
-	/*checking left*/
-	if(twopixarray[point].points[0].x > 1) {
-		checktwopoints(point, point - 1);
-		processpoint(point - tpwidth,setplane);
-		added = true;
-	}
+	outimg.release();
+	outimg2.release();
+	img.release();
 }
 
-inline void throughforeground(unsigned int, unsigned int) {
-
-
+nimg *imgd::GetImg() {
+	return &kdepth;
 }
-
