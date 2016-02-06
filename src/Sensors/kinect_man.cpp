@@ -45,13 +45,8 @@ kinectman::kinectman() {
 	f2dev->setIrAndDepthFrameListener(nailist);
 	f2dev->start();
 
-	//Initializing frames with their respective resolutions
-	kdepth.width = 512;
-	kdepth.height = 424;
-	kdepth.depth = 3;
-	kdepth.data = new unsigned char[kdepth.width * kdepth.height * kdepth.depth];
-
-
+	//Initializing RGB, depth needs to be processed and can't be given straight
+	//so it's in the depth image processor
 	krgb.width = 1920;
 	krgb.height = 1080;
 	krgb.depth = 4;
@@ -73,7 +68,7 @@ kinectman::~kinectman() {
 }
 
 nimg *kinectman::GetDepthImg() {
-	return &kdepth;
+	return depth_proc.GetImg();
 }
 
 nimg *kinectman::GetRGBImg() {
@@ -91,20 +86,8 @@ bool kinectman::ProcessImages() {
 	//Getting pointer to RGB
 	krgb.data = nfmap[libfreenect2::Frame::Color]->data;
 
-	//Casting data to a float, which is what it's suppose to be
-	float *datahold = (float *)&nfmap[libfreenect2::Frame::Depth]->data[4];
-
-	unsigned char normalized;
-	unsigned resolution = kdepth.width * kdepth.height;
-
-	//Converting the float into a proper RGB image (rather than 4 split up parts of one float)
-	for(int i = 0; i < resolution; i++) {
-		////normalize kinect range to 255
-		normalized = datahold[i] * 0.06375f; //(4500.0f - 500.0f)/(255)
-		for(int j = 0; j < kdepth.depth; j++) //3 because ignoring alpha channel in the case that it's 4
-			kdepth.data[i*kdepth.depth + j] = normalized;
-	}
-	depth_proc.ProcessImg(kdepth.data);
+	//Processing depth
+	depth_proc.ProcessImg(nfmap[libfreenect2::Frame::Depth]->data);
 
 	return true;
 }

@@ -4,13 +4,13 @@
 #pragma once
 
 #include "utils/nimg.h"
-#include "Sensors/img_base.h"
 #include <vector>
 #include <math.h>
 #include <cstdlib>
 #include <iostream>
 #include <opencv2/photo.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/features2d/features2d.hpp>
 
 /****************************************************************
    AUTHOR:		Steven Radomski
@@ -25,12 +25,13 @@ struct ctwopix {float slope; cpixstr *points[2]; bool added;}; /*structure 2pixe
 
 struct cplane {float slopex,slopey; std::vector<cpixstr> points; unsigned char r,g,b, minx,maxx,miny,maxy; bool added;}; /*structure for pixels being checked*/
 
-class imgd : public imgb {
+class imgd {
 	public:
 		imgd();
 		~imgd();
 
 		void ProcessImg(unsigned char *);
+		nimg *GetImg();
 
 	private:
 
@@ -50,7 +51,8 @@ class imgd : public imgb {
 		ctwopix* twopixarray;
 		bool checkswitch; /*check if value has been added to lits*/
 		const int iteration;
-
+		cv::Ptr<cv::SimpleBlobDetector> blob_detector;
+		nimg kdepth;
 };
 
 #endif
