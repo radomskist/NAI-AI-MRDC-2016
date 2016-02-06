@@ -57,12 +57,13 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 		cv::morphologyEx(img, outimg, cv::MORPH_OPEN, cv::Mat()); //Phasing out blobs
 		cv::morphologyEx(outimg, img, cv::MORPH_CLOSE, cv::Mat()); //Closing gaps
 
-		blob_detector->detect(img, keypoints); //Detecting remainders
+		//blob_detector->detect(img, keypoints); //Detecting remainders
 		cv::Canny(img, outimg, 30, 30, 3); //Detecting edges
-		for(int i = 0; i < keypoints.size(); i++)
-			cv::circle(outimg, keypoints[i].pt, keypoints[i].size, cv::Scalar(0,0,0),-1); //Removing them
-		cv::HoughLinesP(outimg, lines, 1, CV_PI/180, 5, 100, 45);
-		cv::dilate(outimg, outimg, cv::Mat(), cv::Point(0,0));
+
+		//for(int i = 0; i < keypoints.size(); i++)
+		//	cv::circle(outimg, keypoints[i].pt, keypoints[i].size, cv::Scalar(0,0,0),-1); //Removing them
+		cv::HoughLinesP(outimg, lines, 5, CV_PI/180, 80, 100, 30);
+		//cv::dilate(outimg, outimg, cv::Mat(), cv::Point(0,0));
 
 		for(int i = 0; i < lines.size(); i++ ) {
 		    cv::Point pt1(lines[i][0],lines[i][1]), pt2(lines[i][2],lines[i][3]);
