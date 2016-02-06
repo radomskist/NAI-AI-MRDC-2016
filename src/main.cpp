@@ -5,6 +5,7 @@
 #include "Viewer/window.h"
 #include "Viewer/NaiGL.h"
 #include "Viewer/imgwin.h"
+#include "Viewer/kinectwin.h"
 #include <fstream>
 
 #include "naibrain.h"
@@ -59,7 +60,7 @@ int main(int argc, char** argv)
 
 		std::vector<nimg*> imageref;
 		imageref = mainbrain.GetImages(kmode);
-		imgwin test_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
+		kinwin test_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
 
 		while(test_win.GetKeys()) {
 			imageref = mainbrain.GetImages(kmode);

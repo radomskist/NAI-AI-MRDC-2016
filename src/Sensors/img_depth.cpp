@@ -1,5 +1,10 @@
 #include "Sensors/img_depth.h"
 using namespace std;
+bool kimgdep = true;
+bool kimgedge = true;
+bool kimgline = true;
+bool kimgplane = true;
+
 
 imgd::imgd() : 	iteration(3) {
 	cv::SimpleBlobDetector::Params params;
@@ -40,10 +45,14 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 	unsigned resolution = kdepth.width * kdepth.height;
 	unsigned char *stuff = new unsigned char[resolution];
 
-	for(int i = 0; i < resolution; i++) {
-		////normalize kinect range to 255
-		normalized = datahold[i] * 0.06375f; //(4500.0f - 500.0f)/(255)
-		stuff[i] = normalized;
+	/*flipping the image*/
+	for(int j = 0; j < kdepth.height; j++) {
+		int currentrow = j*kdepth.width;
+		for(int i = 0; i < kdepth.width; i++) {
+			////normalize kinect range to 255
+			normalized = datahold[currentrow + (kdepth.width -1 - i)] * 0.06375f; //(4500.0f - 500.0f)/(255)
+			stuff[currentrow + i] = normalized;
+		}
 	}
 
 	vector<cv::KeyPoint> keypoints;
@@ -62,7 +71,7 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 
 		//for(int i = 0; i < keypoints.size(); i++)
 		//	cv::circle(outimg, keypoints[i].pt, keypoints[i].size, cv::Scalar(0,0,0),-1); //Removing them
-		cv::HoughLinesP(outimg, lines, 5, CV_PI/180, 80, 100, 30);
+		cv::HoughLinesP(outimg, lines, 2, CV_PI/180, 30, 50, 10);
 		//cv::dilate(outimg, outimg, cv::Mat(), cv::Point(0,0));
 
 		for(int i = 0; i < lines.size(); i++ ) {
@@ -76,24 +85,29 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 
 	//Converting the float into a proper RGB image (rather than 4 split up parts of one float)
 	for(int i = 0; i < resolution; i++) {
-		if(!outimg.data[i]) {
+		if(!kimgdep) {
+			kdepth.data[i*3] = 0;
+			kdepth.data[i*3 + 1] = 0;
+			kdepth.data[i*3 + 2] = 0;
+		}
+		else {
 			kdepth.data[i*3] = img.data[i];
 			kdepth.data[i*3 + 1] = img.data[i];
 			kdepth.data[i*3 + 2] = img.data[i];
 		}
-		else if(outimg2.data[i]) {
+
+		if(kimgline && outimg2.data[i]) {
 			kdepth.data[i*3] = 0;
 			kdepth.data[i*3+1] = 255;
 			kdepth.data[i*3+2] = 0;
 		}
-		else {
+		else if(kimgedge && outimg.data[i]) {
 			kdepth.data[i*3] = 255;
 			kdepth.data[i*3+1] = 0;
 			kdepth.data[i*3+2] = 0;
 		}
-		
-
 	}
+
 	outimg.release();
 	outimg2.release();
 	img.release();

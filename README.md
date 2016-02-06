@@ -59,3 +59,13 @@ Arrow keys = rotate camera
 f = toggle path clipping
 
 esc = close program
+
+###Depth image keybinds
+
+1 = Toggle depth image
+
+2 = Toggle edges
+
+3 = Toggle lines
+
+4 = Toggle planes
