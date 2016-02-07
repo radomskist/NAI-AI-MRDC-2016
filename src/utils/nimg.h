@@ -4,7 +4,7 @@
 //TODO overload bracket operators and make all data protected
 struct nimg {
 	nimg() {
-
+		data = 0;
 	}
 	nimg(unsigned int swidth, unsigned int sheight, unsigned int sdepth) { 
 		width = swidth;
@@ -13,14 +13,10 @@ struct nimg {
 		resolution = height*width*depth;
 		data = new unsigned char[resolution];
 		}
-	~nimg() { delete[] data; }
+	~nimg() { if(data) delete[] data; }
 
 	unsigned char *data;
 	unsigned int height, width, depth, resolution;
-
-private:
-
-
 
 };
 #endif

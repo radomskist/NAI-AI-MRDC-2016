@@ -7,6 +7,7 @@ kinectman::kinectman() {
 	std::cout << "\nNaiEye: Initializing freenect" << std::endl;
 	f2init = new libfreenect2::Freenect2;
 	f2dev = NULL;
+	f2pipe = NULL;
 
 	//Checking num of devices
 	if(f2init->enumerateDevices() == 0) {
@@ -20,6 +21,7 @@ kinectman::kinectman() {
 		f2pipe = new libfreenect2::OpenGLPacketPipeline;
 	#else
 		f2pipe = new libfreenect2::CpuPacketPipeline;
+		std::cout << "====================================================================" << std::endl;
 		std::cout << "ERROR! OPENGL DID NOT COMPILE WITH THE FREENECT2 LIBRARY BEING USED!" << std::endl;
 	#endif
 
@@ -54,6 +56,7 @@ kinectman::kinectman() {
 }
 
 void kinectman::clean() {
+
 	nailist->release(nfmap);
 
 	if(f2dev != NULL) {
@@ -64,7 +67,6 @@ void kinectman::clean() {
 
 kinectman::~kinectman() {
 	clean();
-
 }
 
 nimg *kinectman::GetDepthImg() {
@@ -76,6 +78,9 @@ nimg *kinectman::GetRGBImg() {
 }
 
 bool kinectman::ProcessImages() {
+	if(f2dev == NULL)
+		return false;
+
 	nailist->release(nfmap);
 	nailist->waitForNewFrame(nfmap);
 

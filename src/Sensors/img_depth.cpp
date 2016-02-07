@@ -7,25 +7,9 @@ bool kimgplane = true;
 
 
 imgd::imgd() : kdepth(512,424,3) {
-	cv::SimpleBlobDetector::Params params;
-	params.minDistBetweenBlobs = 0.0f;
-	params.filterByInertia = false;
-	params.filterByConvexity = false;
-	params.filterByColor = false;
-	params.filterByCircularity = false;
-	params.filterByArea = true;
-	params.filterByInertia = true;
-
-	params.minArea = 1.0f;
-	params.maxArea = 200.0f;
-	params.minInertiaRatio = 0.3;
-	params.maxInertiaRatio = 1.0;
-	blob_detector = cv::SimpleBlobDetector::create(params);
 }
 
 imgd::~imgd() {
-
-
 }
 
 std::vector<std::array<cv::Point,4>> imgd::CalculatePlanes(std::vector<cv::Vec4i> &lines, std::vector<std::array<cv::Point,2>> &returnlines) {
@@ -221,7 +205,6 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 		cv::morphologyEx(img, outimg, cv::MORPH_OPEN, cv::Mat()); //Phasing out blobs
 		cv::morphologyEx(outimg, img, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(11, 11))); //Closing gaps
 
-		//blob_detector->detect(img, keypoints); //Detecting remainders
 		cv::Canny(img, outimg2, 80, 80, 3, false); //Detecting edges
 		cv::morphologyEx(outimg2, outimg, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(11, 11))); //Closing gaps 
 		cv::dilate(outimg, outimg, cv::Mat(), cv::Point(0,0),1);

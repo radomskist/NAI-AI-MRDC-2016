@@ -2,8 +2,8 @@
 
 naibrain::naibrain() : pfind(&wmap) {
 	kinect_manager = 0;
-
 	//Initializing kinect manager
+
 	try {
 		kinect_manager = new kinectman();
 	}
@@ -19,12 +19,12 @@ naibrain::naibrain() : pfind(&wmap) {
 	}
 	catch (nfail &e) {
 		std::cout << "Webcam initialization failed: " << e.what() << std::endl;
-		bcwebcam = NULL; //just incase
 	}
 }
 
 naibrain::~naibrain() {
-	delete kinect_manager;
+	if(kinect_manager != NULL)
+		delete kinect_manager;
 }
 
 bool naibrain::KStatus() {

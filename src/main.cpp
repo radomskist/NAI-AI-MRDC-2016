@@ -32,8 +32,8 @@ int main(int argc, char** argv)
 	/*Test camera argument loop*/
 	if((areargs && (arg1 == "-ct"))) {
 		std::vector<nimg*> imageref;
-
 		imageref = mainbrain.GetImages(BCCAM);
+
 		if(imageref.empty()) {
 			std::cout << "No webcam" << std::endl;
 			return -12;

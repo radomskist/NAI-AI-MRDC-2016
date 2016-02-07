@@ -32,7 +32,6 @@ class imgd {
 		nimg *GetImg();
 
 	private:
-		cv::Ptr<cv::SimpleBlobDetector> blob_detector; //Unused probably, but might be needed
 		nimg kdepth;
 };
 

@@ -5,6 +5,7 @@
 #include "Memory/world_map.h"
 #include "Memory/path_finding.h"
 #include "utils/nimg.h"
+#include "utils/nexcep.hpp"
 
 enum SensorFlags {
 	KRGB = 0x01,	//Kinect rgb
