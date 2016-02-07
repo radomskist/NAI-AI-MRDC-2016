@@ -7,11 +7,12 @@ basewin::basewin() {
 bool basewin::GetKeys() {
 	SDL_Event event;
 	//Checking for ESC key to close program
+	bool go = true;
 	while( SDL_PollEvent( &event ) )
 		if(event.key.keysym.sym == SDLK_ESCAPE)
-			return false;
+			go = false;
 
-	return true;
+	return go;
 }
 
 

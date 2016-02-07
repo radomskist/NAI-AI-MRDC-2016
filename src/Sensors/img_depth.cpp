@@ -6,7 +6,7 @@ bool kimgline = true;
 bool kimgplane = true;
 
 
-imgd::imgd() : 	iteration(3) {
+imgd::imgd() : kdepth(512,424,3) {
 	cv::SimpleBlobDetector::Params params;
 	params.minDistBetweenBlobs = 0.0f;
 	params.filterByInertia = false;
@@ -21,12 +21,6 @@ imgd::imgd() : 	iteration(3) {
 	params.minInertiaRatio = 0.3;
 	params.maxInertiaRatio = 1.0;
 	blob_detector = cv::SimpleBlobDetector::create(params);
-
-	kdepth.width = 512;
-	kdepth.height = 424;
-	kdepth.depth = 3;
-	kdepth.data = new unsigned char[kdepth.width * kdepth.height * kdepth.depth];
-
 }
 
 imgd::~imgd() {
@@ -34,6 +28,53 @@ imgd::~imgd() {
 
 }
 
+std::vector<std::array<cv::Point,2>> imgd::CalculatePlanes(std::vector<cv::Vec4i> &lines) {
+
+	std::vector<std::array<cv::Point,2>> returnvec;
+	std::vector<std::array<cv::Point,2>> verticle;
+
+	/*Translating points into lines*/
+	for(int i = 0; i < lines.size(); i++) {
+		std::array<cv::Point, 2> points;
+		points[0] = cv::Point(lines[i][0],lines[i][1]);
+		points[1] = cv::Point(lines[i][2],lines[i][3]);
+
+		//Ignore noise on left edge
+		if(points[0].x < 4)
+			continue;
+
+		/*seperate the lines based on angle*/
+		float Angle = atan2(points[1].y - points[0].y,points[1].x - points[0].x);
+		if(fabs(Angle) > 1.22f) /*70 degrees*/
+			verticle.push_back(points);
+		else 
+			returnvec.push_back(points);
+	}
+
+	/*going through verticle lines to see if any match*/
+	for(int i = 0; i < verticle.size(); i++) {
+		int thirdsize = verticle[i][0].y - verticle[i][1].y;
+		int top, bottom;
+
+		if(thirdsize < 0) {
+			
+			
+			
+		}
+
+		//std::cout << thirdsize << std::endl;
+		for(int j = 0; j < verticle.size(); j++) {
+			if(i == j)
+				continue;
+			
+		//	verticle[i].y - 
+		}
+	}
+
+	//Combine the matrices for visuals
+	returnvec.insert(returnvec.end(), verticle.begin(), verticle.end());
+	return returnvec;
+}
 
 /*Two pixel slope check suggested by Joel*/
 void imgd::ProcessImg(unsigned char *depthbuff) {
@@ -49,6 +90,7 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 	for(int j = 0; j < kdepth.height; j++) {
 		int currentrow = j*kdepth.width;
 		for(int i = 0; i < kdepth.width; i++) {
+
 			////normalize kinect range to 255
 			normalized = datahold[currentrow + (kdepth.width -1 - i)] * 0.06375f; //(4500.0f - 500.0f)/(255)
 			stuff[currentrow + i] = normalized;
@@ -67,16 +109,16 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 		cv::morphologyEx(outimg, img, cv::MORPH_CLOSE, cv::Mat()); //Closing gaps
 
 		//blob_detector->detect(img, keypoints); //Detecting remainders
-		cv::Canny(img, outimg, 30, 30, 3); //Detecting edges
+		cv::Canny(img, outimg, 30, 30, 3, false); //Detecting edges
 
 		//for(int i = 0; i < keypoints.size(); i++)
 		//	cv::circle(outimg, keypoints[i].pt, keypoints[i].size, cv::Scalar(0,0,0),-1); //Removing them
-		cv::HoughLinesP(outimg, lines, 2, CV_PI/180, 30, 50, 10);
+		cv::HoughLinesP(outimg, lines, 2, CV_PI/180, 30, 70, 10);
 		//cv::dilate(outimg, outimg, cv::Mat(), cv::Point(0,0));
+		std::vector<std::array<cv::Point,2>> pointset = CalculatePlanes(lines);
 
-		for(int i = 0; i < lines.size(); i++ ) {
-		    cv::Point pt1(lines[i][0],lines[i][1]), pt2(lines[i][2],lines[i][3]);
-		    cv::line(outimg2, pt1, pt2, cv::Scalar(255,255,255), 3, 8);
+		for(int i = 0; i < pointset.size(); i++ ) {
+		    cv::line(outimg2, pointset[i][0], pointset[i][1], cv::Scalar(255,255,255), 3, 8);
 		}
 	}
 	catch(std::exception &e) {
@@ -108,9 +150,11 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 		}
 	}
 
+	img.release();
 	outimg.release();
 	outimg2.release();
 	img.release();
+	delete[] stuff;
 }
 
 nimg *imgd::GetImg() {

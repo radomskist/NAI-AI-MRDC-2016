@@ -16,9 +16,10 @@ kinwin::~kinwin() {
 bool kinwin::GetKeys() {
 	SDL_Event event;
 	//Checking for ESC key to close program
+	bool go = true;
 	while( SDL_PollEvent( &event ) )
 		if(event.key.keysym.sym == SDLK_ESCAPE)
-			return false;
+			go = false;
 
 		/*camerapos*/
 		else if(event.key.keysym.sym == SDLK_1 && event.type == SDL_KEYDOWN)
@@ -30,5 +31,5 @@ bool kinwin::GetKeys() {
 		else if(event.key.keysym.sym == SDLK_4 && event.type == SDL_KEYDOWN)
 			kimgplane = !kimgplane;
 
-	return true;
+	return go;
 }
