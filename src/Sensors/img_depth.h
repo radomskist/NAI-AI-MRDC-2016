@@ -28,7 +28,7 @@ class imgd {
 		~imgd();
 
 		void ProcessImg(unsigned char *);
-		inline std::vector<std::array<cv::Point,2>> CalculatePlanes(std::vector<cv::Vec4i> &);
+		inline std::vector<std::array<cv::Point,4>> CalculatePlanes(std::vector<cv::Vec4i> &, std::vector<std::array<cv::Point,2>>&);
 		nimg *GetImg();
 
 	private:

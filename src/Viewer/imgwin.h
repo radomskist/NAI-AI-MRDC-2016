@@ -9,12 +9,11 @@ class imgwin : public basewin {
 	public:
 		imgwin(unsigned int, unsigned int, unsigned int);
 		~imgwin();
-		void setimg(nimg *);
+		virtual void setimg(nimg *);
 
-	private:
+	protected:
 		SDL_Renderer *rendcam;
 		SDL_Texture *textcam;
-		unsigned int width, height, depth;
 		SDL_Surface* ctssurf; //opencv to sdl surface
 
 };

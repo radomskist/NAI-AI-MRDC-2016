@@ -51,14 +51,17 @@ Create a include folder in the main directory and copy the freenect2, libusb, GL
 
 -mem = memory map, uses the memory map. Used when all other options fail.
 
+
+#CONTROLS
+
+esc = close program
+
 ###Memory map controls:
 WASD, move north, south, west and east respectively.
 
 Arrow keys = rotate camera
 
 f = toggle path clipping
-
-esc = close program
 
 ###Depth image keybinds
 
@@ -69,3 +72,7 @@ esc = close program
 3 = Toggle lines
 
 4 = Toggle planes
+
+r = Freeze frame
+
+f = next frame

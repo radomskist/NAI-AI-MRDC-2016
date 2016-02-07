@@ -8,15 +8,13 @@
 class kinwin : public imgwin {
 	public:
 		kinwin(unsigned int, unsigned int, unsigned int);
+		void setimg(nimg * updimg);
 		~kinwin();
 		bool GetKeys();
 
 	private:
-		SDL_Renderer *rendcam;
-		SDL_Texture *textcam;
-		unsigned int width, height, depth;
-		SDL_Surface* ctssurf; //opencv to sdl surface
-
+		bool slowcap;
+		bool cap;
 };
 
 #endif
