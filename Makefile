@@ -23,3 +23,5 @@ obj/%.o: src/%.cpp
 	-mkdir -p $(dir $(dir $(dir $@)))
 	$(CC) $(OPTS) -c $< $(INCS) -o $@
 
+clean:
+	rm -r ./obj ./NaiBrain

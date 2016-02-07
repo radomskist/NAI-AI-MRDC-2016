@@ -44,9 +44,10 @@ const GLchar* wallshader = {"#version 330 core\n"
 bool naigl::GetKeys() {
 	SDL_Event event;
 	//Checking for ESC key to close program
+	bool go = true;
 	while( SDL_PollEvent( &event ) )
 		if(event.key.keysym.sym == SDLK_ESCAPE)
-			return false;
+			go = false;
 
 		/*camerarot*/
 		else if(event.key.keysym.sym == SDLK_UP)
@@ -73,7 +74,7 @@ bool naigl::GetKeys() {
 			linedepth = !linedepth;
 
 
-	return true;
+	return go;
 }
 
 

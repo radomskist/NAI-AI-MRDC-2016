@@ -8,6 +8,8 @@ Path finding
 Arduino Laptop communication
 	-Needed for issuing commands
 
+Fix memory leak
+
 ALMOST DONE:
 Web camera
 	-Identification needs to be done

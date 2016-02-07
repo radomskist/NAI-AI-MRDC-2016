@@ -9,13 +9,11 @@ class basewin {
 	public:
 		basewin();
 		~basewin();
-		void setimg(unsigned char *);
+
 		virtual bool GetKeys();
 
 	protected:
-		unsigned int width;
-		unsigned int height;
-
+		unsigned int width,height,depth;
 		SDL_Window* win;
 };
 

@@ -5,6 +5,7 @@
 
 #include "utils/nimg.h"
 #include <vector>
+#include <array>
 #include <math.h>
 #include <cstdlib>
 #include <iostream>
@@ -20,10 +21,6 @@
    NOTES:		N/A
 
 ****************************************************************/
-struct cpixstr {unsigned char value; unsigned int pos; int x, y;}; /*structure for pixels being checked*/
-struct ctwopix {float slope; cpixstr *points[2]; bool added;}; /*structure 2pixels being checked*/
-
-struct cplane {float slopex,slopey; std::vector<cpixstr> points; unsigned char r,g,b, minx,maxx,miny,maxy; bool added;}; /*structure for pixels being checked*/
 
 class imgd {
 	public:
@@ -31,27 +28,10 @@ class imgd {
 		~imgd();
 
 		void ProcessImg(unsigned char *);
+		inline std::vector<std::array<cv::Point,4>> CalculatePlanes(std::vector<cv::Vec4i> &, std::vector<std::array<cv::Point,2>>&);
 		nimg *GetImg();
 
 	private:
-
-		/*image processing*/
-		unsigned int pixwidth; /*amount of checking pixels per row/col*/
-		unsigned int pixheight;
-		unsigned int checktot;/*total number of checking pixels*/
-		unsigned int *imcheckpos; /*Array storing location of checking pixels*/
-
-		/*twopix values*/
-		int tptot;
-		int tpwidth;
-		int tpheight;
-
-		cpixstr *cpixlist;
-		std::vector<cplane> cplanelist;
-		ctwopix* twopixarray;
-		bool checkswitch; /*check if value has been added to lits*/
-		const int iteration;
-		cv::Ptr<cv::SimpleBlobDetector> blob_detector;
 		nimg kdepth;
 };
 
