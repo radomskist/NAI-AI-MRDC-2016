@@ -27,7 +27,7 @@ class naigl : public basewin {
 		void addplanes(std::vector<obj_plane> &);
 		void setpath(std::vector<obj_point> );
 		void addents(std::vector<obj_cube> &);
-		bool GetKeys();
+		void GetKeys();
 
 	private:
 		void shaderinit();

@@ -217,6 +217,11 @@ std::vector<std::array<cv::Point,4>> imgd::CalculatePlanes(std::vector<std::arra
 	return planelist;
 }
 
+std::vector<std::array<cv::Point,4>> imgd::CheckPlane(std::array<cv::Point,4> &checkplane) {
+	
+	
+	
+}
 /*Two pixel slope check suggested by Joel*/
 void imgd::ProcessImg(unsigned char *depthbuff) {
 
@@ -293,7 +298,12 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 			kdepth.data[i*3 + 2] = img.data[i];
 		}
 
-		if(kimgline && outimg2.data[i]) {
+		if(kimgplane && outimg3.data[i]) {
+			kdepth.data[i*3] = 0;
+			kdepth.data[i*3+1] = 0;
+			kdepth.data[i*3+2] = 255;
+		}
+		else if(kimgline && outimg2.data[i]) {
 			kdepth.data[i*3] = 0;
 			kdepth.data[i*3+1] = 255;
 			kdepth.data[i*3+2] = 0;
@@ -303,11 +313,7 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 			kdepth.data[i*3+1] = 0;
 			kdepth.data[i*3+2] = 0;
 		}
-		else if(kimgplane && outimg3.data[i]) {
-			kdepth.data[i*3] = 0;
-			kdepth.data[i*3+1] = 0;
-			kdepth.data[i*3+2] = 255;
-		}
+
 	}
 
 	img.release();

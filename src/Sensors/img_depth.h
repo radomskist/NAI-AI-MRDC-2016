@@ -28,12 +28,24 @@ class imgd {
 		~imgd();
 
 		void ProcessImg(unsigned char *);
-		inline std::vector<std::array<cv::Point,4>> ProcessLines(std::vector<cv::Vec4i> &, std::vector<std::array<cv::Point,2>>&, std::vector<std::array<cv::Point,2>>&);
-		inline std::vector<std::array<cv::Point,4>> CalculatePlanes(std::vector<std::array<cv::Point,2>>&,std::vector<std::array<cv::Point,2>>&);
 		nimg *GetImg();
-		inline 
 
 	private:
+		//Merges all lines together and estimates where unseen lines might be.
+		//returns a vector of estimated lines 
+		//Arguments, vector of lines as input, vector of horizontal lines to return, vector of verticle lines to return
+		inline std::vector<std::array<cv::Point,4>> ProcessLines(std::vector<cv::Vec4i> &, std::vector<std::array<cv::Point,2>>&, std::vector<std::array<cv::Point,2>>&);
+
+		//Calulates planes from lines
+		//Returns corners of the plane
+		//Horizontal lines as input, Verticle lines as input.
+		inline std::vector<std::array<cv::Point,4>> CalculatePlanes(std::vector<std::array<cv::Point,2>>&,std::vector<std::array<cv::Point,2>>&);
+
+		//Checks if a detected plane is solid
+		//Returns a list of planes incase one plane might be two planes
+		//Takes in a plane as input
+		inline std::vector<std::array<cv::Point,4>> CheckPlane(std::array<cv::Point,4> &);
+
 		nimg kdepth;
 		bool lineest; //Whether or not estimated lines should be calculated
 		float *datahold;

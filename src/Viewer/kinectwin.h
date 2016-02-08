@@ -8,13 +8,8 @@
 class kinwin : public imgwin {
 	public:
 		kinwin(unsigned int, unsigned int, unsigned int);
-		void setimg(nimg * updimg);
 		~kinwin();
-		bool GetKeys();
-
-	private:
-		bool slowcap;
-		bool cap;
+		void GetKeys();
 };
 
 #endif
