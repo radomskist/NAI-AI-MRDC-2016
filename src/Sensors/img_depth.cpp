@@ -7,15 +7,15 @@ bool kimgplane = true;
 
 
 imgd::imgd() : kdepth(512,424,3) {
+	lineest = false;
 }
 
 imgd::~imgd() {
 }
 
-std::vector<std::array<cv::Point,4>> imgd::CalculatePlanes(std::vector<cv::Vec4i> &lines, std::vector<std::array<cv::Point,2>> &returnlines) {
+std::vector<std::array<cv::Point,4>> imgd::ProcessLines(std::vector<cv::Vec4i> &lines, std::vector<std::array<cv::Point,2>> &horizontal, std::vector<std::array<cv::Point,2>> &verticle) {
 
 	std::vector<std::array<cv::Point,4>> returnvec;
-	std::vector<std::array<cv::Point,2>> verticle;
 	std::vector<float> angles;
 
 	/*Translating points into lines*/
@@ -45,38 +45,38 @@ std::vector<std::array<cv::Point,4>> imgd::CalculatePlanes(std::vector<cv::Vec4i
 				points[1] = points[0];
 				points[0] = temp;
 				}
-			returnlines.push_back(points);
+			horizontal.push_back(points);
 			angles.push_back(Angle);
 		}
 	}
 
 
 	//Merging extra horizontal lines
-	for(int i = 0; i < returnlines.size(); i++)
-		for(int j = i; j < returnlines.size(); j++) {
-			if(abs(angles[i] -angles[j]) > .5) //seeing if similar angle
+	for(int i = 0; i < horizontal.size(); i++)
+		for(int j = i; j < horizontal.size(); j++) {
+			if(abs(angles[i] -angles[j]) > .35) //seeing if similar angle
 				continue;
 
-			if(abs(returnlines[i][0].y - returnlines[j][0].y) > 5) //Making sure lines are even on the same level
+			if(abs(horizontal[i][0].y - horizontal[j][0].y) > 5) //Making sure lines are even on the same level
 				continue;
 
 			//if its within the mainline just remove
-			if(returnlines[i][0].x < returnlines[j][0].x && returnlines[i][1].x > returnlines[j][1].x) {
-				returnlines.erase(returnlines.begin() + j);
+			if(horizontal[i][0].x < horizontal[j][0].x && horizontal[i][1].x > horizontal[j][1].x) {
+				horizontal.erase(horizontal.begin() + j);
 				angles.erase(angles.begin() + j);		
 			}
 			//Making sure they're close enough
-			else if(fabs(abs(returnlines[j][0].x - returnlines[i][0].x)) < 20 || fabs(abs(returnlines[j][1].x - returnlines[i][1].x)) < 20 
-			|| fabs(abs(returnlines[j][1].x - returnlines[i][0].x)) < 20 || fabs(abs(returnlines[j][1].x - returnlines[i][0].x)) < 20
-			|| (returnlines[i][0].x < returnlines[j][1].x && returnlines[i][1].x > returnlines[j][0].x)) { //Checking if its within bounds
+			else if(abs(horizontal[j][0].x - horizontal[i][0].x) < 20 || abs(horizontal[j][1].x - horizontal[i][1].x) < 20 
+			|| abs(horizontal[j][1].x - horizontal[i][0].x) < 20 || abs(horizontal[j][1].x - horizontal[i][0].x) < 20
+			|| (horizontal[i][0].x < horizontal[j][1].x && horizontal[i][1].x > horizontal[j][0].x)) { //Checking if its within bounds
 
-				if(returnlines[j][0].x < returnlines[i][0].x) 
-					returnlines[i][0] = returnlines[j][0];
+				if(horizontal[j][0].x < horizontal[i][0].x) 
+					horizontal[i][0] = horizontal[j][0];
 
-				if(returnlines[j][1].x > returnlines[i][1].x)
-					returnlines[i][1] = returnlines[j][1];
+				if(horizontal[j][1].x > horizontal[i][1].x)
+					horizontal[i][1] = horizontal[j][1];
 
-			returnlines.erase(returnlines.begin() + j);
+			horizontal.erase(horizontal.begin() + j);
 			angles.erase(angles.begin() + j);	
 			}
 
@@ -93,8 +93,8 @@ std::vector<std::array<cv::Point,4>> imgd::CalculatePlanes(std::vector<cv::Vec4i
 				verticle.erase(verticle.begin() + j);
 
 			//Making sure they're close enough
-			else if(fabs(abs(verticle[j][0].y - verticle[i][0].y)) < 20 || fabs(abs(verticle[j][1].y - verticle[i][1].y)) < 20 
-			|| fabs(abs(verticle[j][1].y - verticle[i][0].y)) < 20 || fabs(abs(verticle[j][1].y - verticle[i][0].y)) < 20
+			else if(abs(verticle[j][0].y - verticle[i][0].y) < 20 || abs(verticle[j][1].y - verticle[i][1].y) < 20 
+			|| abs(verticle[j][1].y - verticle[i][0].y) < 20 || abs(verticle[j][1].y - verticle[i][0].y) < 20
 			|| (verticle[i][0].y < verticle[j][1].y && verticle[i][1].y > verticle[j][0].y)) { //Checking if its within bounds
 
 				if(verticle[j][0].y < verticle[i][0].y) 
@@ -108,54 +108,58 @@ std::vector<std::array<cv::Point,4>> imgd::CalculatePlanes(std::vector<cv::Vec4i
 
 		}
 
+	//Should we estimate where lines could be?
+	if(!lineest)
+		return returnvec;
+
 	/*going through verticle lines to see if any match*/
 	for(int i = 0; i < verticle.size(); i++) {
 		int halfsize = (verticle[i][0].y - verticle[i][1].y) * .4;
 		int range = abs(verticle[i][1].x - verticle[i][0].x);
 
-		for(int j = 0; j < verticle.size(); j++) {
+		for(int j = i; j < verticle.size(); j++) {
 			if(i == j)
 				continue;
 
 			if(abs(verticle[i][0].y - verticle[j][0].y) < halfsize) {
-				//std::array<cv::Point,4> pushin;
-				//pushin[0] = verticle[i][0];
-				//pushin[1] = verticle[j][0];
-				//pushin[2] = verticle[j][1];
-				//pushin[3] = verticle[i][1];
-				//returnvec.push_back(pushin);
+				std::array<cv::Point,4> pushin;
+				pushin[0] = verticle[i][0];
+				pushin[1] = verticle[j][0];
+				pushin[2] = verticle[j][1];
+				pushin[3] = verticle[i][1];
+				returnvec.push_back(pushin);
 			}
 		}
 
 		/*horizontal line testing*/	
-		for(int j = 0; j < returnlines.size(); j++) {
+		for(int j = i; j < horizontal.size(); j++) {
 
 			//If its closer to the bottom of the plane than top then throw it out
-			int heighttest = abs(verticle[i][0].y - returnlines[j][0].y);
-			int heighttest2 = abs(verticle[i][1].y - returnlines[j][0].y);			
+			int heighttest = abs(verticle[i][0].y - horizontal[j][0].y);
+			int heighttest2 = abs(verticle[i][1].y - horizontal[j][0].y);			
 			if(heighttest > heighttest2) //have to work upside down with images, less is higher
 				continue;
 
 			//Making sure the horizontal is not more than 75% the verticle lines height above it
-			heighttest = verticle[i][1].y - returnlines[j][0].y;			
+			heighttest = verticle[i][1].y - horizontal[j][0].y;			
 			heighttest2 = (verticle[i][1].y - verticle[i][0].y)*1.25;
 			if(heighttest > heighttest2)
 				continue;
 
 			//make sure the verticle is not more than 75% the horizontals width away from it
-			heighttest = abs(verticle[i][0].x - returnlines[j][1].x);
-			heighttest2 = abs(verticle[i][0].x - returnlines[j][0].x);
+			heighttest = abs(verticle[i][0].x - horizontal[j][1].x);
+			heighttest2 = abs(verticle[i][0].x - horizontal[j][0].x);
 
-			int heighttest3 = abs(returnlines[j][1].x - returnlines[j][0].x)*.75;
+			int heighttest3 = abs(horizontal[j][1].x - horizontal[j][0].x)*.75;
 
 			if(heighttest > heighttest3 && heighttest2 > heighttest3)
 				continue;
 
 			cv::Point closest;
 			if(heighttest > heighttest2) 
-				closest = returnlines[j][0];
+				closest = horizontal[j][0];
 			else
-				closest = returnlines[j][1];
+				closest = horizontal[j][1];
 
 			std::array<cv::Point,4> pushin;
 			pushin[0] = verticle[i][0];
@@ -166,16 +170,58 @@ std::vector<std::array<cv::Point,4>> imgd::CalculatePlanes(std::vector<cv::Vec4i
 		}
 	}
 
-	//Combine the matrices for visuals
-	returnlines.insert(returnlines.end(), verticle.begin(), verticle.end());
 	return returnvec;
+}
+
+std::vector<std::array<cv::Point,4>> imgd::CalculatePlanes(std::vector<std::array<cv::Point,2>> &horizontal, std::vector<std::array<cv::Point,2>> &verticle) {
+
+	std::vector<std::array<cv::Point,4>> planelist;
+	for(int i = 0; i < verticle.size(); i++) {
+		for(int j = 0; j < horizontal.size(); j++) {
+			if(abs(verticle[i][0].y - horizontal[j][0].y) < 20) { //Checking if it's even on the same plane
+				int px = abs(verticle[i][0].x - horizontal[j][0].x);
+				int py = abs(verticle[i][0].x - horizontal[j][1].x);
+
+				if(px > 20 && py > 20) 
+					continue;
+
+				cv::Point closest, furthest, corner, cloestcorner;
+				if(px > py) {
+					closest = horizontal[j][1];
+					furthest = horizontal[j][0];
+				}
+				else {
+					closest = horizontal[j][0];
+					furthest = horizontal[j][1];
+				}				
+				
+				corner.x = furthest.x;
+				int difference = ((abs(horizontal[j][0].y - horizontal[j][1].y))*.5);
+				corner.y = verticle[i][1].y + difference;
+				cloestcorner.x = verticle[i][0].x;
+				cloestcorner.y = verticle[i][1].y - difference;
+
+
+				std::array<cv::Point,4> newpoint;
+				newpoint[0] = closest;
+				newpoint[1] = furthest;
+				newpoint[2] = corner;
+				newpoint[3] = cloestcorner;
+
+				planelist.push_back(newpoint);
+			}
+		}
+	}
+	
+	horizontal.insert(horizontal.end(),verticle.begin(),verticle.end());
+	return planelist;
 }
 
 /*Two pixel slope check suggested by Joel*/
 void imgd::ProcessImg(unsigned char *depthbuff) {
 
 	//Casting data to a float, which is what it's suppose to be (instead of what it gives you for some reason)
-	float *datahold = (float *)&depthbuff[4];
+	datahold = (float *)&depthbuff[4];
 
 	unsigned char normalized;
 	unsigned resolution = kdepth.width * kdepth.height;
@@ -185,7 +231,6 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 	for(int j = 0; j < kdepth.height; j++) {
 		int currentrow = j*kdepth.width;
 		for(int i = 0; i < kdepth.width; i++) {
-
 			////normalize kinect range to 255
 			normalized = datahold[currentrow + (kdepth.width -1 - i)] * 0.06375f; //(4500.0f - 500.0f)/(255)
 			stuff[currentrow + i] = normalized;
@@ -215,8 +260,10 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 		cv::HoughLinesP(outimg, lines, 2, CV_PI/180, 30, 70, 10);
 
 		std::vector<std::array<cv::Point,2>> pointset;
-		std::vector<std::array<cv::Point,4>> planeset = CalculatePlanes(lines,pointset);
-
+		std::vector<std::array<cv::Point,2>> vertset;
+		ProcessLines(lines,pointset,vertset);
+		std::vector<std::array<cv::Point,4>> planeset = CalculatePlanes(pointset,vertset);
+	
 		for(int i = 0; i < pointset.size(); i++ ) {
 		    cv::line(outimg2, pointset[i][0], pointset[i][1], cv::Scalar(255,255,255), 3, 8);
 		}

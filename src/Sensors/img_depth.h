@@ -28,11 +28,14 @@ class imgd {
 		~imgd();
 
 		void ProcessImg(unsigned char *);
-		inline std::vector<std::array<cv::Point,4>> CalculatePlanes(std::vector<cv::Vec4i> &, std::vector<std::array<cv::Point,2>>&);
+		inline std::vector<std::array<cv::Point,4>> ProcessLines(std::vector<cv::Vec4i> &, std::vector<std::array<cv::Point,2>>&, std::vector<std::array<cv::Point,2>>&);
+		inline std::vector<std::array<cv::Point,4>> CalculatePlanes(std::vector<std::array<cv::Point,2>>&,std::vector<std::array<cv::Point,2>>&);
 		nimg *GetImg();
 
 	private:
 		nimg kdepth;
+		bool lineest; //Whether or not estimated lines should be calculated
+		float *datahold;
 };
 
 #endif
