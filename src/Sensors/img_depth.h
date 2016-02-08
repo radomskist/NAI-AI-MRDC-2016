@@ -31,6 +31,7 @@ class imgd {
 		inline std::vector<std::array<cv::Point,4>> ProcessLines(std::vector<cv::Vec4i> &, std::vector<std::array<cv::Point,2>>&, std::vector<std::array<cv::Point,2>>&);
 		inline std::vector<std::array<cv::Point,4>> CalculatePlanes(std::vector<std::array<cv::Point,2>>&,std::vector<std::array<cv::Point,2>>&);
 		nimg *GetImg();
+		inline 
 
 	private:
 		nimg kdepth;

@@ -3,7 +3,7 @@ depends/*
 obj/*
 include/*
 NaiBrain
-./f.bmp
+
 
 !include/GL/.gitkeep
 !include/glm/.gitkeep
