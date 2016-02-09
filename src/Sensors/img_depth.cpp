@@ -10,6 +10,7 @@ imgd::imgd() : kdepth(512,424,3) {
 	lineest = false; //Predict where lines might be?
 	pixdist = 10; //Distance between pixels when testing flatness of plane
 	slopeerrorrange = 5; //Range of error when seeing if plane is flat
+	kdepth.flags &= KDEP;
 }
 
 imgd::~imgd() {

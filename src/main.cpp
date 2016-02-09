@@ -5,6 +5,7 @@
 #include "Viewer/window.h"
 #include "Viewer/NaiGL.h"
 #include "Viewer/imgwin.h"
+#include "Viewer/multiwin.h"
 #include "Viewer/kinectwin.h"
 #include <fstream>
 
@@ -52,7 +53,7 @@ int main(int argc, char** argv)
 	}
 
 	/*Test kinect argument loop*/
-	else if(mainbrain.KStatus() && (areargs == ((arg1 == "-kdep") || (arg1 == "-krgb")))) {
+	else if(mainbrain.KStatus() && areargs && (arg1 == "-kdep") || (arg1 == "-krgb")) {
 		int kmode;
 		if(!areargs || (arg1 != "-krgb"))//default
 			kmode = KDEP;
@@ -131,9 +132,23 @@ int main(int argc, char** argv)
 		}
 	}
 	else {
+		multiwin MainWin(1024, 760);
+		world_map wmap = mainbrain.GetMap();
+		unsigned int kmode = KDEP & KRGB & KFREEZE;
 
+		/*TODO REMOVE*/
+		wmap.gentest();	
+		MainWin.addplanes(wmap.GetPlanes());
+		std::vector<obj_cube> addcube;
+		addcube.push_back(wmap.GetRobot());
+		MainWin.addents(addcube);
+		obj_point newpoint(2000,2000,0);
+		MainWin.setpath(mainbrain.GetPfind().gotopoint(newpoint));
 
-
+		while(MainWin.running()) {
+			MainWin.GetKeys();
+			MainWin.setimg(mainbrain.GetImages(kmode));
+		}
 	}
 
 	//Closing program

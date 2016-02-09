@@ -92,7 +92,7 @@ naigl::naigl() {
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 2 ); 
 
-	win = SDL_CreateWindow( "Memory Map",
+	win = SDL_CreateWindow( "NAI",
 		0,
 		0,
 		width,

@@ -7,13 +7,6 @@
 #include "utils/nimg.h"
 #include "utils/nexcep.hpp"
 
-enum SensorFlags {
-	KRGB = 0x01,	//Kinect rgb
-	KDEP = 0x02,	//Kinect depth
-	BCCAM = 0x04	//Ball check camera
-
-};
-
 class naibrain {
 	public:
 		naibrain();

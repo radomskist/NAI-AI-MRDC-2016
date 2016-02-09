@@ -90,6 +90,7 @@ bool kinectman::ProcessImages() {
 
 	//Getting pointer to RGB
 	krgb.data = nfmap[libfreenect2::Frame::Color]->data;
+	krgb.flags = KRGB;
 
 	//Processing depth
 	depth_proc.ProcessImg(nfmap[libfreenect2::Frame::Depth]->data);
