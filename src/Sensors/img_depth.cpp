@@ -9,7 +9,7 @@ bool kimgplane = true;
 imgd::imgd() : kdepth(512,424,3) {
 	lineest = false; //Predict where lines might be?
 	pixdist = 10; //Distance between pixels when testing flatness of plane
-	slopeerrorrange = 250; //Range of error when seeing if plane is flat
+	slopeerrorrange = 5; //Range of error when seeing if plane is flat
 	filtered = new unsigned char[512*424];
 }
 
@@ -191,7 +191,7 @@ std::vector<obj_plane> imgd::CalculatePlanes(std::vector<std::array<cv::Point,2>
 			if(px > 20 && py > 20) 
 				continue;
 
-			cv::Point closest, furthest, corner, cloestcorner;
+			cv::Point closest, furthest, corner;
 			if(px > py) {
 				closest = horizontal[j][1];
 				furthest = horizontal[j][0];
@@ -203,9 +203,7 @@ std::vector<obj_plane> imgd::CalculatePlanes(std::vector<std::array<cv::Point,2>
 		
 			corner.x = furthest.x;
 			int difference = ((abs(horizontal[j][0].y - horizontal[j][1].y))*.5);
-			corner.y = verticle[i][1].y + difference;
-			cloestcorner.x = horizontal[j][1].x;
-			cloestcorner.y = verticle[i][1].y;
+			corner.y = verticle[i][1].y;
 			closest.x = verticle[i][0].x;
 			std::array<cv::Point,4> newpoint;
 
@@ -244,7 +242,7 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 	checkdist = checkdist / checktot; // every pixdist pixels
 
 	cv::Point checkpoint;
-	int midy = processplane[0][0].y + (processplane[0][1].y * 0.5);
+	int midy = processplane[0][0].y + (processplane[0][1].y * 0.15);
 	checkpoint.y = midy;
 
 	//Boundries pixels should be between
@@ -274,18 +272,49 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 
 	//TODO check if multiple walls where in one plane?
 	//Framework for it is already laid out
+	std::array<cv::Point, 4> newpoint;
+	cv::Point adderu;
+	adderu.x = processplane[0][0].x + pixdist;
+	adderu.y = midy;
+
+	/*
+	THIS DRAWS THE MIDLINE FOR DEBUGGING
+	newpoint[0] = adderu;
+	adderu.x = processplane[0][0].x + checktot * pixdist;
+	newpoint[1] = adderu;
+	adderu.x = processplane[0][0].x + pixdist;
+	newpoint[2] = adderu;
+	adderu.x = processplane[0][0].x + checktot * pixdist;
+	newpoint[3] = adderu;
+	processplane.push_back(newpoint);
+	*/
 
 	//Checking if wall is just a gap
 	for(int i = 1; i < checktot; i++) {
 		checkpoint.x = processplane[0][0].x + i * pixdist;
 		int checkvalue = averagepoints(checkpoint);
-		std::cout << i << " : " << checkpoint.x  << "/" << checkpoint.y << "  " << checkvalue << std::endl;
 
-		if(checkvalue < extremeone || checkvalue > extremetwo || checkvalue < 2) {
+		if(checkvalue < extremeone || checkvalue > extremetwo) {
 			processplane.erase(processplane.begin());
 			return;
 		}
-	}
+	}/*
+	obj_plane newplane(1,1);
+	obj_point corner;
+	corner.y = 300;
+	corner.x = processplane[0][0] * sin(
+	corner.z = processplane[0][0]
+	newplane.p[0] =  corner processplane[0][0];
+	newplane.p[1] =  corner processplane[0][1];
+	corner.y = 0;
+	newplane.p[2] =  corner processplane[0][2];
+	newplane.p[3] =  corner processplane[0][3];
+
+
+	//kinect FOV = 35.3
+	returnplane.push_back(newplane);
+*/
+	//return returnplane;
 }
 
 inline int imgd::averagepoints(cv::Point avg) {
@@ -295,14 +324,15 @@ inline int imgd::averagepoints(cv::Point avg) {
 
 	int yspot = avg.y*kdepth.width;
 	int total = filtered[avg.x + yspot];
+
+	if(total < 2)
+		return 0;
+
 	total += filtered[avg.x + 1 + yspot];
 	total += filtered[avg.x - 1 + yspot];
 	total += filtered[avg.x + 2 + yspot];
 	total += filtered[avg.x - 2 + yspot];
 	total *= 0.2f;
-
-	if(abs(total - filtered[avg.x + yspot]) > 20)
-		return 0;
 
 	return total;
 }
@@ -400,8 +430,10 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 
 	}
 
+	img.release();
 	outimg.release();
 	outimg2.release();
+	outimg3.release();
 }
 
 nimg *imgd::GetImg() {
