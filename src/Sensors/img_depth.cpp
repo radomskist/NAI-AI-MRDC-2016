@@ -7,10 +7,14 @@ bool kimgplane = true;
 
 
 imgd::imgd() : kdepth(512,424,3) {
-	lineest = false;
+	lineest = false; //Predict where lines might be?
+	pixdist = 10; //Distance between pixels when testing flatness of plane
+	slopeerrorrange = 250; //Range of error when seeing if plane is flat
+	filtered = new unsigned char[512*424];
 }
 
 imgd::~imgd() {
+
 }
 
 std::vector<std::array<cv::Point,4>> imgd::ProcessLines(std::vector<cv::Vec4i> &lines, std::vector<std::array<cv::Point,2>> &horizontal, std::vector<std::array<cv::Point,2>> &verticle) {
@@ -173,75 +177,158 @@ std::vector<std::array<cv::Point,4>> imgd::ProcessLines(std::vector<cv::Vec4i> &
 	return returnvec;
 }
 
-std::vector<std::array<cv::Point,4>> imgd::CalculatePlanes(std::vector<std::array<cv::Point,2>> &horizontal, std::vector<std::array<cv::Point,2>> &verticle) {
-
-	std::vector<std::array<cv::Point,4>> planelist;
+std::vector<obj_plane> imgd::CalculatePlanes(std::vector<std::array<cv::Point,2>> &horizontal, std::vector<std::array<cv::Point,2>> &verticle, std::vector<std::array<cv::Point,4>> &returnvec) {
+	std::vector<obj_plane> planelist;
 	for(int i = 0; i < verticle.size(); i++) {
 		for(int j = 0; j < horizontal.size(); j++) {
-			if(abs(verticle[i][0].y - horizontal[j][0].y) < 20) { //Checking if it's even on the same plane
-				int px = abs(verticle[i][0].x - horizontal[j][0].x);
-				int py = abs(verticle[i][0].x - horizontal[j][1].x);
 
-				if(px > 20 && py > 20) 
-					continue;
+			if(abs(verticle[i][0].y - horizontal[j][0].y) > 20)//Checking if it's even on the same plane
+				continue; 
 
-				cv::Point closest, furthest, corner, cloestcorner;
-				if(px > py) {
-					closest = horizontal[j][1];
-					furthest = horizontal[j][0];
-				}
-				else {
-					closest = horizontal[j][0];
-					furthest = horizontal[j][1];
-				}				
-				
-				corner.x = furthest.x;
-				int difference = ((abs(horizontal[j][0].y - horizontal[j][1].y))*.5);
-				corner.y = verticle[i][1].y + difference;
-				cloestcorner.x = verticle[i][0].x;
-				cloestcorner.y = verticle[i][1].y - difference;
+			int px = abs(verticle[i][0].x - horizontal[j][0].x);
+			int py = abs(verticle[i][0].x - horizontal[j][1].x);
 
+			if(px > 20 && py > 20) 
+				continue;
 
-				std::array<cv::Point,4> newpoint;
-				newpoint[0] = closest;
-				newpoint[1] = furthest;
-				newpoint[2] = corner;
-				newpoint[3] = cloestcorner;
-
-				planelist.push_back(newpoint);
+			cv::Point closest, furthest, corner, cloestcorner;
+			if(px > py) {
+				closest = horizontal[j][1];
+				furthest = horizontal[j][0];
 			}
+			else {
+				closest = horizontal[j][0];
+				furthest = horizontal[j][1];
+			}				
+		
+			corner.x = furthest.x;
+			int difference = ((abs(horizontal[j][0].y - horizontal[j][1].y))*.5);
+			corner.y = verticle[i][1].y + difference;
+			cloestcorner.x = horizontal[j][1].x;
+			cloestcorner.y = verticle[i][1].y;
+			closest.x = verticle[i][0].x;
+			std::array<cv::Point,4> newpoint;
+
+			/*organizing so it goes from left to right*/
+			if(closest.x < furthest.x) {
+				newpoint[0] = closest;
+				newpoint[1] = verticle[i][1];
+				newpoint[2] = corner;
+				newpoint[3] = furthest;
+			}
+			else {
+				newpoint[0] = furthest;
+				newpoint[1] = corner;
+				newpoint[2] = verticle[i][1];
+				newpoint[3] = closest;
+			}
+
+			std::vector<std::array<cv::Point,4>> newarray;
+			newarray.push_back(newpoint);	
+			ConvertToObj(newarray, planelist);
+			if(!newarray.empty())
+				returnvec.insert(returnvec.end(), newarray.begin(), newarray.end());
 		}
 	}
-	
 	horizontal.insert(horizontal.end(),verticle.begin(),verticle.end());
 	return planelist;
 }
 
+void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std::vector<obj_plane>& returnplane) {
+	int checkdist = processplane[0][3].x - processplane[0][0].x;
+	if(pixdist > checkdist) {
+		processplane.erase(processplane.begin());
+		return;
+	}
+	int checktot = checkdist / pixdist;
+	checkdist = checkdist / checktot; // every pixdist pixels
+
+	cv::Point checkpoint;
+	int midy = processplane[0][0].y + (processplane[0][1].y * 0.5);
+	checkpoint.y = midy;
+
+	//Boundries pixels should be between
+	//Subtracting 5 pixels to make sure it's not on the edge which would be 0.
+	cv::Point getextreme;
+	getextreme.x = processplane[0][3].x - 8;
+	getextreme.y = midy;
+	int extremetwo = averagepoints(getextreme);
+	getextreme.x = processplane[0][0].x + 8;
+	int extremeone = averagepoints(getextreme);
+
+	if(extremeone < 2 || extremetwo < 2) {
+		processplane.erase(processplane.begin());
+		return;
+	}
+
+	//extreme one should be the smaller range
+	if(extremetwo < extremeone) {
+		int temp = extremetwo;
+		extremetwo = extremeone;
+		extremeone = temp;
+	}
+
+	//Adding range of error
+	extremeone -= slopeerrorrange;
+	extremetwo += slopeerrorrange;
+
+	//TODO check if multiple walls where in one plane?
+	//Framework for it is already laid out
+
+	//Checking if wall is just a gap
+	for(int i = 1; i < checktot; i++) {
+		checkpoint.x = processplane[0][0].x + i * pixdist;
+		int checkvalue = averagepoints(checkpoint);
+		std::cout << i << " : " << checkpoint.x  << "/" << checkpoint.y << "  " << checkvalue << std::endl;
+
+		if(checkvalue < extremeone || checkvalue > extremetwo || checkvalue < 2) {
+			processplane.erase(processplane.begin());
+			return;
+		}
+	}
+}
+
+inline int imgd::averagepoints(cv::Point avg) {
+	//Checking if in range
+	if(kdepth.width - avg.x < 3 && avg.x < kdepth.width - 3)
+		return 0;
+
+	int yspot = avg.y*kdepth.width;
+	int total = filtered[avg.x + yspot];
+	total += filtered[avg.x + 1 + yspot];
+	total += filtered[avg.x - 1 + yspot];
+	total += filtered[avg.x + 2 + yspot];
+	total += filtered[avg.x - 2 + yspot];
+	total *= 0.2f;
+
+	if(abs(total - filtered[avg.x + yspot]) > 20)
+		return 0;
+
+	return total;
+}
+
 /*Two pixel slope check suggested by Joel*/
 void imgd::ProcessImg(unsigned char *depthbuff) {
-
 	//Casting data to a float, which is what it's suppose to be (instead of what it gives you for some reason)
 	datahold = (float *)&depthbuff[4];
 
 	unsigned char normalized;
 	unsigned resolution = kdepth.width * kdepth.height;
-	unsigned char *stuff = new unsigned char[resolution];
-
+	
 	/*flipping the image*/
 	for(int j = 0; j < kdepth.height; j++) {
 		int currentrow = j*kdepth.width;
 		for(int i = 0; i < kdepth.width; i++) {
 			////normalize kinect range to 255
 			normalized = datahold[currentrow + (kdepth.width -1 - i)] * 0.06375f; //(4500.0f - 500.0f)/(255)
-			stuff[currentrow + i] = normalized;
+			filtered[currentrow + i] = normalized;
 		}
 	}
-
 	vector<cv::KeyPoint> keypoints;
 	vector<cv::Vec4i> lines;
 
-
-	cv::Mat img(424, 512, CV_8UC1, stuff); //mat for depth image
+	//TODO clean all this garbage
+	cv::Mat img(424, 512, CV_8UC1, filtered); //Mat for edges
 	cv::Mat outimg(424, 512, CV_8UC1); //Mat for edges
 	cv::Mat outimg2; //Mat for lines
 	cv::Mat outimg3 = cv::Mat::zeros(424,512,CV_8UC1); //Mat for planes
@@ -249,6 +336,8 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 	try {
 		cv::morphologyEx(img, outimg, cv::MORPH_OPEN, cv::Mat()); //Phasing out blobs
 		cv::morphologyEx(outimg, img, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(11, 11))); //Closing gaps
+		for(int i = 0; i < resolution; i++)
+			filtered[i] = img.data[i];
 
 		cv::Canny(img, outimg2, 80, 80, 3, false); //Detecting edges
 		cv::morphologyEx(outimg2, outimg, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(11, 11))); //Closing gaps 
@@ -257,22 +346,22 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 		outimg2.setTo(cv::Scalar(0,0,0));
 		//for(int i = 0; i < keypoints.size(); i++)
 		//	cv::circle(outimg, keypoints[i].pt, keypoints[i].size, cv::Scalar(0,0,0),-1); //Removing them
-		cv::HoughLinesP(outimg, lines, 2, CV_PI/180, 30, 70, 10);
+		cv::HoughLinesP(outimg, lines, 2, 0.017, 30, 70, 10);
 
 		std::vector<std::array<cv::Point,2>> pointset;
 		std::vector<std::array<cv::Point,2>> vertset;
-		ProcessLines(lines,pointset,vertset);
-		std::vector<std::array<cv::Point,4>> planeset = CalculatePlanes(pointset,vertset);
-	
+		std::vector<std::array<cv::Point,4>> planepoints = ProcessLines(lines,pointset,vertset);
+		std::vector<obj_plane> planeset = CalculatePlanes(pointset,vertset,planepoints);
+
 		for(int i = 0; i < pointset.size(); i++ ) {
 		    cv::line(outimg2, pointset[i][0], pointset[i][1], cv::Scalar(255,255,255), 3, 8);
 		}
 
-		for(int i = 0; i < planeset.size(); i++ ) {
-		    cv::line(outimg3, planeset[i][0], planeset[i][1], cv::Scalar(255,255,255), 3, 8);
-		    cv::line(outimg3, planeset[i][1], planeset[i][2], cv::Scalar(255,255,255), 3, 8);
-		    cv::line(outimg3, planeset[i][2], planeset[i][3], cv::Scalar(255,255,255), 3, 8);
-		    cv::line(outimg3, planeset[i][3], planeset[i][0], cv::Scalar(255,255,255), 3, 8);
+		for(int i = 0; i < planepoints.size(); i++ ) {
+		    cv::line(outimg3, planepoints[i][0], planepoints[i][1], cv::Scalar(255,255,255), 3, 8);
+		    cv::line(outimg3, planepoints[i][1], planepoints[i][2], cv::Scalar(255,255,255), 3, 8);
+		    cv::line(outimg3, planepoints[i][2], planepoints[i][3], cv::Scalar(255,255,255), 3, 8);
+		    cv::line(outimg3, planepoints[i][3], planepoints[i][0], cv::Scalar(255,255,255), 3, 8);
 		}
 
 	}
@@ -293,7 +382,12 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 			kdepth.data[i*3 + 2] = img.data[i];
 		}
 
-		if(kimgline && outimg2.data[i]) {
+		if(kimgplane && outimg3.data[i]) {
+			kdepth.data[i*3] = 0;
+			kdepth.data[i*3+1] = 0;
+			kdepth.data[i*3+2] = 255;
+		}
+		else if(kimgline && outimg2.data[i]) {
 			kdepth.data[i*3] = 0;
 			kdepth.data[i*3+1] = 255;
 			kdepth.data[i*3+2] = 0;
@@ -303,18 +397,11 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 			kdepth.data[i*3+1] = 0;
 			kdepth.data[i*3+2] = 0;
 		}
-		else if(kimgplane && outimg3.data[i]) {
-			kdepth.data[i*3] = 0;
-			kdepth.data[i*3+1] = 0;
-			kdepth.data[i*3+2] = 255;
-		}
+
 	}
 
-	img.release();
 	outimg.release();
 	outimg2.release();
-	img.release();
-	delete[] stuff;
 }
 
 nimg *imgd::GetImg() {

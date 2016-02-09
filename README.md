@@ -56,6 +56,8 @@ Create a include folder in the main directory and copy the freenect2, libusb, GL
 
 esc = close program
 
+F11 = Fullscreen
+
 ###Memory map controls:
 WASD, move north, south, west and east respectively.
 
@@ -72,7 +74,3 @@ f = toggle path clipping
 3 = Toggle lines
 
 4 = Toggle planes
-
-r = Freeze frame
-
-f = next frame

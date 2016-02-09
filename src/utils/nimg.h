@@ -17,6 +17,7 @@ struct nimg {
 
 	unsigned char *data;
 	unsigned int height, width, depth, resolution;
+	unsigned int flags;
 
 };
 #endif

@@ -41,8 +41,9 @@ int main(int argc, char** argv)
 
 		imgwin opencv_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
 
-		while(opencv_win.GetKeys()) {
+		while(opencv_win.running()) {
 			imageref = mainbrain.GetImages(BCCAM);
+			opencv_win.GetKeys();
 
 			if(!imageref.empty()) 
 				opencv_win.setimg(imageref.front());
@@ -62,7 +63,8 @@ int main(int argc, char** argv)
 		imageref = mainbrain.GetImages(kmode);
 		kinwin test_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
 
-		while(test_win.GetKeys()) {
+		while(test_win.running()) {
+			test_win.GetKeys();
 			imageref = mainbrain.GetImages(kmode);
 
 			if(!imageref.empty()) 
@@ -105,13 +107,13 @@ int main(int argc, char** argv)
 		depthtest.ProcessImg(imgref.data);
 		test_win.setimg(&imgref);
 
-		while(test_win.GetKeys()) { 
-
+		while(test_win.running()) { 
+			test_win.GetKeys();
 		}
 	}
 
 	/*Memory window argument loops*/
-	else {
+	else if(areargs && (arg1 == "-mem")) {
 		naigl MemWin;
 		world_map wmap = mainbrain.GetMap();
 		wmap.gentest();	
@@ -123,10 +125,14 @@ int main(int argc, char** argv)
 		MemWin.setpath(mainbrain.GetPfind().gotopoint(newpoint));
 
 		//TODO: limit to framerate
-		while(MemWin.GetKeys()) {
+		while(MemWin.running()) {
+			MemWin.GetKeys();
 			MemWin.draw();
-
 		}
+	}
+	else {
+
+
 
 	}
 

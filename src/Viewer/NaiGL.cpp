@@ -41,16 +41,15 @@ const GLchar* wallshader = {"#version 330 core\n"
 };
 
 
-bool naigl::GetKeys() {
+void naigl::GetKeys() {
 	SDL_Event event;
 	//Checking for ESC key to close program
-	bool go = true;
-	while( SDL_PollEvent( &event ) )
-		if(event.key.keysym.sym == SDLK_ESCAPE)
-			go = false;
 
+	std::stack<SDL_Event> noevent;
+
+	while( SDL_PollEvent( &event ) )
 		/*camerarot*/
-		else if(event.key.keysym.sym == SDLK_UP)
+		if(event.key.keysym.sym == SDLK_UP)
 			urotation -= .1f;
 		else if(event.key.keysym.sym == SDLK_DOWN)
 			urotation += .1f;
@@ -72,9 +71,11 @@ bool naigl::GetKeys() {
 		/*Line depth test*/
 		else if(event.key.keysym.sym == SDLK_f && event.type == SDL_KEYDOWN)
 			linedepth = !linedepth;
+		else 
+			noevent.push(event);
 
+	ProcKeys(noevent);
 
-	return go;
 }
 
 
