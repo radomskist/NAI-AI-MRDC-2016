@@ -11,6 +11,8 @@ imgd::imgd() : kdepth(512,424,3) {
 	pixdist = 10; //Distance between pixels when testing flatness of plane
 	slopeerrorrange = 5; //Range of error when seeing if plane is flat
 	kdepth.flags &= KDEP;
+
+	freezetime = GetMilli();
 }
 
 imgd::~imgd() {
@@ -390,6 +392,13 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 		    cv::line(outimg3, planepoints[i][2], planepoints[i][3], cv::Scalar(255,255,255), 3, 8);
 		    cv::line(outimg3, planepoints[i][3], planepoints[i][0], cv::Scalar(255,255,255), 3, 8);
 		}
+
+		if(planepoints.size() >= 1 && freezetime < GetMilli()) {
+			kdepth.flags &= KFREEZE;
+			freezetime = GetMilli() + 2000;
+		}
+		else
+			kdepth.flags &= ~KFREEZE;
 
 	}
 	catch(std::exception &e) {
