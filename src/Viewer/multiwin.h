@@ -4,9 +4,9 @@
 /*SDL headers for windows*/
 #include <SDL2/SDL.h>
 #include <iostream>
-#include "Viewer/window.h"
+#include "Viewer/NaiGL.h"
 
-class multiwin : public basewin {
+class multiwin : public naigl {
 	public:
 		multiwin();
 		~multiwin();

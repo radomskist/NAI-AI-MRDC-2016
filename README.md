@@ -74,7 +74,3 @@ f = toggle path clipping
 3 = Toggle lines
 
 4 = Toggle planes
-
-r = Freeze frame
-
-f = next frame

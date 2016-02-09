@@ -4,6 +4,7 @@
 #pragma once
 
 #include "utils/nimg.h"
+#include "Memory/objects.hpp"
 #include <vector>
 #include <array>
 #include <math.h>
@@ -31,6 +32,9 @@ class imgd {
 		nimg *GetImg();
 
 	private:
+		//averages area around a point
+		inline int averagepoints(cv::Point);
+
 		//Merges all lines together and estimates where unseen lines might be.
 		//returns a vector of estimated lines 
 		//Arguments, vector of lines as input, vector of horizontal lines to return, vector of verticle lines to return
@@ -39,16 +43,21 @@ class imgd {
 		//Calulates planes from lines
 		//Returns corners of the plane
 		//Horizontal lines as input, Verticle lines as input.
-		inline std::vector<std::array<cv::Point,4>> CalculatePlanes(std::vector<std::array<cv::Point,2>>&,std::vector<std::array<cv::Point,2>>&);
+		inline std::vector<obj_plane> CalculatePlanes(std::vector<std::array<cv::Point,2>>&, std::vector<std::array<cv::Point,2>>&, std::vector<std::array<cv::Point,4>> &);
 
-		//Checks if a detected plane is solid
-		//Returns a list of planes incase one plane might be two planes
-		//Takes in a plane as input
-		inline std::vector<std::array<cv::Point,4>> CheckPlane(std::array<cv::Point,4> &);
+		//TODO Break up into multiple planes
+		//Checks if a detected plane is solid and then turns it into an obj
+		//Also cuts up a plane into mini planes if it discovers that the plane has a gap
+		//Takes in a vector of points to a plane as input, vector of planes as output
+		inline void ConvertToObj(std::vector<std::array<cv::Point,4>> &, std::vector<obj_plane>&);
 
 		nimg kdepth;
+		int slopeerrorrange;
+		int pixdist;
 		bool lineest; //Whether or not estimated lines should be calculated
 		float *datahold;
+		unsigned char *filtered;
+
 };
 
 #endif
