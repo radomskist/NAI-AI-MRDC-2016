@@ -10,7 +10,6 @@ imgd::imgd() : kdepth(512,424,3) {
 	lineest = false; //Predict where lines might be?
 	pixdist = 10; //Distance between pixels when testing flatness of plane
 	slopeerrorrange = 5; //Range of error when seeing if plane is flat
-	filtered = new unsigned char[512*424];
 }
 
 imgd::~imgd() {
@@ -242,7 +241,7 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 	checkdist = checkdist / checktot; // every pixdist pixels
 
 	cv::Point checkpoint;
-	int midy = processplane[0][0].y + (processplane[0][1].y * 0.15);
+	int midy = processplane[0][0].y + (processplane[0][1].y - processplane[0][0].y) * 0.5;
 	checkpoint.y = midy;
 
 	//Boundries pixels should be between
@@ -323,15 +322,15 @@ inline int imgd::averagepoints(cv::Point avg) {
 		return 0;
 
 	int yspot = avg.y*kdepth.width;
-	int total = filtered[avg.x + yspot];
+	int total = datahold[avg.x + yspot];
 
 	if(total < 2)
 		return 0;
 
-	total += filtered[avg.x + 1 + yspot];
-	total += filtered[avg.x - 1 + yspot];
-	total += filtered[avg.x + 2 + yspot];
-	total += filtered[avg.x - 2 + yspot];
+	total += datahold[avg.x + 1 + yspot];
+	total += datahold[avg.x - 1 + yspot];
+	total += datahold[avg.x + 2 + yspot];
+	total += datahold[avg.x - 2 + yspot];
 	total *= 0.2f;
 
 	return total;
@@ -346,19 +345,18 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 	unsigned resolution = kdepth.width * kdepth.height;
 	
 	/*flipping the image*/
+	cv::Mat img(424, 512, CV_8UC1); //Mat for edges
 	for(int j = 0; j < kdepth.height; j++) {
 		int currentrow = j*kdepth.width;
 		for(int i = 0; i < kdepth.width; i++) {
 			////normalize kinect range to 255
 			normalized = datahold[currentrow + (kdepth.width -1 - i)] * 0.06375f; //(4500.0f - 500.0f)/(255)
-			filtered[currentrow + i] = normalized;
+			img.data[currentrow + i] = normalized;
 		}
 	}
 	vector<cv::KeyPoint> keypoints;
 	vector<cv::Vec4i> lines;
 
-	//TODO clean all this garbage
-	cv::Mat img(424, 512, CV_8UC1, filtered); //Mat for edges
 	cv::Mat outimg(424, 512, CV_8UC1); //Mat for edges
 	cv::Mat outimg2; //Mat for lines
 	cv::Mat outimg3 = cv::Mat::zeros(424,512,CV_8UC1); //Mat for planes
@@ -366,8 +364,6 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 	try {
 		cv::morphologyEx(img, outimg, cv::MORPH_OPEN, cv::Mat()); //Phasing out blobs
 		cv::morphologyEx(outimg, img, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(11, 11))); //Closing gaps
-		for(int i = 0; i < resolution; i++)
-			filtered[i] = img.data[i];
 
 		cv::Canny(img, outimg2, 80, 80, 3, false); //Detecting edges
 		cv::morphologyEx(outimg2, outimg, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(11, 11))); //Closing gaps 

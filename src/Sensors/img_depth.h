@@ -56,7 +56,6 @@ class imgd {
 		int pixdist;
 		bool lineest; //Whether or not estimated lines should be calculated
 		float *datahold;
-		unsigned char *filtered;
 
 };
 
