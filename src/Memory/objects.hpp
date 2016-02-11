@@ -19,11 +19,12 @@ struct obj_point {
 			z = set.z;
 		}
 
-		obj_point& operator=(const obj_point&& set) {
+		obj_point& operator=(const obj_point& set) {
 			x = set.x;
 			y = set.y;
 			z = set.z;
 		}
+
 
 		obj_point(float sx,float sy, float sz) {
 			x = sx;
