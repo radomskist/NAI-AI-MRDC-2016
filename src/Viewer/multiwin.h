@@ -5,15 +5,21 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 #include "Viewer/NaiGL.h"
+#include "utils/nimg.h"
+#include "Viewer/kinectwin.h"
 
-class multiwin : public naigl {
+class multiwin {
 	public:
 		multiwin();
 		~multiwin();
-
+		bool running();
 		void GetKeys();
 
-	protected:
+	private:
+		//kinwin kdepth, kfreeze;
+		//imgwin rgbwin;
+		//naigl glwin;
 };
+
 
 #endif

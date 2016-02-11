@@ -1,3 +1,6 @@
+#ifndef _NAI_UTILS_TIME
+#define _NAI_UTILS_TIME
+
 /****************************************************************
    PROGRAM:		NaiTime Library
    AUTHOR:		Steven Radomski
@@ -30,3 +33,5 @@ inline int GetSec()
 
 	return tv.tv_sec;
 	}
+
+#endif

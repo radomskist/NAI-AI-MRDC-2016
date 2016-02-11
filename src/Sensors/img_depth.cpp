@@ -10,7 +10,9 @@ imgd::imgd() : kdepth(512,424,3) {
 	lineest = false; //Predict where lines might be?
 	pixdist = 10; //Distance between pixels when testing flatness of plane
 	slopeerrorrange = 5; //Range of error when seeing if plane is flat
-	filtered = new unsigned char[512*424];
+	kdepth.flags &= KDEP;
+
+	freezetime = GetMilli();
 }
 
 imgd::~imgd() {
@@ -242,7 +244,7 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 	checkdist = checkdist / checktot; // every pixdist pixels
 
 	cv::Point checkpoint;
-	int midy = processplane[0][0].y + (processplane[0][1].y * 0.15);
+	int midy = processplane[0][0].y + (processplane[0][1].y - processplane[0][0].y) * 0.5;
 	checkpoint.y = midy;
 
 	//Boundries pixels should be between
@@ -298,22 +300,44 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 			processplane.erase(processplane.begin());
 			return;
 		}
-	}/*
+	}
+/*
+	newpoint[0] = closest;
+	newpoint[1] = verticle[i][1];
+	newpoint[2] = corner;
+	newpoint[3] = furthest;
+*/
+
+	//half xkinect FOV = 35.3
 	obj_plane newplane(1,1);
 	obj_point corner;
+	float screenpos = corner.x - 256;
+
+	// 0.616101226 = 35.3 (half of the kinects FOV) converted to radians
+	// the position of the point on the screen frm the center of the verticle axis
+	// .003906 = 1/256, which is half of the width (512)
+	/*obj_point pointhold;
+	pointhold.z = 300;
+
+	float depthspot = processplane[0][0].x + 5 + (processplane[0][0].y + (processplane[0][1].y - processplane[0][0].y) * pixwidth);
+	pointhold.y = datahold[depthspot] * sin(35.3*screenpos*0.00390625);
+	pointhold.x = datahold[depthspot] * sin(54.7*screenpos*0.00390625);
+	newplane.p[0] = pointhold*/
+
+	/*
 	corner.y = 300;
 	corner.x = processplane[0][0] * sin(
 	corner.z = processplane[0][0]
+
 	newplane.p[0] =  corner processplane[0][0];
 	newplane.p[1] =  corner processplane[0][1];
 	corner.y = 0;
 	newplane.p[2] =  corner processplane[0][2];
 	newplane.p[3] =  corner processplane[0][3];
+	*/
 
+	//returnplane.push_back(newplane);
 
-	//kinect FOV = 35.3
-	returnplane.push_back(newplane);
-*/
 	//return returnplane;
 }
 
@@ -323,15 +347,15 @@ inline int imgd::averagepoints(cv::Point avg) {
 		return 0;
 
 	int yspot = avg.y*kdepth.width;
-	int total = filtered[avg.x + yspot];
+	int total = datahold[avg.x + yspot];
 
 	if(total < 2)
 		return 0;
 
-	total += filtered[avg.x + 1 + yspot];
-	total += filtered[avg.x - 1 + yspot];
-	total += filtered[avg.x + 2 + yspot];
-	total += filtered[avg.x - 2 + yspot];
+	total += datahold[avg.x + 1 + yspot];
+	total += datahold[avg.x - 1 + yspot];
+	total += datahold[avg.x + 2 + yspot];
+	total += datahold[avg.x - 2 + yspot];
 	total *= 0.2f;
 
 	return total;
@@ -346,19 +370,18 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 	unsigned resolution = kdepth.width * kdepth.height;
 	
 	/*flipping the image*/
+	cv::Mat img(424, 512, CV_8UC1); //Mat for edges
 	for(int j = 0; j < kdepth.height; j++) {
 		int currentrow = j*kdepth.width;
 		for(int i = 0; i < kdepth.width; i++) {
 			////normalize kinect range to 255
 			normalized = datahold[currentrow + (kdepth.width -1 - i)] * 0.06375f; //(4500.0f - 500.0f)/(255)
-			filtered[currentrow + i] = normalized;
+			img.data[currentrow + i] = normalized;
 		}
 	}
 	vector<cv::KeyPoint> keypoints;
 	vector<cv::Vec4i> lines;
 
-	//TODO clean all this garbage
-	cv::Mat img(424, 512, CV_8UC1, filtered); //Mat for edges
 	cv::Mat outimg(424, 512, CV_8UC1); //Mat for edges
 	cv::Mat outimg2; //Mat for lines
 	cv::Mat outimg3 = cv::Mat::zeros(424,512,CV_8UC1); //Mat for planes
@@ -366,8 +389,6 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 	try {
 		cv::morphologyEx(img, outimg, cv::MORPH_OPEN, cv::Mat()); //Phasing out blobs
 		cv::morphologyEx(outimg, img, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(11, 11))); //Closing gaps
-		for(int i = 0; i < resolution; i++)
-			filtered[i] = img.data[i];
 
 		cv::Canny(img, outimg2, 80, 80, 3, false); //Detecting edges
 		cv::morphologyEx(outimg2, outimg, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(11, 11))); //Closing gaps 
@@ -393,6 +414,13 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 		    cv::line(outimg3, planepoints[i][2], planepoints[i][3], cv::Scalar(255,255,255), 3, 8);
 		    cv::line(outimg3, planepoints[i][3], planepoints[i][0], cv::Scalar(255,255,255), 3, 8);
 		}
+
+		if(planepoints.size() >= 1 && freezetime < GetMilli()) {
+			kdepth.flags |= KFREEZE;
+			freezetime = GetMilli() + 2000;
+		}
+		else
+			kdepth.flags |= ~KFREEZE;
 
 	}
 	catch(std::exception &e) {

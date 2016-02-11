@@ -47,7 +47,6 @@ std::vector<nimg*>  &naibrain::GetImages(unsigned int imgmask) {
 		if(kinect_manager->ProcessImages()) {
 			if(imgmask & KDEP && kinect_manager->GetDepthImg())
 				Images.push_back(kinect_manager->GetDepthImg());
-
 			if(imgmask & KRGB && kinect_manager->GetRGBImg())
 				Images.push_back(kinect_manager->GetRGBImg());
 		}

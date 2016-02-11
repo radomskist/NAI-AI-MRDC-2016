@@ -10,7 +10,7 @@ imgwin::imgwin(unsigned int set_width, unsigned int set_height, unsigned int set
 	win = SDL_CreateWindow("TEST", //name
 		0, 0, //pos x,y
 		width, height, //width, height
-		0); //flags
+		SDL_WINDOW_BORDERLESS); //flags
 
 	if(win == NULL) {
 		throw "Window failed to create";

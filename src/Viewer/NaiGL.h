@@ -29,7 +29,7 @@ class naigl : public basewin {
 		void addents(std::vector<obj_cube> &);
 		void GetKeys();
 
-	private:
+	protected:
 		void shaderinit();
 		SDL_GLContext nglcont;
 		GLuint naishader;

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "Sensors/img_depth.h"
+#include "Sensors/img_rgb.h"
 #include "Memory/objects.hpp"
 #include "utils/nexcep.hpp"
 #include "utils/nimg.h"
@@ -55,9 +56,8 @@ class kinectman {
 
 		/*image processing objects*/
 		imgd depth_proc;
+		imgrgb rgb_proc;
 
-		/*Frame objects*/
-		nimg krgb;
 
 };
 

@@ -30,13 +30,11 @@ void basewin::ProcKeys(std::stack<SDL_Event> &events) {
 			fullscreen = !fullscreen;
 			fullscreen ? SDL_SetWindowFullscreen(win, SDL_WINDOW_FULLSCREEN) : SDL_SetWindowFullscreen(win, 0);
 		}
-
 	}
-
 }
 
 basewin::~basewin() {
-	//delete win; compiler bitches about this
+	SDL_SetWindowFullscreen(win, 0);
 
 }
 

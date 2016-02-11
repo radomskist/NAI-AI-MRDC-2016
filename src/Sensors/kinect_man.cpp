@@ -23,6 +23,7 @@ kinectman::kinectman() {
 		f2pipe = new libfreenect2::CpuPacketPipeline;
 		std::cout << "====================================================================" << std::endl;
 		std::cout << "ERROR! OPENGL DID NOT COMPILE WITH THE FREENECT2 LIBRARY BEING USED!" << std::endl;
+		std::cout << "====================================================================" << std::endl;
 	#endif
 
 	if(f2pipe == NULL) {
@@ -47,11 +48,6 @@ kinectman::kinectman() {
 	f2dev->setIrAndDepthFrameListener(nailist);
 	f2dev->start();
 
-	//Initializing RGB, depth needs to be processed and can't be given straight
-	//so it's in the depth image processor
-	krgb.width = 1920;
-	krgb.height = 1080;
-	krgb.depth = 4;
 	std::cout << "\nNaiEye: Video initialized!" << std::endl;
 }
 
@@ -74,7 +70,7 @@ nimg *kinectman::GetDepthImg() {
 }
 
 nimg *kinectman::GetRGBImg() {
-	return &krgb;
+	return rgb_proc.GetImg();
 }
 
 bool kinectman::ProcessImages() {
@@ -88,11 +84,10 @@ bool kinectman::ProcessImages() {
 	if(nfmap[libfreenect2::Frame::Depth]->data == NULL)
 		return false;
 
-	//Getting pointer to RGB
-	krgb.data = nfmap[libfreenect2::Frame::Color]->data;
-
 	//Processing depth
 	depth_proc.ProcessImg(nfmap[libfreenect2::Frame::Depth]->data);
+	//RGB process
+	rgb_proc.ProcessImg(nfmap[libfreenect2::Frame::Color]->data);
 
 	return true;
 }
