@@ -130,23 +130,23 @@ int main(int argc, char** argv)
 		}
 	}
 	else {
-		multiwin MainWin();
+		multiwin MainWin;
 		world_map wmap = mainbrain.GetMap();
 		unsigned int kmode = KDEP | KRGB | KFREEZE;
 
-		/*TODO REMOVE*/
 		wmap.gentest();	
-		//MainWin.addplanes(wmap.GetPlanes());
 		std::vector<obj_cube> addcube;
 		addcube.push_back(wmap.GetRobot());
-		//MainWin.addents(addcube);
-		//obj_point newpoint(2000,2000,0);
-		//MainWin.setpath(mainbrain.GetPfind().gotopoint(newpoint));
+		naigl *glwin = MainWin.GetGL();
+		glwin->addents(addcube);
+		obj_point newpoint(2000,2000,0);
+		glwin->setpath(mainbrain.GetPfind().gotopoint(newpoint));
+		glwin->addplanes(wmap.GetPlanes());
 
-		//while(MainWin.running()) {
-		//	MainWin.GetKeys();
-		//	MainWin.setimg(mainbrain.GetImages(kmode));
-		//}
+		while(MainWin.running()) {
+			MainWin.GetKeys();
+			MainWin.SetImg(mainbrain.GetImages(kmode));
+		}
 	}
 
 	//Closing program

@@ -19,6 +19,10 @@ void basewin::GetKeys() {
 	ProcKeys(noevent);
 }
 
+void basewin::SetPos(unsigned int setx, unsigned int sety) {
+	SDL_SetWindowPosition(win,setx,sety);
+}
+
 void basewin::ProcKeys(std::stack<SDL_Event> &events) {
 
 	while(!events.empty()) {

@@ -82,8 +82,8 @@ void naigl::GetKeys() {
 naigl::naigl() {
 	xpos = -600.0f;
 	ypos = 0.0f;
-	width = 640;
-	height = 480;
+	width = 512;
+	height = 424;
 	urotation = -0.59f;
 	lrotation = 0.99f;
 	linedepth = false;
