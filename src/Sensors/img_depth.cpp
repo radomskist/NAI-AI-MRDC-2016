@@ -8,8 +8,8 @@ bool kimgplane = true;
 
 imgd::imgd() : kdepth(512,424,3) {
 	lineest = false; //Predict where lines might be?
-	pixdist = 20; //Distance between pixels when testing flatness of plane
-	slopeerrorrange = 5; //Range of error when seeing if plane is flat
+	pixdist = 10; //Distance between pixels when testing flatness of plane
+	slopeerrorrange = 200; //Range of error when seeing if plane is flat
 	kdepth.flags = KDEP;
 
 	freezetime = GetSec();
@@ -235,7 +235,7 @@ std::vector<obj_plane> imgd::CalculatePlanes(std::vector<std::array<cv::Point,2>
 }
 
 void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std::vector<obj_plane>& returnplane) {
-	int checkdist = processplane[0][3].x - processplane[0][0].x - 8;
+	int checkdist = processplane[0][3].x - processplane[0][0].x - 10;
 	if(pixdist > checkdist) {
 		processplane.erase(processplane.begin());
 		return;
@@ -250,11 +250,22 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 	//Boundries pixels should be between
 	//Subtracting 5 pixels to make sure it's not on the edge which would be 0.
 	cv::Point getextreme;
-	getextreme.x = processplane[0][3].x - 8;
+	getextreme.x = processplane[0][3].x - pixdist;
 	getextreme.y = midy;
+	std::array<cv::Point, 4> newpoint;
+	newpoint[0] = getextreme;
+	newpoint[3] = getextreme;
 	int extremetwo = averagepoints(getextreme);
-	getextreme.x = processplane[0][0].x + 8;
+	getextreme.x = processplane[0][0].x + pixdist;
+
+	newpoint[1] = getextreme;
+	newpoint[2] = getextreme;
 	int extremeone = averagepoints(getextreme);
+
+	/*
+	THIS DRAWS THE MIDLINE FOR DEBUGGING*/	
+	processplane.push_back(newpoint);
+
 
 	if(extremeone < 2 || extremetwo < 2) {
 		processplane.erase(processplane.begin());
@@ -273,23 +284,6 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 	extremetwo += slopeerrorrange;
 
 	//TODO check if multiple walls where in one plane?
-	//Framework for it is already laid out
-	std::array<cv::Point, 4> newpoint;
-	cv::Point adderu;
-	adderu.x = processplane[0][0].x + pixdist;
-	adderu.y = midy;
-
-	/*
-	THIS DRAWS THE MIDLINE FOR DEBUGGING*/	
-	newpoint[0] = adderu;
-	adderu.x = processplane[0][0].x + checktot * pixdist;
-	newpoint[1] = adderu;
-	adderu.x = processplane[0][0].x + pixdist;
-	newpoint[2] = adderu;
-	adderu.x = processplane[0][0].x + checktot * pixdist;
-	newpoint[3] = adderu;
-	processplane.push_back(newpoint);
-	
 
 	//Checking if wall is just a gap
 	for(int i = 1; i < checktot; i++) {
@@ -305,10 +299,6 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 	if(processplane.size() > 0 && freezetime < GetSec()) {
 		kdepth.flags = KDEP | KFREEZE;
 		freezetime = GetSec() + 1;
-	}
-	else {
-
-		std:cout << GetMilli() <<  " " << freezetime << std::endl;
 	}
 
 

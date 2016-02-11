@@ -1,24 +1,36 @@
-THINGS THAT CAN BE DONE RIGHT AWAY:
+NAI TODO:
+General:
+	-Need to build test course
+	-Need colored balls (golf and soft ball)
+	-Need to fix kinect lense
+
 Kinect RGB
-	-This should get pretty decently developed asap
+	-Blob detection to see far balls?
+	-Need to deal with shadows
+	-Recognize key points
+	-QR reading
 
-QR reading
-	-ez
+Kinect depth
+	-Range finding request on points
+	-Use blob detection to identify other robots?
 
-State manager & States
-	-Manages jobs and is basically the core of the AI
+Web camera
+	-Ball color identification needs to be done
+	-See where golf ball dispenser is
+
+AI:
+	-Create base state object
+	-Create state manager
+	-Finish coarse path finding
+	-Fine path finding
+
+SDL:
+	-Fix crashing from mouse events
 
 Arduino Laptop communication
 	-Needed for issuing commands
+	-Figure out what commands need to be done
 
-Fix memory leak
-
-ALMOST DONE:
-Web camera
-	-Identification needs to be done
-
-Path finding
-	-This should get pretty decently developed asap
-
-Find fast streaming software
-	Kyle suggested using a remote screen viewer, which makes things easier.
+Laptop general:
+	-Find streaming software for display
+	-Deal with crashing when laptop closes

@@ -56,7 +56,7 @@ Create a include folder in the main directory and copy the freenect2, libusb, GL
 
 esc = close program
 
-F11 = Fullscreen
+F11 = Fullscreen (when one screen) Align windows (with multiwin)
 
 ###Memory map controls:
 WASD, move north, south, west and east respectively.
