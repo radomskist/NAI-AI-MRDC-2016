@@ -30,10 +30,12 @@ class imgrgb {
 		~imgrgb();
 
 		void ProcessImg(unsigned char *);
+		void findground(cv::Mat&);
 		nimg *GetImg();
 
 	private:
 		nimg krgb;
+		cv::Mat groundmat;
 };
 
 #endif
