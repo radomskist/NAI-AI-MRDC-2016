@@ -1,7 +1,7 @@
 #include "Sensors/img_rgb.h"
 
 imgrgb::imgrgb() {
-	krgb.flags &= KRGB;
+	krgb.flags = KRGB;
 	krgb.width = 512;
 	krgb.height = 424;
 	krgb.depth = 4;
@@ -26,7 +26,7 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 	cv::bilateralFilter(rgbin, img, 4, 300, 300);
 
 	cv::Mat cannystuff(512,400,CV_8UC1);
-	//cv::morphologyEx(rgbin, img, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5)));
+	//cv::morphologyEx(img, img, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5)));
 	//cv::morphologyEx(img, img, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(20, 20)));
 
 	cv::Canny(img, cannystuff, 40, 40, 3, false); //Detecting edges

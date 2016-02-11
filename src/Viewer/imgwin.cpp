@@ -20,8 +20,6 @@ imgwin::imgwin(unsigned int set_width, unsigned int set_height, unsigned int set
 }
 
 void imgwin::setimg(nimg * updimg) {
-
-	
 	ctssurf = SDL_CreateRGBSurfaceFrom(updimg->data,
 		updimg->width, updimg->height,
 		8 * updimg->depth, //8 bits * 3 channels
@@ -44,6 +42,5 @@ void imgwin::setimg(nimg * updimg) {
 }
 
 imgwin::~imgwin() {
-
 }
 

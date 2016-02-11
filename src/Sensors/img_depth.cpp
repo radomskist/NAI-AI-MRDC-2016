@@ -8,11 +8,11 @@ bool kimgplane = true;
 
 imgd::imgd() : kdepth(512,424,3) {
 	lineest = false; //Predict where lines might be?
-	pixdist = 10; //Distance between pixels when testing flatness of plane
+	pixdist = 20; //Distance between pixels when testing flatness of plane
 	slopeerrorrange = 5; //Range of error when seeing if plane is flat
-	kdepth.flags &= KDEP;
+	kdepth.flags = KDEP;
 
-	freezetime = GetMilli();
+	freezetime = GetSec();
 }
 
 imgd::~imgd() {
@@ -235,7 +235,7 @@ std::vector<obj_plane> imgd::CalculatePlanes(std::vector<std::array<cv::Point,2>
 }
 
 void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std::vector<obj_plane>& returnplane) {
-	int checkdist = processplane[0][3].x - processplane[0][0].x;
+	int checkdist = processplane[0][3].x - processplane[0][0].x - 8;
 	if(pixdist > checkdist) {
 		processplane.erase(processplane.begin());
 		return;
@@ -280,7 +280,7 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 	adderu.y = midy;
 
 	/*
-	THIS DRAWS THE MIDLINE FOR DEBUGGING
+	THIS DRAWS THE MIDLINE FOR DEBUGGING*/	
 	newpoint[0] = adderu;
 	adderu.x = processplane[0][0].x + checktot * pixdist;
 	newpoint[1] = adderu;
@@ -289,7 +289,7 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 	adderu.x = processplane[0][0].x + checktot * pixdist;
 	newpoint[3] = adderu;
 	processplane.push_back(newpoint);
-	*/
+	
 
 	//Checking if wall is just a gap
 	for(int i = 1; i < checktot; i++) {
@@ -301,6 +301,17 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 			return;
 		}
 	}
+
+	if(processplane.size() > 0 && freezetime < GetSec()) {
+		kdepth.flags = KDEP | KFREEZE;
+		freezetime = GetSec() + 1;
+	}
+	else {
+
+		std:cout << GetMilli() <<  " " << freezetime << std::endl;
+	}
+
+
 /*
 	newpoint[0] = closest;
 	newpoint[1] = verticle[i][1];
@@ -349,14 +360,9 @@ inline int imgd::averagepoints(cv::Point avg) {
 	int yspot = avg.y*kdepth.width;
 	int total = datahold[avg.x + yspot];
 
-	if(total < 2)
-		return 0;
-
 	total += datahold[avg.x + 1 + yspot];
 	total += datahold[avg.x - 1 + yspot];
-	total += datahold[avg.x + 2 + yspot];
-	total += datahold[avg.x - 2 + yspot];
-	total *= 0.2f;
+	total *= 0.33f;
 
 	return total;
 }
@@ -366,6 +372,7 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 	//Casting data to a float, which is what it's suppose to be (instead of what it gives you for some reason)
 	datahold = (float *)&depthbuff[4];
 
+	kdepth.flags = KDEP;
 	unsigned char normalized;
 	unsigned resolution = kdepth.width * kdepth.height;
 	
@@ -414,13 +421,6 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 		    cv::line(outimg3, planepoints[i][2], planepoints[i][3], cv::Scalar(255,255,255), 3, 8);
 		    cv::line(outimg3, planepoints[i][3], planepoints[i][0], cv::Scalar(255,255,255), 3, 8);
 		}
-
-		if(planepoints.size() >= 1 && freezetime < GetMilli()) {
-			kdepth.flags |= KFREEZE;
-			freezetime = GetMilli() + 2000;
-		}
-		else
-			kdepth.flags |= ~KFREEZE;
 
 	}
 	catch(std::exception &e) {

@@ -13,12 +13,15 @@ class multiwin {
 		multiwin();
 		~multiwin();
 		bool running();
+		void SetImg(std::vector<nimg*>);
 		void GetKeys();
+		naigl *GetGL();
 
 	private:
-		//kinwin kdepth, kfreeze;
-		//imgwin rgbwin;
-		//naigl glwin;
+		kinwin kdepth, kfreeze;
+		imgwin rgbwin;
+		naigl glwin;
+		bool isrunning;
 };
 
 

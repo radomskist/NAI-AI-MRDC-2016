@@ -11,6 +11,7 @@ class basewin {
 		basewin();
 		~basewin();
 
+		void SetPos(unsigned int, unsigned int);
 		void ProcKeys(std::stack<SDL_Event> &);
 		virtual void GetKeys();
 		bool running();

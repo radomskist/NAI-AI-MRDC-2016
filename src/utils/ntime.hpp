@@ -16,7 +16,7 @@
 /*Get milli of second
 Basically how many milliseconds
 occured in the current second*/
-inline int GetMilli()
+inline unsigned long GetMilli()
 	{
 
 	timeval tv;
