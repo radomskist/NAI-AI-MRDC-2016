@@ -83,8 +83,8 @@ int main(int argc, char** argv)
 
 		imgwin test_win(imgref.width, imgref.height, imgref.depth);
 
-		char *b = new char[512*424*3];
-		imgref.data = new unsigned char[512*424*3];
+		char *b = new char[1920*1080*4];
+		imgref.data = new unsigned char[1920*1080*4];
 		std::fstream fileopen ("f.bmp", std::ios::in | std::ios::binary);
 
 		if(!fileopen.is_open())
@@ -97,16 +97,14 @@ int main(int argc, char** argv)
 		fileopen.seekg(0, std::ios::beg);
 		fileopen.read(b, n);
 
-		for(int i = 0; i < 512*424; i++) {
-			imgref.data[i*3] = b[i*3+54];
-			imgref.data[i*3+1] = b[i*3+54];
-			imgref.data[i*3+2] = b[i*3+54];
-			//imgref.data[i*3 + 3] = b[i*4 + 72];
+		for(int i = 0; i < 1920*1080; i++) {
+			imgref.data[i*4] = b[i*4  + 72];
+			imgref.data[i*4+1] = b[i*4 + 1 + 72];
+			imgref.data[i*4+2] = b[i*4 + 2 + 72];
 		}
-		imgd depthtest;
-
+		imgrgb depthtest;
 		depthtest.ProcessImg(imgref.data);
-		test_win.setimg(&imgref);
+		test_win.setimg(depthtest.GetImg());
 
 		while(test_win.running()) { 
 			test_win.GetKeys();
@@ -132,23 +130,23 @@ int main(int argc, char** argv)
 		}
 	}
 	else {
-		multiwin MainWin(1024, 760);
+		multiwin MainWin();
 		world_map wmap = mainbrain.GetMap();
-		unsigned int kmode = KDEP & KRGB & KFREEZE;
+		unsigned int kmode = KDEP | KRGB | KFREEZE;
 
 		/*TODO REMOVE*/
 		wmap.gentest();	
-		MainWin.addplanes(wmap.GetPlanes());
+		//MainWin.addplanes(wmap.GetPlanes());
 		std::vector<obj_cube> addcube;
 		addcube.push_back(wmap.GetRobot());
-		MainWin.addents(addcube);
-		obj_point newpoint(2000,2000,0);
-		MainWin.setpath(mainbrain.GetPfind().gotopoint(newpoint));
+		//MainWin.addents(addcube);
+		//obj_point newpoint(2000,2000,0);
+		//MainWin.setpath(mainbrain.GetPfind().gotopoint(newpoint));
 
-		while(MainWin.running()) {
-			MainWin.GetKeys();
-			MainWin.setimg(mainbrain.GetImages(kmode));
-		}
+		//while(MainWin.running()) {
+		//	MainWin.GetKeys();
+		//	MainWin.setimg(mainbrain.GetImages(kmode));
+		//}
 	}
 
 	//Closing program

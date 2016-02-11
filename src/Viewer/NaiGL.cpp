@@ -97,7 +97,7 @@ naigl::naigl() {
 		0,
 		width,
 		height,
-		SDL_WINDOW_OPENGL );
+		SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS);
 
 	nglcont = SDL_GL_CreateContext(win);
 

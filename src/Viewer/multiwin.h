@@ -6,21 +6,20 @@
 #include <iostream>
 #include "Viewer/NaiGL.h"
 #include "utils/nimg.h"
+#include "Viewer/kinectwin.h"
 
-class multiwin : public naigl {
+class multiwin {
 	public:
-		multiwin(unsigned int, unsigned int);
+		multiwin();
 		~multiwin();
-
+		bool running();
 		void GetKeys();
-		void setimg(std::vector<nimg*> &);
 
-	protected:
-		int rendcount;
-		SDL_Renderer *rendcam;
-		SDL_Texture *textcam;
-		SDL_Surface* ctssurf; //opencv to sdl surface
-
+	private:
+		//kinwin kdepth, kfreeze;
+		//imgwin rgbwin;
+		//naigl glwin;
 };
+
 
 #endif

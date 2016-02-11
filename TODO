@@ -2,8 +2,11 @@ THINGS THAT CAN BE DONE RIGHT AWAY:
 Kinect RGB
 	-This should get pretty decently developed asap
 
-Path finding
-	-This should get pretty decently developed asap
+QR reading
+	-ez
+
+State manager & States
+	-Manages jobs and is basically the core of the AI
 
 Arduino Laptop communication
 	-Needed for issuing commands
@@ -14,5 +17,8 @@ ALMOST DONE:
 Web camera
 	-Identification needs to be done
 
-Viewer on remote laptop
+Path finding
+	-This should get pretty decently developed asap
+
+Find fast streaming software
 	Kyle suggested using a remote screen viewer, which makes things easier.

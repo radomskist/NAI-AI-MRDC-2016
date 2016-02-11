@@ -300,22 +300,44 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 			processplane.erase(processplane.begin());
 			return;
 		}
-	}/*
+	}
+/*
+	newpoint[0] = closest;
+	newpoint[1] = verticle[i][1];
+	newpoint[2] = corner;
+	newpoint[3] = furthest;
+*/
+
+	//half xkinect FOV = 35.3
 	obj_plane newplane(1,1);
 	obj_point corner;
+	float screenpos = corner.x - 256;
+
+	// 0.616101226 = 35.3 (half of the kinects FOV) converted to radians
+	// the position of the point on the screen frm the center of the verticle axis
+	// .003906 = 1/256, which is half of the width (512)
+	/*obj_point pointhold;
+	pointhold.z = 300;
+
+	float depthspot = processplane[0][0].x + 5 + (processplane[0][0].y + (processplane[0][1].y - processplane[0][0].y) * pixwidth);
+	pointhold.y = datahold[depthspot] * sin(35.3*screenpos*0.00390625);
+	pointhold.x = datahold[depthspot] * sin(54.7*screenpos*0.00390625);
+	newplane.p[0] = pointhold*/
+
+	/*
 	corner.y = 300;
 	corner.x = processplane[0][0] * sin(
 	corner.z = processplane[0][0]
+
 	newplane.p[0] =  corner processplane[0][0];
 	newplane.p[1] =  corner processplane[0][1];
 	corner.y = 0;
 	newplane.p[2] =  corner processplane[0][2];
 	newplane.p[3] =  corner processplane[0][3];
+	*/
 
+	//returnplane.push_back(newplane);
 
-	//kinect FOV = 35.3
-	returnplane.push_back(newplane);
-*/
 	//return returnplane;
 }
 
@@ -394,11 +416,11 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 		}
 
 		if(planepoints.size() >= 1 && freezetime < GetMilli()) {
-			kdepth.flags &= KFREEZE;
+			kdepth.flags |= KFREEZE;
 			freezetime = GetMilli() + 2000;
 		}
 		else
-			kdepth.flags &= ~KFREEZE;
+			kdepth.flags |= ~KFREEZE;
 
 	}
 	catch(std::exception &e) {
