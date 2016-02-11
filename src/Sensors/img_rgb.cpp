@@ -44,8 +44,9 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 		krgb.data[i*4 + 2] = img.data[i*3 + 2];	
 		krgb.data[i*4 + 3] = 0;	
 	}
-
-	
+	img.release();
+	rgbin.release();
+	cannystuff.release();
 }
 
 nimg *imgrgb::GetImg() {
