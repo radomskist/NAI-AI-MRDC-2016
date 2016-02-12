@@ -1,8 +1,2 @@
 GROUND DETECTION
- -Done by drawing contours
- -Fill it in on a black and white screen, and to test if a point is in the ground just see if the pixel is white or not
- -Use 4 pixels to test what the ground is
  -Remember to check size (contourArea)
-
-
-TEST THE DEPTH CHANGES!!!!
