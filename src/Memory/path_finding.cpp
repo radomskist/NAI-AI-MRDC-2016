@@ -38,43 +38,16 @@ int path_finding::get_dist(int st, int end){
 std::vector<obj_point> path_finding::coarsepathfind(obj_point gl) {
 
 
-
+	generate_grid();
 	std::vector<int> open_set, closed_set, neighbors, path;
-
-
-
-	neighbors = path_finding::neighbors(1);
-	std::cout << "neighbors of 1 are: ";
-	for (int i = 0; i < neighbors.size(); i++){
-		std::cout << neighbors[i] << std::endl;
-	}
-	std::cout << std::endl;
-
-	neighbors = path_finding::neighbors(60);
-	std::cout << "neighbors of 60 are: ";
-	for (int i = 0; i < neighbors.size(); i++){
-		std::cout << neighbors[i] << std::endl;
-	}
-	std::cout << std::endl;
-
-
 
 
 
 	obj_point rob_pos_obj = wmap->GetRobot().pos;
 	std::vector<obj_point> ret_path;
 	int current, goal, rob_pos=(((int)rob_pos_obj.x/400)+(((int)rob_pos_obj.y/400)*width));
-			std::cout << rob_pos << std::endl;
 	bool done = false;
 	goal = (gl.x/400)+((gl.y/400)*width);
-
-	std::cout << "goal is: " << goal << std::endl;
-	std::cout << "distance from 1: " << path_finding::get_dist(1,goal) << std::endl;
-	std::cout << "distance from 10: " << path_finding::get_dist(10,goal) << std::endl;
-	std::cout << "distance from 121: " << path_finding::get_dist(121,goal) << std::endl;
-	std::cout << "distance from 15: " << path_finding::get_dist(15,goal) << std::endl;
-	std::cout << "distance from 60: " << path_finding::get_dist(60,goal) << std::endl;
-	std::cout << std::endl;
 
 
 
@@ -94,7 +67,6 @@ std::vector<obj_point> path_finding::coarsepathfind(obj_point gl) {
 		current = open_set.front();
 		
 		for(int i =1; i < open_set.size(); ++i){
-			std::cout << "sort it" << std::endl;
 			if (grid[current].weight >= grid[open_set[i]].weight)
 				current = open_set[i];
 		}//............................................................................................................................set the next grid space to be evaluated to the lowest weighted grid space in frontier
@@ -102,54 +74,38 @@ std::vector<obj_point> path_finding::coarsepathfind(obj_point gl) {
 		closed_set.push_back(current);//...............................................................................................put that same grid space in the "has been evaluated" vector
 
 		std::vector<int> neighbors_ = this->neighbors(current);//......................................................................generate the list of the neighboring spaces to the current grid space
-		std::cout << "neighbors_ size is: " << neighbors_.size() << std::endl;//for debugging
 		for(int i=0; i < neighbors_.size(); ++i){//....................................................................................for every neighbor in the list of neighbors:
 			
 			grid[neighbors_[i]].weight = get_dist(neighbors_[i], goal);//..........................................................set the weight to the manhattan distance to the goal grid space
 
 			if(this->contains(open_set, neighbors_[i]) && (grid[neighbors_[i]].weight > grid[current].weight)){//..................if the current neighbor is in the "frontier" and is closer than the current:
-				std::cout << "open set size 1 " << open_set.size() << " closed set size " << closed_set.size() << std::endl;
+
 				open_set.erase(std::search_n(open_set.begin(), open_set.end(),1,neighbors_[i]));//.............................remove that neighbor from the "to be evaluated" frontier b/c current is better
 			}
 			else if((this->contains(closed_set, neighbors_[i])) && (grid[neighbors_[i]].weight < grid[current].weight)){//........if the current neighbor has been checked and is better than the current space:
-				std::cout << "open set size 2 " << open_set.size() << " closed set size " << closed_set.size() << std::endl;
 				open_set.erase(std::search_n(closed_set.begin(), closed_set.end(),1,neighbors_[i]));//.........................remove the neighbor from the closed set because that neighbor is closer.
 
 			}
 			else{//................................................................................................................if the neighbor has not been selected for evaluation yet:
-				std::cout << "open set size 3 " << open_set.size() << " closed set size " << closed_set.size() << std::endl;
 				open_set.push_back(neighbors_[i]);
-				for(int i = 0; i < open_set.size() ; i++){//prints weights
-					std::cout << open_set[i] << "'s weight is: " << grid[open_set[i]].weight<< std::endl;
-				}
-				std::cout << "\n\n\n\n\n\n" << std::endl;
 				grid[neighbors_[i]].parent = current;//........................................................................set the new frontier space's parent to the space it came from
 			}
 
 		}
 		for(int i =1; i < open_set.size(); ++i){
-			std::cout << "sort it" << std::endl;
 			if (grid[current].weight >= grid[open_set[i]].weight)
 				least_weighted = open_set[i];
 		}
-		std::cout << "end it" << std::endl;
 		count++;
 	}//....................................................................................................................................end main loop
 	path.push_back(goal);
 	goal = current;
 	count = 0;
 	while(current != rob_pos && count < 121){
-		std::cout << "nooo" << std::endl;
 		path.push_back(grid[current].parent);
 		current = grid[current].parent;
 		count++;
 	}
-	std::reverse(path.begin(),path.end());
-	std::cout << "current path is: ";
-	for(int i = 0; i < path.size() ; i++){
-		std::cout << path[i] << ' ';
-	}
-	std::cout<<std::endl;
 	obj_point obj;
 
 	//TODO: convert path to obj_point
@@ -163,19 +119,54 @@ std::vector<obj_point> path_finding::coarsepathfind(obj_point gl) {
 
 }
 
-bool path_finding::generate_grid(void){
+void path_finding::generate_grid(void){
 	std::vector<obj_plane> planes = wmap->GetPlanes();
-	obj_point corners[4];
-
+	bool is_vert;
+	obj_point corners[2];
+	int dist;
 	for( int i = 0; i< planes.size(); ++i){
-		//corners = {0,0,0,0};
-		for(int j=0;j < 4; j++){
-			//corners[j] = planes[i].p[j]/400;//scale down current plane's corners into grid sized corners
+		for(int j=0; j<= 2; ++j){
+			corners[j] = planes[i].p[j*2];//scale down current plane's corners into grid sized corners
+			corners[j].x = std::nearbyint(corners[j].x / 400);
+			corners[j].y = std::nearbyint(corners[j].y / 400);
+
+		}
+		if(corners[1].x - corners[0].x == 0)
+			is_vert = true;
+		else
+			is_vert = false;
+
+		if(is_vert){
+			for(int j = corners[0].y ; j <= corners[1].y; ++j){
+				grid[xy2griterator(corners[0].x, corners[0].y+j)].tags | non_traversable;
+			}
+		}
+		else{
+			for(int j = corners[0].x ; j <= corners[1].x; ++j){
+				grid[xy2griterator(corners[0].x+j, corners[0].y)].tags | non_traversable;
+			}
 		}
 		
 		
 	}
-	return true;
+	
+	std::string test_string;
+	for(int i = 0; i < 121; ++i){
+		if(grid[i].tags | non_traversable)
+			test_string += "X";
+		else
+			test_string += "0";
+	}
+	for(int i =1; i<= 10; ++i){
+		for(int j = 0; i < 10; ++j){
+			std::cout << test_string[j*i] << std::endl;
+		}
+	}
+	return;
+}
+
+int path_finding::xy2griterator(int x, int y){
+	return x+(y*width);
 }
 
 bool path_finding::contains(std::vector<int> search_vect, int tar){
@@ -187,6 +178,7 @@ bool path_finding::contains(std::vector<int> search_vect, int tar){
 }
 
 std::vector<obj_point> path_finding::gotopoint(obj_point findpoint) {
+
 	std::vector<obj_point> returnpoint;
 
 	obj_point newp;

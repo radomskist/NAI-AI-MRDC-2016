@@ -32,14 +32,14 @@ void world_map::gentest() {
 	obj_plane newplane = obj_plane(1,1);
 	newplane.p[0].x = 800; newplane.p[0].y = 400; newplane.p[0].z = 400;
 	newplane.p[1].x = 800; newplane.p[1].y = 400; newplane.p[1].z = 0;
-	newplane.p[2].x = 2000; newplane.p[2].y = 400; newplane.p[2].z = 400;
-	newplane.p[3].x = 2000; newplane.p[3].y = 400; newplane.p[3].z = 0;
+	newplane.p[2].x = 2400; newplane.p[2].y = 400; newplane.p[2].z = 400;
+	newplane.p[3].x = 2400; newplane.p[3].y = 400; newplane.p[3].z = 0;
 	plane_list.push_back(newplane);//Putting the plane in our list
 
 	newplane.p[0].x = 800; newplane.p[0].y = 400; newplane.p[0].z = 400;
 	newplane.p[1].x = 800; newplane.p[1].y = 400; newplane.p[1].z = 0;
-	newplane.p[2].x = 800; newplane.p[2].y = 2000; newplane.p[2].z = 400;
-	newplane.p[3].x = 800; newplane.p[3].y = 2000; newplane.p[3].z = 0;
+	newplane.p[2].x = 800; newplane.p[2].y = 2400; newplane.p[2].z = 400;
+	newplane.p[3].x = 800; newplane.p[3].y = 2400; newplane.p[3].z = 0;
 	plane_list.push_back(newplane);
 
 	newplane.p[0].x = 800; newplane.p[0].y = 400; newplane.p[0].z = 400;

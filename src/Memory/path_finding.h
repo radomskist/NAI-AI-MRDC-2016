@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream> 
+#include <math.h>
 
 enum node_flag{
     non_traversable=0x01,
@@ -31,7 +32,7 @@ class path_finding {
 		bool findpathtoobj(std::string);
 		bool searchat(obj_point);
 		std::vector<obj_point> gotopoint(obj_point);
-
+		
 		
 
 	private:
@@ -40,9 +41,10 @@ class path_finding {
 		std::vector<int> neighbors(int);
 		int get_dist(int, int); //returns manhattan distance between st and end
 		bool contains(std::vector<int>, int);
+		int xy2griterator(int, int);
 		grid_space grid[121];
 		int width = 11;
-		bool generate_grid(void);
+		void generate_grid(void);
 
 
 		world_map *wmap;
