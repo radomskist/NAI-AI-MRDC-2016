@@ -5,6 +5,8 @@ General:
 	-Need to fix kinect lense
 
 Kinect RGB
+	-Find color of floor before calculating?
+		 -Remember to check size (contourArea)
 	-Blob detection to see far balls?
 	-Need to deal with shadows
 	-Recognize key points

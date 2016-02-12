@@ -9,7 +9,7 @@ bool kimgplane = true;
 imgd::imgd() : kdepth(512,424,3) {
 	lineest = false; //Predict where lines might be?
 	pixdist = 10; //Distance between pixels when testing flatness of plane
-	slopeerrorrange = 500; //Range of error when seeing if plane is flat
+	slopeerrorrange = 100; //Range of error when seeing if plane is flat
 	kdepth.flags = KDEP;
 	failpercent = .5; //Percent of wall spots that can fail but still be accepted. To avoid noise problems
 
