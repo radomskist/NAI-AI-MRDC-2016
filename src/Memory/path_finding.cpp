@@ -180,22 +180,12 @@ bool path_finding::contains(std::vector<int> search_vect, int tar){
 std::vector<obj_point> path_finding::gotopoint(obj_point findpoint) {
 
 	std::vector<obj_point> returnpoint;
-
-	obj_point newp;
-	newp.z = 50.0f;
-	//Don't touch above
 	
-	returnpoint = coarsepathfind(findpoint);
+	//returnpoint = coarsepathfind(findpoint);
 
-	for(int i = 0; i < returnpoint.size(); ++i){
+	/*for(int i = 0; i < returnpoint.size(); ++i){
 		std::cout << returnpoint[i].x << ' ' << returnpoint[i].y << std::endl;
-	}
-
-	/*//Testpoint
-	newp.x = 200.0f;
-	newp.y = 2200.0f;
-	returnpoint.push_back(newp);
-	*/
+	}*/
 
 	//Don't touch below
 	return returnpoint;

@@ -1,4 +1,4 @@
-#include "Sensors/img_depth.h"
+#include "Devices/img_depth.h"
 using namespace std;
 bool kimgdep = true;
 bool kimgedge = true;

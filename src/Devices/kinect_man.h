@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "Sensors/img_depth.h"
-#include "Sensors/img_rgb.h"
+#include "Devices/img_depth.h"
+#include "Devices/img_rgb.h"
 #include "Memory/objects.hpp"
 #include "utils/nexcep.hpp"
 #include "utils/nimg.h"

@@ -20,6 +20,13 @@ naibrain::naibrain() : pfind(&wmap) {
 	catch (nfail &e) {
 		std::cout << "Webcam initialization failed: " << e.what() << std::endl;
 	}
+
+	try {
+		drivechip = naicom::createcomm("NaiDrive");
+	}
+	catch (nfail &e) {
+		std::cout << "Arduino initialization failed: " << e.what() << std::endl;
+	}
 }
 
 naibrain::~naibrain() {
