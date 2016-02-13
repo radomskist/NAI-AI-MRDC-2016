@@ -1,4 +1,4 @@
-#include "Sensors/webcam.h"
+#include "Devices/webcam.h"
 
 nwebc *naiwebc::createwebcam(std::string ofname) {
 	

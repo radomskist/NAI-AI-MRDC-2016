@@ -116,10 +116,10 @@ int main(int argc, char** argv)
 		naigl MemWin;
 		world_map wmap = mainbrain.GetMap();
 		wmap.gentest();	
-		MemWin.addplanes(wmap.GetPlanes());
+		MemWin.setplanes(wmap.GetPlanes());
 		std::vector<obj_cube> addcube;
 		addcube.push_back(wmap.GetRobot());
-		MemWin.addents(addcube);
+		MemWin.setents(addcube);
 		obj_point newpoint(2000,2000,0);
 		MemWin.setpath(mainbrain.GetPfind().gotopoint(newpoint));
 
@@ -138,10 +138,10 @@ int main(int argc, char** argv)
 		std::vector<obj_cube> addcube;
 		addcube.push_back(wmap.GetRobot());
 		naigl *glwin = MainWin.GetGL();
-		glwin->addents(addcube);
+		glwin->setents(addcube);
 		obj_point newpoint(2000,2000,0);
 		glwin->setpath(mainbrain.GetPfind().gotopoint(newpoint));
-		glwin->addplanes(wmap.GetPlanes());
+		glwin->setplanes(wmap.GetPlanes());
 
 		while(MainWin.running()) {
 			MainWin.GetKeys();

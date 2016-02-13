@@ -1,4 +1,4 @@
-#include "Sensors/img_rgb.h"
+#include "Devices/img_rgb.h"
 
 imgrgb::imgrgb() {
 	krgb.flags = KRGB;

@@ -1,8 +1,7 @@
 #include "Memory/path_finding.h"
 
 
-path_finding::path_finding(world_map *setmap) {
-	wmap = setmap;
+path_finding::path_finding(const world_map &set_map) : wmap(set_map) {
 }
 
 path_finding::~path_finding() {
@@ -41,9 +40,7 @@ std::vector<obj_point> path_finding::coarsepathfind(obj_point gl) {
 	generate_grid();
 	std::vector<int> open_set, closed_set, neighbors, path;
 
-
-
-	obj_point rob_pos_obj = wmap->GetRobot().pos;
+	obj_point rob_pos_obj = wmap.GetRobot().pos;
 	std::vector<obj_point> ret_path;
 	int current, goal, rob_pos=(((int)rob_pos_obj.x/400)+(((int)rob_pos_obj.y/400)*width));
 	bool done = false;
@@ -120,7 +117,7 @@ std::vector<obj_point> path_finding::coarsepathfind(obj_point gl) {
 }
 
 void path_finding::generate_grid(void){
-	std::vector<obj_plane> planes = wmap->GetPlanes();
+	std::vector<obj_plane> planes = wmap.GetPlanes();
 	bool is_vert;
 	obj_point corners[2];
 	int dist;
@@ -177,25 +174,15 @@ bool path_finding::contains(std::vector<int> search_vect, int tar){
 	return false;
 }
 
-std::vector<obj_point> path_finding::gotopoint(obj_point findpoint) {
+std::vector<obj_point> path_finding::gotopoint(obj_point findpoint) const {
 
 	std::vector<obj_point> returnpoint;
-
-	obj_point newp;
-	newp.z = 50.0f;
-	//Don't touch above
 	
-	returnpoint = coarsepathfind(findpoint);
+	//returnpoint = coarsepathfind(findpoint);
 
-	for(int i = 0; i < returnpoint.size(); ++i){
+	/*for(int i = 0; i < returnpoint.size(); ++i){
 		std::cout << returnpoint[i].x << ' ' << returnpoint[i].y << std::endl;
-	}
-
-	/*//Testpoint
-	newp.x = 200.0f;
-	newp.y = 2200.0f;
-	returnpoint.push_back(newp);
-	*/
+	}*/
 
 	//Don't touch below
 	return returnpoint;

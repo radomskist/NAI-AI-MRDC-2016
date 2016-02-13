@@ -1,6 +1,6 @@
 #include "naibrain.h"
 
-naibrain::naibrain() : pfind(&wmap) {
+naibrain::naibrain() : pfind(GetMap()) {
 	kinect_manager = 0;
 	//Initializing kinect manager
 
@@ -20,6 +20,13 @@ naibrain::naibrain() : pfind(&wmap) {
 	catch (nfail &e) {
 		std::cout << "Webcam initialization failed: " << e.what() << std::endl;
 	}
+
+	try {
+		drivechip = naicom::createcomm("NaiDrive");
+	}
+	catch (nfail &e) {
+		std::cout << "Arduino initialization failed: " << e.what() << std::endl;
+	}
 }
 
 naibrain::~naibrain() {
@@ -31,11 +38,11 @@ bool naibrain::KStatus() {
 	return kinect_manager;
 }
 
-world_map &naibrain::GetMap() {
+const world_map &naibrain::GetMap() {
 	return wmap;
 }
 
-path_finding &naibrain::GetPfind(){
+const path_finding &naibrain::GetPfind(){
 	return pfind;
 }
 

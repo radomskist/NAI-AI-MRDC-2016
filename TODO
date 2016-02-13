@@ -24,7 +24,6 @@ Web camera
 
 AI:
 	-Look for posts on edge of map?
-	-Check depth of points directly infront for plexi
 	-Create base state object
 	-Create state manager
 	-Finish coarse path finding
@@ -34,9 +33,9 @@ SDL:
 	-Fix crashing from mouse events
 
 Arduino Laptop communication
-	-Needed for issuing commands
 	-Figure out what commands need to be done
 
 Laptop general:
 	-Find streaming software for display
+		?VLC
 	-Deal with crashing when laptop closes

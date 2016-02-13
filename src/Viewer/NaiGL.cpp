@@ -207,7 +207,7 @@ naigl::naigl() {
 
 }
 
-void naigl::setpath(std::vector<obj_point> set_newpath) {
+void naigl::setpath(const std::vector<obj_point> set_newpath) {
 
 	std::vector<float> newpath;
 	glBindVertexArray(naivaopath);
@@ -234,7 +234,7 @@ inline void easypush(std::vector<float> &push, obj_point &point) {
 	push.push_back(point.z);
 }
 
-void naigl::addents(std::vector<obj_cube> &add_objs) {
+void naigl::setents(const std::vector<obj_cube> &add_objs) {
 
 	std::vector<float> cubeverts;
 	std::vector<float> cubecolorverts;
@@ -346,7 +346,7 @@ void naigl::addents(std::vector<obj_cube> &add_objs) {
 }
 
 
-void naigl::addplanes(std::vector<obj_plane> &add_newplane) {
+void naigl::setplanes(const std::vector<obj_plane> &add_newplane) {
 	for(int i = 0; i < add_newplane.size(); i++){
 	
 		obj_plane newplane = add_newplane[i];

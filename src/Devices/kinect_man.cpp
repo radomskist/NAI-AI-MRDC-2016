@@ -1,4 +1,4 @@
-#include "Sensors/kinect_man.h"
+#include "Devices/kinect_man.h"
 
 kinectman::kinectman() {
 	/*********************

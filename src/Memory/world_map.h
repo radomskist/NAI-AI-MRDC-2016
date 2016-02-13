@@ -16,15 +16,18 @@ class world_map {
 		~world_map();
 
 		//std::vector<2d_obj> GetObjsinview(perspective data) //This will be an optimization feature to check for objects ahead of time
-		std::vector<obj_plane> &GetPlanes();
+		const std::vector<obj_plane> &GetPlanes() const;
+		const obj_cube &GetRobot() const;
+
 		void addobjs(std::vector<obj_base>&);
 		void gentest();
-		obj_cube &GetRobot();
 
 	private:
 		obj_cube robot;
 		std::vector<obj_cube> entities_list;
 		std::vector<obj_plane> plane_list;
+
+		bool maptodate;
 
 };
 
