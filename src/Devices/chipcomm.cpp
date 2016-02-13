@@ -3,16 +3,23 @@
 ccomm *naicom::createcomm(std::string ofname) {
 	//TODO CHECK FOR NAME?
 	bool reading = true;
-	int file;
+	int file = 0;
 	int iterator = 0;
 
 	std::string directory = "/dev/ttyACM";
 
 	while(file == 0) {
 		std::string cur_dir = directory + std::to_string(iterator);
-
+		iterator++;
 		if((file = open(cur_dir.c_str(), O_RDWR| O_NOCTTY | O_NDELAY)) == -1){ 
 			close(file);
+
+			//Checking 10 files because wont always be in order
+			if(iterator < 10) { 
+				file = 0;
+				continue;
+			}
+
 			throw nfail("Connection could not be made.");
 		    return NULL;
 		}
@@ -20,8 +27,10 @@ ccomm *naicom::createcomm(std::string ofname) {
 		return new ccomm(file);
 
 	/*TODO: Read first command for name and reloop if not matching*/
-	iterator++;
 	}
+	close(file);
+	throw nfail("Connection could not be made.");
+    return NULL;
 }
 
 
@@ -47,13 +56,28 @@ ccomm::ccomm(int set_file) {
 }
 
 
+bool ccomm::writecom(std::string writestr) {
+
+	char buff[] = {"FUCK LOL"};
+
+	if(write(file, buff, 8) < 0)
+		return false;
+
+	return true;
+
+}
+
 std::string ccomm::readall() {
-//TODO Loop until it reads everything
+	//TODO Loop until it reads everything
 	char buff[50];
 	//int w = write(file, "FDS", 3);
-	if(read(file, buff, 50) != -1)
-		std::cout << buff << std::endl;
+	if(read(file, buff, 50*sizeof(char)) < 0) {
+		std::string emptystring;
+		emptystring.empty();
+		return emptystring;
+	}
 
+	return std::string(buff);
 }
 
 ccomm::~ccomm() {

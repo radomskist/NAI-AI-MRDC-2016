@@ -24,8 +24,6 @@ Web camera
 
 AI:
 	-Look for posts on edge of map?
-	-Create base state object
-	-Create state manager
 	-Finish coarse path finding
 	-Fine path finding
 

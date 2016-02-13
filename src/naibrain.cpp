@@ -27,6 +27,8 @@ naibrain::naibrain() : pfind(GetMap()) {
 	catch (nfail &e) {
 		std::cout << "Arduino initialization failed: " << e.what() << std::endl;
 	}
+
+	states.push(new test_state(GetMap()));
 }
 
 naibrain::~naibrain() {
@@ -44,6 +46,20 @@ const world_map &naibrain::GetMap() {
 
 const path_finding &naibrain::GetPfind(){
 	return pfind;
+}
+
+void naibrain::tick() {
+	std::string currentcoms = states.top()->commands();
+
+	if(drivechip){
+		std::string readit = drivechip->readall();
+		if(readit.size() > 0)		
+			std::cout << readit << std::endl;
+
+
+		//if(!drivechip->writecom(currentcoms))
+		//	std::cout << "Failed to write" << std::endl;
+	}
 }
 
 std::vector<nimg*>  &naibrain::GetImages(unsigned int imgmask) {

@@ -144,6 +144,7 @@ int main(int argc, char** argv)
 		glwin->setplanes(wmap.GetPlanes());
 
 		while(MainWin.running()) {
+			mainbrain.tick();
 			MainWin.GetKeys();
 			MainWin.SetImg(mainbrain.GetImages(kmode));
 		}
