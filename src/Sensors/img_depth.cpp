@@ -9,8 +9,9 @@ bool kimgplane = true;
 imgd::imgd() : kdepth(512,424,3) {
 	lineest = false; //Predict where lines might be?
 	pixdist = 10; //Distance between pixels when testing flatness of plane
-	slopeerrorrange = 200; //Range of error when seeing if plane is flat
+	slopeerrorrange = 100; //Range of error when seeing if plane is flat
 	kdepth.flags = KDEP;
+	failpercent = .5; //Percent of wall spots that can fail but still be accepted. To avoid noise problems
 
 	freezetime = GetSec();
 }
@@ -235,39 +236,58 @@ std::vector<obj_plane> imgd::CalculatePlanes(std::vector<std::array<cv::Point,2>
 }
 
 void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std::vector<obj_plane>& returnplane) {
-	int checkdist = processplane[0][3].x - processplane[0][0].x - 10;
-	if(pixdist > checkdist) {
+
+	int checkdist = abs(processplane[0][3].x - processplane[0][0].x - 10);
+	int checkdistv = abs(processplane[0][0].y - processplane[0][1].y - 10); //Verticle check
+	
+	if(pixdist > checkdist || pixdist > checkdistv) {
 		processplane.erase(processplane.begin());
 		return;
 	}
+
+	/*horizontal*/
 	int checktot = checkdist / pixdist;
-	checkdist = checkdist / checktot; // every pixdist pixels
+
+	/*verticle*/
+	int checktottwo = checkdistv / pixdist;
 
 	cv::Point checkpoint;
 	int midy = processplane[0][0].y + (processplane[0][1].y - processplane[0][0].y) * 0.5;
+	int midx = processplane[0][0].x + (processplane[0][3].x - processplane[0][0].x) * 0.5;
 	checkpoint.y = midy;
 
 	//Boundries pixels should be between
 	//Subtracting 5 pixels to make sure it's not on the edge which would be 0.
+
+	/*Horizontal check*/
 	cv::Point getextreme;
 	getextreme.x = processplane[0][3].x - pixdist;
 	getextreme.y = midy;
 	std::array<cv::Point, 4> newpoint;
 	newpoint[0] = getextreme;
-	newpoint[3] = getextreme;
 	int extremetwo = averagepoints(getextreme);
-	getextreme.x = processplane[0][0].x + pixdist;
 
+	getextreme.x = processplane[0][0].x + pixdist;
 	newpoint[1] = getextreme;
-	newpoint[2] = getextreme;
 	int extremeone = averagepoints(getextreme);
+
+
+	/*Verticle check*/
+	getextreme.x = midx;
+	getextreme.y = processplane[0][0].y + pixdist;
+	newpoint[2] = getextreme;
+	int extremethree = averagepoints(getextreme);
+
+	getextreme.y = processplane[0][1].y - pixdist;
+	newpoint[3] = getextreme;
+	int extremefour = averagepoints(getextreme);
 
 	/*
 	THIS DRAWS THE MIDLINE FOR DEBUGGING*/	
 	processplane.push_back(newpoint);
 
 
-	if(extremeone < 2 || extremetwo < 2) {
+	if(extremeone < 500 || extremetwo < 500 || extremethree < 500 || extremefour < 500) {
 		processplane.erase(processplane.begin());
 		return;
 	}
@@ -278,30 +298,58 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 		extremetwo = extremeone;
 		extremeone = temp;
 	}
+	//Verticle fix
+	if(extremefour < extremethree) {
+		int temp = extremefour;
+		extremefour = extremethree;
+		extremethree = temp;
+	}
 
 	//Adding range of error
 	extremeone -= slopeerrorrange;
 	extremetwo += slopeerrorrange;
+	extremethree -= slopeerrorrange;
+	extremefour += slopeerrorrange;
 
 	//TODO check if multiple walls where in one plane?
 
-	//Checking if wall is just a gap
+	//Checking if wall is just a gap (horizontal)
+	int failcount = 0;
+	int failcap = checktot * failpercent;
 	for(int i = 1; i < checktot; i++) {
 		checkpoint.x = processplane[0][0].x + i * pixdist;
 		int checkvalue = averagepoints(checkpoint);
-
-		if(checkvalue < extremeone || checkvalue > extremetwo) {
-			processplane.erase(processplane.begin());
-			return;
-		}
+		if(checkvalue < extremeone || checkvalue > extremetwo)
+			failcount++;
 	}
 
-	if(processplane.size() > 0 && freezetime < GetSec()) {
+	if(failcount > failcap){
+		processplane.erase(processplane.begin());
+		return;
+	}
+
+	//Checking for gaps (verticle)
+	failcount = 0;
+	failcap = checktottwo * failpercent;
+	checkpoint.x = midx;
+
+	for(int i = 1; i < checktottwo; i++) {
+		checkpoint.y = processplane[0][0].y + i * pixdist;
+		int checkvalue = averagepoints(checkpoint);
+		if(checkvalue < extremethree || checkvalue > extremefour) 
+			failcount++;
+	}
+
+	if(failcount > failcap){
+		processplane.erase(processplane.begin());
+		return;
+	}
+
+	/*Doing freezeframe*/
+	if(processplane.size() > 1 && freezetime < GetSec()) {
 		kdepth.flags = KDEP | KFREEZE;
 		freezetime = GetSec() + 1;
 	}
-
-
 /*
 	newpoint[0] = closest;
 	newpoint[1] = verticle[i][1];

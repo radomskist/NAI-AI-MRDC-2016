@@ -5,12 +5,16 @@ General:
 	-Need to fix kinect lense
 
 Kinect RGB
-	-Blob detection to see far balls?
-	-Need to deal with shadows
+	-fit rgb image to depth image
+	-dynamic floor coloring (by getting average color of points)
+	-Check path for obsticals
+	-Check color of balls
 	-Recognize key points
 	-QR reading
 
 Kinect depth
+	-Check for a plane under long parallel horizontal lines
+	-Check path for obsticals
 	-Range finding request on points
 	-Use blob detection to identify other robots?
 
@@ -19,6 +23,8 @@ Web camera
 	-See where golf ball dispenser is
 
 AI:
+	-Look for posts on edge of map?
+	-Check depth of points directly infront for plexi
 	-Create base state object
 	-Create state manager
 	-Finish coarse path finding

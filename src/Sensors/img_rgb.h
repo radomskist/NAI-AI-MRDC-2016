@@ -30,12 +30,15 @@ class imgrgb {
 		~imgrgb();
 
 		void ProcessImg(unsigned char *);
-		void findground(cv::Mat&);
 		nimg *GetImg();
 
 	private:
+		inline void findground(cv::Mat&);
+		inline void findballs(cv::Mat&, cv::Mat&);
+
 		nimg krgb;
 		cv::Mat groundmat;
+		cv::Ptr<cv::SimpleBlobDetector> balldet;
 };
 
 #endif
