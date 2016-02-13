@@ -11,6 +11,7 @@ ccomm *naicom::createcomm(std::string ofname) {
 	while(file == 0) {
 		std::string cur_dir = directory + std::to_string(iterator);
 		iterator++;
+
 		if((file = open(cur_dir.c_str(), O_RDWR| O_NOCTTY | O_NDELAY)) == -1){ 
 			close(file);
 
@@ -23,14 +24,11 @@ ccomm *naicom::createcomm(std::string ofname) {
 			throw nfail("Connection could not be made.");
 		    return NULL;
 		}
-
+		std::cout << "found: " << cur_dir << std::endl;
 		return new ccomm(file);
 
 	/*TODO: Read first command for name and reloop if not matching*/
 	}
-	close(file);
-	throw nfail("Connection could not be made.");
-    return NULL;
 }
 
 

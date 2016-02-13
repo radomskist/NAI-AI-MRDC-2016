@@ -18,6 +18,7 @@ naibrain::naibrain() : pfind(GetMap()) {
 		bcwebcam = naiwebc::createwebcam("USB Camera (046d:08ad)");
 	}
 	catch (nfail &e) {
+		bcwebcam = NULL;
 		std::cout << "Webcam initialization failed: " << e.what() << std::endl;
 	}
 
@@ -25,6 +26,7 @@ naibrain::naibrain() : pfind(GetMap()) {
 		drivechip = naicom::createcomm("NaiDrive");
 	}
 	catch (nfail &e) {
+		drivechip = NULL;
 		std::cout << "Arduino initialization failed: " << e.what() << std::endl;
 	}
 
@@ -54,7 +56,7 @@ void naibrain::tick() {
 	if(kinect_manager != NULL)
 		kinect_manager->ProcessImages();
 
-	if(drivechip){
+	if(drivechip != NULL){
 		std::string readit = drivechip->readall();
 
 		if(!drivechip->writecom(currentcoms))
