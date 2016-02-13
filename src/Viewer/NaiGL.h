@@ -24,9 +24,9 @@ class naigl : public basewin {
 		~naigl();
 
 		void draw();
-		void addplanes(std::vector<obj_plane> &);
-		void setpath(std::vector<obj_point> );
-		void addents(std::vector<obj_cube> &);
+		void setplanes(const std::vector<obj_plane> &);
+		void setpath(const std::vector<obj_point> );
+		void setents(const std::vector<obj_cube> &);
 		void GetKeys();
 
 	protected:

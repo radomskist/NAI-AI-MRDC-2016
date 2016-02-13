@@ -17,8 +17,8 @@ class naibrain {
 		naibrain();
 		~naibrain();
 		std::vector<nimg*> &GetImages(unsigned int); /*get list of images from specified flags*/
-		world_map &GetMap(); /*Get world map*/
-		path_finding &GetPfind(); /*Get path to a point from path find object*/
+		const world_map &GetMap(); /*Get world map*/
+		const path_finding &GetPfind(); /*Get path to a point from path find object*/
 		bool KStatus(); /*returns whether or not kinect is working*/
 
 	private:

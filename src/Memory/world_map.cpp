@@ -12,7 +12,7 @@ world_map::world_map() : robot("NAI") {
 	robot.color[0] = 0.5f;
 	robot.color[1] = 0.0f;
 	robot.color[2] = 0.76f;
-
+	maptodate = false;
 
 }
 
@@ -56,15 +56,15 @@ void world_map::gentest() {
 	
 }
 
-obj_cube &world_map::GetRobot() {
+const obj_cube &world_map::GetRobot() const {
 	return robot;
 }
 
-std::vector<obj_plane> &world_map::GetPlanes() {
+const std::vector<obj_plane> &world_map::GetPlanes() const {
 	return plane_list;
 }
 
-void addobjs(std::vector<obj_base> &add_obj) {
+void world_map::addobjs(std::vector<obj_base> &add_obj) {
 	
 }
 

@@ -26,12 +26,12 @@ struct grid_space{
 
 class path_finding {
 	public:
-		path_finding(world_map*);
+		path_finding(const world_map&);
 		~path_finding();
 
 		bool findpathtoobj(std::string);
 		bool searchat(obj_point);
-		std::vector<obj_point> gotopoint(obj_point);
+		std::vector<obj_point> gotopoint(obj_point) const;
 		
 		
 
@@ -45,9 +45,7 @@ class path_finding {
 		grid_space grid[121];
 		int width = 11;
 		void generate_grid(void);
-
-
-		world_map *wmap;
+		const world_map &wmap;
 
 	};
 #endif
