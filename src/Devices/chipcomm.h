@@ -15,6 +15,7 @@ class ccomm {
 		ccomm(int);
 		~ccomm();
 
+		bool writecom(std::string);
 		std::string readall();
 		std::string GetName();
 

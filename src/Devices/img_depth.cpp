@@ -13,6 +13,7 @@ imgd::imgd() : kdepth(512,424,3) {
 	kdepth.flags = KDEP;
 	failpercent = .5; //Percent of wall spots that can fail but still be accepted. To avoid noise problems
 
+	kdepth.data = new unsigned char[kdepth.width * kdepth.height * kdepth.depth];
 	freezetime = GetSec();
 }
 
