@@ -57,8 +57,8 @@ void naibrain::tick() {
 			std::cout << readit << std::endl;
 
 
-		//if(!drivechip->writecom(currentcoms))
-		//	std::cout << "Failed to write" << std::endl;
+		if(!drivechip->writecom(currentcoms))
+			std::cout << "Failed to write" << std::endl;
 	}
 }
 

@@ -58,9 +58,8 @@ ccomm::ccomm(int set_file) {
 
 bool ccomm::writecom(std::string writestr) {
 
-	char buff[] = {"FUCK LOL"};
 
-	if(write(file, buff, 8) < 0)
+	if(write(file, writestr.c_str(), writestr.size()) < 0)
 		return false;
 
 	return true;
