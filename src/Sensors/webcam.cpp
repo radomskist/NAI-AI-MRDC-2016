@@ -5,7 +5,6 @@ nwebc *naiwebc::createwebcam(std::string ofname) {
     int file;
     v4l2_capability cap;
 	int iterator = 0;
-	//TODO do for all videon files and get iterator
 	std::string directory = "/dev/video";
 
 	while(true) {

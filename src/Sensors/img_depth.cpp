@@ -346,7 +346,7 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 	}
 
 	/*Doing freezeframe*/
-	if(processplane.size() > 0 && freezetime < GetSec()) {
+	if(processplane.size() > 1 && freezetime < GetSec()) {
 		kdepth.flags = KDEP | KFREEZE;
 		freezetime = GetSec() + 1;
 	}

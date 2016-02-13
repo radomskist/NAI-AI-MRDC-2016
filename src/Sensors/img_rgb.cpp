@@ -104,6 +104,7 @@ void imgrgb::findballs(cv::Mat &hsvin, cv::Mat &circlemat) {
 	std::vector<cv::Vec4i> hierarchy;
 	cv::findContours(img3,contours,hierarchy,cv::CHAIN_APPROX_NONE,cv::RETR_LIST);
 */
+	closed.release();
 }
 
 void imgrgb::ProcessImg(unsigned char *rgbbuff) {
@@ -113,11 +114,10 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 	cv::Mat img(1080,1920, CV_8UC4, rgbbuff);
 	cv::Mat rgbin;
 	cv::Mat HSVin;
-	//cv::cvtColor(rgbin,img,CV_BGR2HSV);
 	rgbin = img(cv::Rect(190, 0, 1539, 1080));
 	cv::resize(rgbin,img, cv::Size(512,380));
 	cv::flip(img, rgbin, 1);
-	img.release();
+
 	cv::cvtColor(rgbin,HSVin,CV_BGR2HSV);
 	cv::Mat channels[3];
 	cv::split(HSVin, channels);
