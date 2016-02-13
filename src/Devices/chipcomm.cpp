@@ -24,7 +24,6 @@ ccomm *naicom::createcomm(std::string ofname) {
 			throw nfail("Connection could not be made.");
 		    return NULL;
 		}
-		std::cout << "found: " << cur_dir << std::endl;
 		return new ccomm(file);
 
 	/*TODO: Read first command for name and reloop if not matching*/
