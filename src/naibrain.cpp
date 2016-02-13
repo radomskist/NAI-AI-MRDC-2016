@@ -51,11 +51,11 @@ const path_finding &naibrain::GetPfind(){
 void naibrain::tick() {
 	std::string currentcoms = states.top()->commands();
 
+	if(kinect_manager != NULL)
+		kinect_manager->ProcessImages();
+
 	if(drivechip){
 		std::string readit = drivechip->readall();
-		if(readit.size() > 0)		
-			std::cout << readit << std::endl;
-
 
 		if(!drivechip->writecom(currentcoms))
 			std::cout << "Failed to write" << std::endl;
@@ -66,13 +66,13 @@ std::vector<nimg*>  &naibrain::GetImages(unsigned int imgmask) {
 	Images.clear();
 
 	//Processing kinect
-	if((imgmask & (KRGB | KDEP)) && kinect_manager != NULL) 
-		if(kinect_manager->ProcessImages()) {
-			if(imgmask & KDEP && kinect_manager->GetDepthImg())
-				Images.push_back(kinect_manager->GetDepthImg());
-			if(imgmask & KRGB && kinect_manager->GetRGBImg())
-				Images.push_back(kinect_manager->GetRGBImg());
-		}
+	if((imgmask & (KRGB | KDEP)) && kinect_manager != NULL) {
+		if(imgmask & KDEP)
+			Images.push_back(kinect_manager->GetDepthImg());
+
+		if(imgmask & KRGB)
+			Images.push_back(kinect_manager->GetRGBImg());
+	}
 
 	//Processing webcams
 	if((imgmask & BCCAM) && bcwebcam != NULL)
