@@ -24,7 +24,7 @@ class naibrain {
 		~naibrain();
 		std::vector<nimg*> &GetImages(unsigned int); /*get list of images from specified flags*/
 		const world_map &GetMap(); /*Get world map*/
-		const path_finding &GetPfind(); /*Get path to a point from path find object*/
+		path_finding &GetPfind(); /*Get path to a point from path find object*/
 		void tick(); /*process every frame*/
 
 		//TODO remove
