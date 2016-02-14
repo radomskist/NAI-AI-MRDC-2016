@@ -1,6 +1,8 @@
 #include "Infoproc/driveman.h"
 
 drive_man::drive_man() {
+	delay = GetMilli();
+
 	try {
 		drivechip = naicom::createcomm("NaiDrive");
 	}
@@ -10,9 +12,12 @@ drive_man::drive_man() {
 	}
 }
 
-bool drive_man::runcom(std::string &command) const {
-	if(command.empty() || drivechip == NULL)
+bool drive_man::runcom(std::string &command) {
+
+	if(command.empty() || drivechip == NULL || delay > GetMilli())
 		return false;
+
+	delay = GetMilli() + 200;
 
 	if(movecheck(command))
 		return drivechip->writecom(command);
