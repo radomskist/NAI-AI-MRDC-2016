@@ -46,7 +46,6 @@ void naibrain::gentest() {
 	wmap.gentest();
 
 }
-
 void naibrain::tick() {
 	if(kinect_manager != NULL) {
 		kinect_manager->ProcessImages();
@@ -55,6 +54,7 @@ void naibrain::tick() {
 		driveman.SetChecks(kinect_manager->PathCheck(left,right),left,right);
 	}
 	states.top()->Process();
+
 	driveman.runcom(states.top()->commands());
 }
 
