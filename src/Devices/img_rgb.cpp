@@ -36,12 +36,13 @@ void imgrgb::findground(cv::Mat &hsvin) {
 	groundmat.release();
 	groundmat = cv::Mat::zeros(380,512,CV_8UC1);
 
-	cv::threshold(hsvin,img2, 200.0, 210.0, cv::THRESH_BINARY);
+	cv::threshold(hsvin,img2, 180.0, 220.0, cv::THRESH_BINARY);
 	cv::morphologyEx(img2, img3, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(30, 30)));
 	std::vector<std::vector<cv::Point>> contours;
 	std::vector<cv::Vec4i> hierarchy;
 	cv::findContours(img3,contours,hierarchy,cv::CHAIN_APPROX_NONE,cv::RETR_LIST);
 	
+	//TODO optimize this crap
 	for(int i = 0; i < contours.size(); i++) {
 		int testpoints = 0;
 		if (cv::pointPolygonTest(contours[i], cv::Point(102,300), false) >= 0) 
@@ -67,6 +68,16 @@ void imgrgb::findground(cv::Mat &hsvin) {
 	img2.release();
 	img3.release();
 }
+
+//return forward
+bool imgrgb::GroundCheck(bool &left, bool &right) {
+	int ypos = 300 * 512;
+
+	left = groundmat.data[204 + ypos] && groundmat.data[102 + ypos];
+	right = groundmat.data[306 + ypos] && groundmat.data[408 + ypos];
+	return groundmat.data[256 + ypos] && groundmat.data[204 + ypos] && groundmat.data[306 + ypos];
+}
+
 
 void imgrgb::findballs(cv::Mat &hsvin, cv::Mat &circlemat) {
 	circlemat.release();

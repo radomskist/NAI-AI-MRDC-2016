@@ -4,11 +4,13 @@
 
 #include "Devices/webcam.h"
 #include "Devices/kinect_man.h"
-#include "Devices/chipcomm.h"
 #include "Memory/world_map.h"
 #include "Memory/path_finding.h"
-#include "Infoproc/base_state.h"
-#include "Infoproc/test_state.h"
+#include "Infoproc/driveman.h"
+#include "Infoproc/states/base_state.h"
+#include "Infoproc/states/test_state.h"
+#include "Devices/chipcomm.h"
+
 #include "utils/nimg.h"
 #include "utils/nexcep.hpp"
 
@@ -36,12 +38,12 @@ class naibrain {
 		kinectman* kinect_manager; /*kinect manager object*/
  		std::vector<nimg*> Images; /*List of images from sensors*/
 		nwebc *bcwebcam; /*webcam object*/
-		ccomm *drivechip; /*Arduino chip*/
 
 		/*ai objects*/
 		world_map wmap; /*world map object*/
 		path_finding pfind; /*path find object*/
 		std::stack<base_state*> states; /*list of states*/
+		drive_man driveman; /*driving manager*/
 		
 };
 

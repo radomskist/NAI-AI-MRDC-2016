@@ -51,6 +51,12 @@ kinectman::kinectman() {
 	std::cout << "\nNaiEye: Video initialized!" << std::endl;
 }
 
+bool kinectman::PathCheck(bool &left , bool& right) {
+
+	return rgb_proc.GroundCheck(left,right);
+
+}
+
 void kinectman::clean() {
 
 	nailist->release(nfmap);

@@ -32,6 +32,9 @@ class imgrgb {
 		void ProcessImg(unsigned char *);
 		nimg *GetImg();
 
+		//return forward
+		bool GroundCheck(bool &, bool&);
+
 	private:
 		inline void findground(cv::Mat&);
 		inline void findballs(cv::Mat&, cv::Mat&);

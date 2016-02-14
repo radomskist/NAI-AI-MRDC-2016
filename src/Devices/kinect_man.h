@@ -37,6 +37,8 @@ class kinectman {
 		kinectman();
 		~kinectman();
 
+		bool PathCheck(bool &, bool&);
+
 		nimg *GetDepthImg();
 		nimg *GetRGBImg();
 

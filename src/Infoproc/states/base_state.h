@@ -10,10 +10,11 @@ class base_state {
 		~base_state();
 
 		virtual bool Process() = 0; //Process information
-		virtual std::string commands() = 0; //Which commands to run
+		std::string &commands(); //Which commands to run
 		virtual base_state *endstate() = 0; //Which state to go into next?
 
-	private:
+	protected:
+		std::string commlist;
 		const world_map *wmap;
 
 };

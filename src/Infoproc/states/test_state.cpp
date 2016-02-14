@@ -1,4 +1,4 @@
-#include "Infoproc/test_state.h"
+#include "Infoproc/states/test_state.h"
 
 test_state::test_state(const world_map* set_map) : base_state(set_map) {
 
@@ -7,12 +7,8 @@ test_state::test_state(const world_map* set_map) : base_state(set_map) {
 }
 
 bool test_state::Process() {
+	commlist = "MV 90!";
 	return true;
-}
-
-std::string test_state::commands() {
-	return std::string("RR 5");
-	
 }
 
 base_state *test_state::endstate() {
