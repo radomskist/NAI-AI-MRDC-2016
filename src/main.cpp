@@ -114,11 +114,11 @@ int main(int argc, char** argv)
 	/*Memory window argument loops*/
 	else if(areargs && (arg1 == "-mem")) {
 		naigl MemWin;
-		world_map wmap = mainbrain.GetMap();
-		wmap.gentest();	
-		MemWin.setplanes(wmap.GetPlanes());
+		const world_map *wmap = mainbrain.GetMap();
+		mainbrain.gentest();	
+		MemWin.setplanes(wmap->GetPlanes());
 		std::vector<obj_cube> addcube;
-		addcube.push_back(wmap.GetRobot());
+		addcube.push_back(wmap->GetRobot());
 		MemWin.setents(addcube);
 		obj_point newpoint(2000,2000,0);
 		MemWin.setpath(mainbrain.GetPfind().gotopoint(newpoint));
@@ -131,17 +131,17 @@ int main(int argc, char** argv)
 	}
 	else {
 		multiwin MainWin;
-		world_map wmap = mainbrain.GetMap();
+		const world_map *wmap = mainbrain.GetMap();
 		unsigned int kmode = KDEP | KRGB | KFREEZE;
 
-		wmap.gentest();	
+		mainbrain.gentest();
 		std::vector<obj_cube> addcube;
-		addcube.push_back(wmap.GetRobot());
+		addcube.push_back(wmap->GetRobot());
 		naigl *glwin = MainWin.GetGL();
 		glwin->setents(addcube);
 		obj_point newpoint(2000,2000,0);
 		glwin->setpath(mainbrain.GetPfind().gotopoint(newpoint));
-		glwin->setplanes(wmap.GetPlanes());
+		glwin->setplanes(wmap->GetPlanes());
 
 		while(MainWin.running()) {
 			mainbrain.tick();

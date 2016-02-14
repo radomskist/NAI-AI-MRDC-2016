@@ -42,12 +42,17 @@ bool naibrain::KStatus() {
 	return kinect_manager;
 }
 
-const world_map &naibrain::GetMap() {
-	return wmap;
+const world_map *naibrain::GetMap() {
+	return &wmap;
 }
 
 path_finding &naibrain::GetPfind(){
 	return pfind;
+}
+
+void naibrain::gentest() {
+	wmap.gentest();
+
 }
 
 void naibrain::tick() {

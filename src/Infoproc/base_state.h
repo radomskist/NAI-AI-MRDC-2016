@@ -6,7 +6,7 @@
 class base_state {
 
 	public:
-		base_state(const world_map&);
+		base_state(const world_map*);
 		~base_state();
 
 		virtual bool Process() = 0; //Process information
@@ -14,7 +14,7 @@ class base_state {
 		virtual base_state *endstate() = 0; //Which state to go into next?
 
 	private:
-		const world_map wmap;
+		const world_map *wmap;
 
 };
 
