@@ -366,29 +366,29 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 	// 0.616101226 = 35.3 (half of the kinects FOV) converted to radians
 	// the position of the point on the screen frm the center of the verticle axis
 	// .003906 = 1/256, which is half of the width (512)
-	/*obj_point pointhold;
+	obj_point pointhold;
 	pointhold.z = 300;
+/*
+	float depthspot = processplane[0][0].x + 5 + ((processplane[0][0].y + 5)* pixwidth);
 
-	float depthspot = processplane[0][0].x + 5 + (processplane[0][0].y + (processplane[0][1].y - processplane[0][0].y) * pixwidth);
 	pointhold.y = datahold[depthspot] * sin(35.3*screenpos*0.00390625);
 	pointhold.x = datahold[depthspot] * sin(54.7*screenpos*0.00390625);
-	newplane.p[0] = pointhold*/
+	newplane.p[0] = pointhold;
 
-	/*
+	
 	corner.y = 300;
-	corner.x = processplane[0][0] * sin(
-	corner.z = processplane[0][0]
+	//corner.x = processplane[0][0] * sin(
+	//corner.z = processplane[0][0]
 
 	newplane.p[0] =  corner processplane[0][0];
 	newplane.p[1] =  corner processplane[0][1];
 	corner.y = 0;
 	newplane.p[2] =  corner processplane[0][2];
 	newplane.p[3] =  corner processplane[0][3];
-	*/
+	
 
-	//returnplane.push_back(newplane);
+	returnplane.push_back(newplane);*/
 
-	//return returnplane;
 }
 
 inline int imgd::averagepoints(cv::Point avg) {

@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iostream> 
 #include <math.h>
+#include <stack>
 
 enum node_flag{
     non_traversable=0x01,
@@ -13,13 +14,16 @@ enum node_flag{
     goal=0x08,
     gballbox=0x10,
     my_gballbox=0x20,
-    is_robot=0x40};
+    is_robot=0x40,
+	gclosed=0x80,
+	gopened=0x80,
+	none=0x00};
 
 inline node_flag operator|(node_flag a, node_flag b)
 {return static_cast<node_flag>(static_cast<int>(a) | static_cast<int>(b));}
 
 struct grid_space{
-	unsigned long weight,parent;  //parent is the grid array iterator of the parent grid space
+	int weight,parent,x,y;  //parent is the grid array iterator of the parent grid space
 	uint8_t tags;
 };
 
@@ -31,20 +35,21 @@ class path_finding {
 
 		bool findpathtoobj(std::string);
 		bool searchat(obj_point);
-		std::vector<obj_point> gotopoint(obj_point) const;
+		std::vector<obj_point> gotopoint(obj_point);
 		
 		
 
 	private:
 		//Coarse pathfinding
-		std::vector<obj_point> coarsepathfind(obj_point);
-		std::vector<int> neighbors(int);
-		int get_dist(int, int); //returns manhattan distance between st and end
-		bool contains(std::vector<int>, int);
-		int xy2griterator(int, int);
+		inline bool coarsepathfind(obj_point, std::vector<obj_point>&);
+		inline void getneighbors(int, std::vector<int>&);
+		inline int get_dist(int, int); //returns manhattan distance between st and end
+		inline bool contains(std::vector<int>, int);
+		inline int xy2griterator(int, int);
+		inline int generate_grid(obj_point&);
+
 		grid_space grid[121];
 		int width = 11;
-		void generate_grid(void);
 		const world_map &wmap;
 
 	};

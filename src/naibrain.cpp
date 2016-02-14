@@ -46,7 +46,7 @@ const world_map &naibrain::GetMap() {
 	return wmap;
 }
 
-const path_finding &naibrain::GetPfind(){
+path_finding &naibrain::GetPfind(){
 	return pfind;
 }
 
