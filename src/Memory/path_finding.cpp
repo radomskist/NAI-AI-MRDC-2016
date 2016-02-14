@@ -84,9 +84,9 @@ bool path_finding::coarsepathfind(obj_point gl, std::vector<obj_point> &ret_path
 
 	obj_point obj;
 	obj.z = 50;
+
 	//convert path to obj_point
 	while(current != -1){
-		//std::cout << obj.x << "," << obj.y << std::endl;
 		obj.x = grid[current].x * 400 + 200;
 		obj.y = grid[current].y * 400 + 200;
 		ret_path.push_back(obj);

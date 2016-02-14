@@ -22,14 +22,6 @@ naibrain::naibrain() : pfind(GetMap()) {
 		std::cout << "Webcam initialization failed: " << e.what() << std::endl;
 	}
 
-	try {
-		drivechip = naicom::createcomm("NaiDrive");
-	}
-	catch (nfail &e) {
-		drivechip = NULL;
-		std::cout << "Arduino initialization failed: " << e.what() << std::endl;
-	}
-
 	states.push(new test_state(GetMap()));
 }
 
@@ -56,17 +48,14 @@ void naibrain::gentest() {
 }
 
 void naibrain::tick() {
-	std::string currentcoms = states.top()->commands();
-
-	if(kinect_manager != NULL)
+	if(kinect_manager != NULL) {
 		kinect_manager->ProcessImages();
 
-	if(drivechip != NULL){
-		std::string readit = drivechip->readall();
-
-		if(!drivechip->writecom(currentcoms))
-			std::cout << "Failed to write" << std::endl;
+		bool left,right;
+		driveman.SetChecks(kinect_manager->PathCheck(left,right),left,right);
 	}
+	states.top()->Process();
+	driveman.runcom(states.top()->commands());
 }
 
 std::vector<nimg*>  &naibrain::GetImages(unsigned int imgmask) {
