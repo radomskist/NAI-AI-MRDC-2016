@@ -15,7 +15,6 @@ enum node_flag{
     gballbox=0x10,
     my_gballbox=0x20,
     is_robot=0x40,
-	gclosed=0x80,
 	gopened=0x80,
 	none=0x00};
 
@@ -30,7 +29,7 @@ struct grid_space{
 
 class path_finding {
 	public:
-		path_finding(const world_map&);
+		path_finding(const world_map*);
 		~path_finding();
 
 		bool findpathtoobj(std::string);
@@ -50,7 +49,7 @@ class path_finding {
 
 		grid_space grid[121];
 		int width = 11;
-		const world_map &wmap;
+		const world_map *wmap;
 
 	};
 #endif

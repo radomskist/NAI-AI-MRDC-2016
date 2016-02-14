@@ -1,6 +1,6 @@
 #include "Infoproc/test_state.h"
 
-test_state::test_state(const world_map& set_map) : base_state(set_map) {
+test_state::test_state(const world_map* set_map) : base_state(set_map) {
 
 
 

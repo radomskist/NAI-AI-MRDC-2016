@@ -5,7 +5,7 @@
 class test_state : public base_state {
 
 	public:
-		test_state(const world_map&);
+		test_state(const world_map*);
 		~test_state();
 		bool Process();
 		std::string commands();

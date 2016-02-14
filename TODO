@@ -4,6 +4,9 @@ General:
 	-Need colored balls (golf and soft ball)
 	-Need to fix kinect lense
 
+Kinect general
+	-Stop kinect from flooding logger
+
 Kinect RGB
 	-fit rgb image to depth image
 	-dynamic floor coloring (by getting average color of points)
@@ -24,7 +27,6 @@ Web camera
 
 AI:
 	-Look for posts on edge of map?
-	-Finish coarse path finding
 	-Fine path finding
 
 SDL:
@@ -37,3 +39,10 @@ Laptop general:
 	-Find streaming software for display
 		?VLC
 	-Deal with crashing when laptop closes
+
+
+Extras:
+	-Make coarse path finding go diagnol when can
+	-Make coarse path finding check which path is shortest
+	-Make depth camera check if walls that fail are two walls and a gap
+
