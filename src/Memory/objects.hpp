@@ -105,7 +105,7 @@ struct obj_cube : public obj_base {
 
 		std::vector<std::string> tags; //dataname and tag
 		obj_point pos;
-		float width, height;
+		float width, height,rot;
 		float color[3];
 		
 	private:

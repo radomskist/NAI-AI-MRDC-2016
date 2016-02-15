@@ -34,13 +34,13 @@ class path_finding {
 
 		bool findpathtoobj(std::string);
 		bool searchat(obj_point);
-		std::vector<obj_point> gotopoint(obj_point);
-		
+		bool gotopoint(obj_point);
+		const std::vector<obj_point> &GetPath() const;
 		
 
 	private:
 		//Coarse pathfinding
-		inline bool coarsepathfind(obj_point, std::vector<obj_point>&);
+		inline bool coarsepathfind(obj_point);
 		inline void getneighbors(int, std::vector<int>&);
 		inline int get_dist(int, int); //returns manhattan distance between st and end
 		inline bool contains(std::vector<int>, int);
@@ -50,6 +50,9 @@ class path_finding {
 		grid_space grid[121];
 		int width = 11;
 		const world_map *wmap;
+		const obj_cube *robot;
+
+		std::vector<obj_point> curpath;
 
 	};
 #endif

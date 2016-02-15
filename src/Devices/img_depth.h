@@ -58,7 +58,7 @@ class imgd {
 		bool lineest; //Whether or not estimated lines should be calculated
 		float *datahold;
 		int failpercent;
-		unsigned long freezetime;
+		unsigned int freezetime;
 
 };
 

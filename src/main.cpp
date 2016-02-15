@@ -118,15 +118,15 @@ int main(int argc, char** argv)
 		mainbrain.gentest();	
 		MemWin.setplanes(wmap->GetPlanes());
 		std::vector<obj_cube> addcube;
-		addcube.push_back(wmap->GetRobot());
+		obj_cube newbot = *(wmap->GetRobot());
+		addcube.push_back(newbot);
 		MemWin.setents(addcube);
-		obj_point newpoint(2000,2000,0);
-		MemWin.setpath(mainbrain.GetPfind().gotopoint(newpoint));
 
 		//TODO: limit to framerate
 		while(MemWin.running()) {
 			MemWin.GetKeys();
 			MemWin.draw();
+			MemWin.setpath(mainbrain.GetPfind().GetPath());
 		}
 	}
 	else {
@@ -136,17 +136,17 @@ int main(int argc, char** argv)
 
 		mainbrain.gentest();
 		std::vector<obj_cube> addcube;
-		addcube.push_back(wmap->GetRobot());
+		obj_cube newbot = *(wmap->GetRobot());
+		addcube.push_back(newbot);
 		naigl *glwin = MainWin.GetGL();
 		glwin->setents(addcube);
-		obj_point newpoint(2000,2000,0);
-		glwin->setpath(mainbrain.GetPfind().gotopoint(newpoint));
 		glwin->setplanes(wmap->GetPlanes());
 
 		while(MainWin.running()) {
 			mainbrain.tick();
 			MainWin.GetKeys();
 			MainWin.SetImg(mainbrain.GetImages(kmode));
+			glwin->setpath(mainbrain.GetPfind().GetPath());
 		}
 	}
 
