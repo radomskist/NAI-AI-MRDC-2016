@@ -33,26 +33,27 @@ void drive_man::SetChecks(bool sfront, bool sleft, bool sright) {
 void drive_man::tick() {
 	//TODO readd override for when the path is completed
 	//also need checks for path being completed
-	if(drivechip == NULL)
+	if(pfind->GetPath().size() == 0 || currentnode == 0)
+		return;
+
+	//TODO compensate simulation for delay due to lag
+	if(delay < GetMilli())
+		delay = GetMilli() + 250;
+	else
 		return;
 
 	checkpath();
 
-	if(currentpath.size() == 0)
-		return;
-
-	if(delay > GetMilli())
-		delay = GetMilli() + 200;
-
 	if(movecheck(currentpath)) {
-		drivechip->writecom(currentpath);
-		std::cout << currentpath << std::endl;
+		if(drivechip != NULL)	 //Checking here so we can do simulations
+			drivechip->writecom(currentpath);
+
 		if(currentpath[0] == 'M' && currentpath[1] == 'V')
-			estimv.x += 5;
+			(dir == 90 || dir == 270) ? estimv.x += 50 : estimv.y += 50;
 		else if(currentpath[0] == 'R' && currentpath[1] == 'R')
-			dir += 1;
+			estiangle += 5;
 		else if(currentpath[0] == 'R' && currentpath[1] == 'L')
-			dir -= 1;
+			estiangle -= 5;
 	}
 	else
 		std::cout << "Obstacle" << std::endl;
@@ -81,16 +82,20 @@ bool drive_man::checkpath() {
 	if((curpath[currentnode].x - curpath[currentnode-1].x) != 0)
 		curpath[currentnode].x < curpath[currentnode-1].x ? dir = 90 : dir = 270;
 	else
-		curpath[currentnode].y < curpath[currentnode-1].y ? dir = 180 : dir = 0;
+		curpath[currentnode].y < curpath[currentnode-1].y ? dir = 0 : dir = 180;
+
+	if(((dir == 90 || dir == 270 ) && (abs(curpath[currentnode-1].x - robot->pos.x) < 50))
+	 || ((dir == 0 || dir == 180) && (abs(curpath[currentnode-1].y - robot->pos.y) < 50)))
+		currentnode--;
 
 	//TODO add left for between 270 and 0
-	if(dir == robot->rot)
-		currentpath = "MV 5!";
+	if(dir - robot->rot < 2)
+		currentpath = "MV 90!";
 	else {
-		if(dir < robot->rot)
-			currentpath = "RR 5!";
+		if(dir > robot->rot)
+			currentpath = "RR 20!";
 		else
-			currentpath = "RL 5!";
+			currentpath = "RL 20!";
 
 	}
 

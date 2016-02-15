@@ -63,7 +63,7 @@ void naibrain::tick() {
 	if(inc.x > 1 || inc.y > 1 || inc.z > 1 || ang > .5 || ang < -.5) {
 		inc.x += robot->pos.x;
 		inc.y += robot->pos.y;
-		inc.z += robot->pos.z;
+		inc.z = 50;
 		wmap.SetRobotAttr(inc, robot->rot + ang);
 	}
 }
