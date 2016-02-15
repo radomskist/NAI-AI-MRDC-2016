@@ -51,9 +51,9 @@ void drive_man::tick() {
 		if(currentpath[0] == 'M' && currentpath[1] == 'V')
 			(dir == 90 || dir == 270) ? estimv.x += 50 : estimv.y += 50;
 		else if(currentpath[0] == 'R' && currentpath[1] == 'R')
-			estiangle += 5;
+			estiangle += 10;
 		else if(currentpath[0] == 'R' && currentpath[1] == 'L')
-			estiangle -= 5;
+			estiangle -= 10;
 	}
 	else
 		std::cout << "Obstacle" << std::endl;
