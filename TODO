@@ -34,13 +34,8 @@ AI:
 SDL:
 	-Fix crashing from mouse events
 
-Arduino Laptop communication
-	-Figure out what commands need to be done
-
 Laptop general:
-	-Find streaming software for display
-		?VLC
-	-Install OpenGL dependencies so processing isn't slow
+	-Fix opengl when opencv is online
 
 
 Extras:
