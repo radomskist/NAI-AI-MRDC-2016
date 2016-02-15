@@ -50,6 +50,7 @@ class path_finding {
 		grid_space grid[121];
 		int width = 11;
 		const world_map *wmap;
+		const obj_cube *robot;
 
 		std::vector<obj_point> curpath;
 

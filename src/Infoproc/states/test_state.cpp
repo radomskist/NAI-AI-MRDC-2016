@@ -6,7 +6,7 @@ test_state::test_state(const world_map* set_map, path_finding &set_find) : base_
 
 bool test_state::Process() {
 	if(pfind.GetPath().empty())
-		pfind.gotopoint(obj_point(1400,1800,50));
+		pfind.gotopoint(obj_point(800,800,50));
 
 	return true;
 }

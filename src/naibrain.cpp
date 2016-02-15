@@ -1,6 +1,6 @@
 #include "naibrain.h"
 
-naibrain::naibrain() : pfind(GetMap()), driveman(&pfind) {
+naibrain::naibrain() : pfind(GetMap()), driveman(&pfind, wmap.GetRobot()) {
 	kinect_manager = 0;
 	//Initializing kinect manager
 
@@ -56,6 +56,16 @@ void naibrain::tick() {
 	states.top()->Process();
 	driveman.runcom(states.top()->commands());
 	driveman.tick();
+	obj_point inc;
+	float ang;
+	driveman.GetEst(inc,ang);
+	const obj_cube *robot = wmap.GetRobot();
+	if(inc.x > 1 || inc.y > 1 || inc.z > 1 || ang > .5 || ang < -.5) {
+		inc.x += robot->pos.x;
+		inc.y += robot->pos.y;
+		inc.z += robot->pos.z;
+		wmap.SetRobotAttr(inc, robot->rot + ang);
+	}
 }
 
 std::vector<nimg*>  &naibrain::GetImages(unsigned int imgmask) {

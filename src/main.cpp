@@ -118,7 +118,8 @@ int main(int argc, char** argv)
 		mainbrain.gentest();	
 		MemWin.setplanes(wmap->GetPlanes());
 		std::vector<obj_cube> addcube;
-		addcube.push_back(wmap->GetRobot());
+		obj_cube newbot = *(wmap->GetRobot());
+		addcube.push_back(newbot);
 		MemWin.setents(addcube);
 
 		//TODO: limit to framerate
@@ -135,7 +136,8 @@ int main(int argc, char** argv)
 
 		mainbrain.gentest();
 		std::vector<obj_cube> addcube;
-		addcube.push_back(wmap->GetRobot());
+		obj_cube newbot = *(wmap->GetRobot());
+		addcube.push_back(newbot);
 		naigl *glwin = MainWin.GetGL();
 		glwin->setents(addcube);
 		glwin->setplanes(wmap->GetPlanes());

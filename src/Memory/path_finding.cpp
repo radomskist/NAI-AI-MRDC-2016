@@ -1,7 +1,7 @@
 #include "Memory/path_finding.h"
 
 
-path_finding::path_finding(const world_map *set_map) : wmap(set_map) {
+path_finding::path_finding(const world_map *set_map) : wmap(set_map), robot(set_map->GetRobot()) {
 	int size = width*width;
 	for(int i = 0; i < size; i++) {
 		grid[i].x = i % width;
@@ -37,7 +37,7 @@ bool path_finding::coarsepathfind(obj_point gl) {
 	int current;
 	int goal = generate_grid(gl);
 	std::stack<int> open_set;
-	obj_point rob_pos_obj = wmap->GetRobot().pos;
+	obj_point rob_pos_obj = robot->pos;
 
 	 // divide get_robot.pos().x and y by 400 and tag the square it's in as the starting square, save the number to so you can just use that
 	int rob_pos=((rob_pos_obj.x/400)+((int)(rob_pos_obj.y/400)*width));
