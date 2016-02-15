@@ -46,6 +46,7 @@ void drive_man::tick() {
 
 	if(movecheck(currentpath)) {
 		drivechip->writecom(currentpath);
+		std::cout << currentpath << std::endl;
 		if(currentpath[0] == 'M' && currentpath[1] == 'V')
 			estimv.x += 5;
 		else if(currentpath[0] == 'R' && currentpath[1] == 'R')
@@ -80,7 +81,7 @@ bool drive_man::checkpath() {
 	if((curpath[currentnode].x - curpath[currentnode-1].x) != 0)
 		curpath[currentnode].x < curpath[currentnode-1].x ? dir = 90 : dir = 270;
 	else
-		curpath[currentnode].y < curpath[currentnode-1].y ? dir = 0 : dir = 180;
+		curpath[currentnode].y < curpath[currentnode-1].y ? dir = 180 : dir = 0;
 
 	//TODO add left for between 270 and 0
 	if(dir == robot->rot)
