@@ -27,7 +27,7 @@ class drive_man {
 		unsigned int delay;
 		std::string override;
 		std::string currentpath;
-		float dir;
+		int dir;
 		int currentnode;
 		const obj_cube *robot;
 		const path_finding *pfind;

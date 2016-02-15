@@ -43,7 +43,6 @@ Laptop general:
 	-Install OpenGL dependencies so processing isn't slow
 
 
-
 Extras:
 	-Make coarse path finding go diagnol when can
 	-Make coarse path finding check which path is shortest

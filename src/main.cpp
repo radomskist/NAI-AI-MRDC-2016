@@ -136,8 +136,8 @@ int main(int argc, char** argv)
 
 		mainbrain.gentest();
 		std::vector<obj_cube> addcube;
-		obj_cube newbot = *(wmap->GetRobot());
-		addcube.push_back(newbot);
+		const obj_cube *newbot = wmap->GetRobot();
+		addcube.push_back(*newbot);
 		naigl *glwin = MainWin.GetGL();
 		glwin->setents(addcube);
 		glwin->setplanes(wmap->GetPlanes());
@@ -146,6 +146,9 @@ int main(int argc, char** argv)
 			mainbrain.tick();
 			MainWin.GetKeys();
 			MainWin.SetImg(mainbrain.GetImages(kmode));
+			addcube.pop_back();
+			addcube.push_back(*newbot);
+			glwin->setents(addcube);
 			glwin->setpath(mainbrain.GetPfind().GetPath());
 		}
 	}
