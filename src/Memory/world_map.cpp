@@ -13,7 +13,7 @@ world_map::world_map() : robot("NAI") {
 	robot.color[1] = 0.0f;
 	robot.color[2] = 0.76f;
 	maptodate = false;
-
+	robot.rot = 90;
 }
 
 world_map::~world_map() {

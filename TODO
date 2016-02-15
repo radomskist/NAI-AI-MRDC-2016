@@ -9,6 +9,7 @@ Kinect general
 
 Kinect RGB
 	-fit rgb image to depth image
+	-Combine Saturation and Hue for floor detection
 	-dynamic floor coloring (by getting average color of points)
 	-Check path for obsticals
 	-Check color of balls
@@ -16,6 +17,7 @@ Kinect RGB
 	-QR reading
 
 Kinect depth
+	-Make sure freeze frame still works
 	-Check for a plane under long parallel horizontal lines
 	-Check path for obsticals
 	-Range finding request on points
@@ -38,11 +40,13 @@ Arduino Laptop communication
 Laptop general:
 	-Find streaming software for display
 		?VLC
-	-Deal with crashing when laptop closes
+	-Install OpenGL dependencies so processing isn't slow
+
 
 
 Extras:
 	-Make coarse path finding go diagnol when can
 	-Make coarse path finding check which path is shortest
 	-Make depth camera check if walls that fail are two walls and a gap
+	-Generate ID# for path and map so it only updates when changed
 

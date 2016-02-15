@@ -23,7 +23,7 @@ class world_map {
 		void gentest();
 
 	private:
-		obj_cube robot;
+		obj_cube robot; //rot, 90 = positive down the x axis, 0 = positive down the y axis, 180 = negative down y axis, 270 = negative down x axis
 		std::vector<obj_cube> entities_list;
 		std::vector<obj_plane> plane_list;
 

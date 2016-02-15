@@ -33,7 +33,7 @@ int path_finding::get_dist(int st, int end){
 }
 
 
-bool path_finding::coarsepathfind(obj_point gl, std::vector<obj_point> &ret_path) {
+bool path_finding::coarsepathfind(obj_point gl) {
 	int current;
 	int goal = generate_grid(gl);
 	std::stack<int> open_set;
@@ -84,12 +84,12 @@ bool path_finding::coarsepathfind(obj_point gl, std::vector<obj_point> &ret_path
 
 	obj_point obj;
 	obj.z = 50;
-
+	curpath.clear();
 	//convert path to obj_point
 	while(current != -1){
 		obj.x = grid[current].x * 400 + 200;
 		obj.y = grid[current].y * 400 + 200;
-		ret_path.push_back(obj);
+		curpath.push_back(obj);
 		current = grid[current].parent;
 	}
 
@@ -99,7 +99,7 @@ bool path_finding::coarsepathfind(obj_point gl, std::vector<obj_point> &ret_path
 int path_finding::generate_grid(obj_point &gl){
 	const std::vector<obj_plane> &planes = wmap->GetPlanes();
 	obj_point corners[2];
-	int goal = (gl.x*0.0025) + (gl.y*0.0025 * 11);
+	int goal = (gl.x*0.0025) + ((int)(gl.y*0.0025) * 11);
 
 	for(int i = 0; i < 121; ++i) {
 		grid[i].weight = get_dist(i, goal);
@@ -152,12 +152,16 @@ bool path_finding::contains(std::vector<int> search_vect, int tar){
 	return false;
 }
 
-std::vector<obj_point> path_finding::gotopoint(obj_point findpoint) {
+bool path_finding::gotopoint(obj_point findpoint) {
 
-	std::vector<obj_point> returnpoint;
-	if(!coarsepathfind(findpoint,returnpoint))
-		std::cout << "Path failed" << std::endl;
+	if(!coarsepathfind(findpoint))
+		return false;
 
-	return returnpoint;
+	return true;
+}
+
+const std::vector<obj_point> &path_finding::GetPath() const {
+	return curpath;
+
 }
 

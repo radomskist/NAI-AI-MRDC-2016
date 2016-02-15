@@ -1,7 +1,6 @@
 #ifndef NAI_STATE_BASE
 #define NAI_STATE_BASE
 #include "Memory/world_map.h"
-#include "Memory/path_finding.h"
 
 class base_state {
 
@@ -16,7 +15,6 @@ class base_state {
 	protected:
 		std::string commlist;
 		const world_map *wmap;
-
 };
 
 #endif

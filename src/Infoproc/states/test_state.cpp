@@ -1,13 +1,13 @@
 #include "Infoproc/states/test_state.h"
 
-test_state::test_state(const world_map* set_map) : base_state(set_map) {
-
-
-
+test_state::test_state(const world_map* set_map, path_finding &set_find) : base_state(set_map), pfind(set_find) {
+	
 }
 
 bool test_state::Process() {
-	commlist = "MV 90!";
+	if(pfind.GetPath().empty())
+		pfind.gotopoint(obj_point(1400,1800,50));
+
 	return true;
 }
 
