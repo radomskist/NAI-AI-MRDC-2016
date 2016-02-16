@@ -56,16 +56,26 @@ void naibrain::tick() {
 	states.top()->Process();
 	driveman.runcom(states.top()->commands());
 	driveman.tick();
-	obj_point inc;
-	float ang;
-	driveman.GetEst(inc,ang);
+	approximate();
+
+}
+
+void naibrain::approximate() {
+	obj_point dinc; //drive incriment
+	float dang; //drive angle
+
 	const obj_cube *robot = wmap.GetRobot();
-	if(inc.x > 1 || inc.y > 1 || inc.z > 1 || ang > .5 || ang < -.5) {
-		inc.x += robot->pos.x;
-		inc.y += robot->pos.y;
-		inc.z = 50;
-		wmap.SetRobotAttr(inc, robot->rot + ang);
-	}
+
+	//TODO still go through with kinect localize?
+	//We didn't move a tall if this is the case
+	if(!driveman.GetEst(dinc,dang))
+		return;
+
+	dinc.x += robot->pos.x;
+	dinc.y += robot->pos.y;
+	dinc.z = 50;
+
+	wmap.SetRobotAttr(dinc, robot->rot + dang);
 }
 
 std::vector<nimg*>  &naibrain::GetImages(unsigned int imgmask) {

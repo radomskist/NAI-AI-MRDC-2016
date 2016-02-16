@@ -35,8 +35,9 @@ SDL:
 	-Fix crashing from mouse events
 
 Laptop general:
+	-Get CUDA + Nvidia drives (check if openkinect needs anymore nvidia crap)
 	-Fix opengl when opencv is online
-
+	-List power
 
 Extras:
 	-Make coarse path finding go diagnol when can

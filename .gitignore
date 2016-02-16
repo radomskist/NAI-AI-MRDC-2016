@@ -4,6 +4,10 @@ obj/*
 include/*
 NaiBrain
 f.bmp
+pass.txt
+connectrun.sh
+pushcompile.sh
+
 
 !include/GL/.gitkeep
 !include/glm/.gitkeep
