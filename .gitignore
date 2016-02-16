@@ -5,6 +5,8 @@ include/*
 NaiBrain
 f.bmp
 pass.txt
+connectrun.sh
+scriptgen.sh
 
 !include/GL/.gitkeep
 !include/glm/.gitkeep
