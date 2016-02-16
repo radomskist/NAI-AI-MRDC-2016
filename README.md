@@ -80,13 +80,15 @@ Works via SSH through ad hoc.
 
 1) Install expect (unix script library)
 
-2) Create a file called "pass.txt" with just the password
+2) Host wifi hotspot on robot computer
 
-3) Host wifi hotspot on robot computer
+3) Run the scriptgen.sh <ssh connection> <path to nai folder on robot computer> <password to login>
 
 4) Connect to the hotspot with the remote computer (which uses the scripts)
 
-5)	a. connectrun.sh to run the program and get display remotely
+5)
+
+	a. connectrun.sh to run the program and get display remotely
 
 	b. pushcompile.sh to copy src and compile on remote computer
 
