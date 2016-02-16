@@ -6,7 +6,7 @@ NaiBrain
 f.bmp
 pass.txt
 connectrun.sh
-scriptgen.sh
+pushcompile.sh
 
 !include/GL/.gitkeep
 !include/glm/.gitkeep
