@@ -49,23 +49,27 @@ void drive_man::tick() {
 			drivechip->writecom(currentpath);
 
 		if(currentpath[0] == 'M' && currentpath[1] == 'V')
-			(dir == 90 || dir == 270) ? estimv.x += 50 : estimv.y += 50;
+			(dir == 90 || dir == 270) ? estimv.x += 25 : estimv.y += 25;
 		else if(currentpath[0] == 'R' && currentpath[1] == 'R')
-			estiangle += 10;
+			estiangle += 5.5;
 		else if(currentpath[0] == 'R' && currentpath[1] == 'L')
-			estiangle -= 10;
+			estiangle -= 5.5;
 	}
 	else
 		std::cout << "Obstacle" << std::endl;
 }
 
 //TODO remove error-proneness (which came first)
-void drive_man::GetEst(obj_point &GetMv, float &GetAng) {
+bool drive_man::GetEst(obj_point &GetMv, float &GetAng) {
+	if(estimv.x < 1 && estimv.y < 1  && estiangle < 1 && estiangle > -1) 
+		return false;
+
 	GetMv = estimv;
 	GetAng = estiangle;
 	estiangle = 0;
 	estimv.x = 0;
 	estimv.y = 0;
+	return true;
 }
 
 bool drive_man::checkpath() {

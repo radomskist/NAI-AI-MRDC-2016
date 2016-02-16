@@ -34,8 +34,6 @@ http://opencv.org/downloads.html
 http://opencv.org/
 
 
-
-
 ##Special folders
 Create a depends folder in the main directory to have libraries such as libusb and freenect2 in them.
 
@@ -74,3 +72,25 @@ f = toggle path clipping
 3 = Toggle lines
 
 4 = Toggle planes
+
+
+###Remote compile + display
+
+Works via SSH through ad hoc.
+
+1) Install expect (unix script library)
+
+2) Create a file called "pass.txt" with just the password
+
+3) Host wifi hotspot on robot computer
+
+4) Connect to the hotspot with the remote computer (which uses the scripts)
+
+5)	a. connectrun.sh to run the program and get display remotely
+
+	b. pushcompile.sh to copy src and compile on remote computer
+
+
+Scripts may require some modification (change of IP)
+
+Scripts require #!/usr/bin/expect

@@ -16,7 +16,7 @@ class drive_man {
 		void tick();
 		bool runcom(std::string&);
 		void SetChecks(bool,bool,bool);
-		void GetEst(obj_point &, float &);
+		bool GetEst(obj_point &, float &);
 
 	private:
 		inline bool movecheck(std::string&);

@@ -34,6 +34,7 @@ class naibrain {
 		bool KStatus(); /*returns whether or not kinect is working*/
 
 	private:
+		inline void approximate();
 		/*devices*/
 		kinectman* kinect_manager; /*kinect manager object*/
  		std::vector<nimg*> Images; /*List of images from sensors*/
