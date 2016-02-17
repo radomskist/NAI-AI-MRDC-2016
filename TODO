@@ -37,7 +37,7 @@ Laptop general:
 	-Nvidia drives (check if openkinect needs anymore nvidia crap)
 	-Fix opengl when opencv is online
 	-Get power in cpp and temperature
-	-Remount swap shit
+	-Remount swap
 
 Extras:
 	-Make coarse path finding go diagnol when can
