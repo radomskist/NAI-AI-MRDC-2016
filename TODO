@@ -17,7 +17,6 @@ Kinect RGB
 	-QR reading
 
 Kinect depth
-	-Make sure freeze frame still works
 	-Check for a plane under long parallel horizontal lines
 	-Check path for obsticals
 	-Range finding request on points
@@ -35,9 +34,10 @@ SDL:
 	-Fix crashing from mouse events
 
 Laptop general:
-	-Get CUDA + Nvidia drives (check if openkinect needs anymore nvidia crap)
+	-Nvidia drives (check if openkinect needs anymore nvidia crap)
 	-Fix opengl when opencv is online
-	-List power
+	-Get power in cpp and temperature
+	-Remount swap shit
 
 Extras:
 	-Make coarse path finding go diagnol when can

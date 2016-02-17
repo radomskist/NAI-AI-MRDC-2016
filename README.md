@@ -74,7 +74,7 @@ f = toggle path clipping
 4 = Toggle planes
 
 
-##Remote compile + display
+#Remote compile + display
 
 Works via SSH through ad hoc. Scripts may require some modification (change of IP). Scripts require #!/usr/bin/expect
 

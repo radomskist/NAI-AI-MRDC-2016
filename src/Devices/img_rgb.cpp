@@ -122,11 +122,13 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 	//Image needs to be scaled down
 	//1920 -> 512, 1080 -> 424
 	//3.75x, 2.47x
-	cv::Mat img(1080,1920, CV_8UC4, rgbbuff);
 	cv::Mat rgbin;
 	cv::Mat HSVin;
-	rgbin = img(cv::Rect(190, 0, 1539, 1080));
-	cv::resize(rgbin,img, cv::Size(512,380));
+	cv::Mat img(1080,1920, CV_8UC4, rgbbuff);
+	cv::resize(img,rgbin, cv::Size(650,381));
+	img = cv::Mat::zeros(424,512,CV_8UC4);
+	img = rgbin(cv::Rect(29, 0, 541, 381));
+
 	cv::flip(img, rgbin, 1);
 
 	cv::cvtColor(rgbin,HSVin,CV_BGR2HSV);
