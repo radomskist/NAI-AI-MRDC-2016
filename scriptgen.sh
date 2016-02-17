@@ -17,7 +17,7 @@ echo "#!/usr/bin/expect" > "connectrun.sh"
 echo "spawn ssh -t -Y -C $1 \"cd $2;sudo ./NaiBrain\"" >> "connectrun.sh"
 echo "expect \"password:\"" >> "connectrun.sh"
 echo "send \"$3\\\r\"" >> "connectrun.sh"
-echo "expect \"password:\"" >> "connectrun.sh"
+echo "expect \"*sudo*:\"" >> "connectrun.sh"
 echo "send \"$3\\\r\"" >> "connectrun.sh"
 echo "interact" >> "connectrun.sh"
 

@@ -1,4 +1,4 @@
-#include "Devices/img_depth.h"
+#include "Infoproc/kinect/img_depth.h"
 using namespace std;
 bool kimgdep = true;
 bool kimgedge = true;

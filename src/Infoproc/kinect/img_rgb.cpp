@@ -1,4 +1,4 @@
-#include "Devices/img_rgb.h"
+#include "Infoproc/kinect/img_rgb.h"
 
 imgrgb::imgrgb() {
 	krgb.flags = KRGB;
@@ -120,14 +120,20 @@ void imgrgb::findballs(cv::Mat &hsvin, cv::Mat &circlemat) {
 
 void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 	//Image needs to be scaled down
-	//1920 -> 512, 1080 -> 424
+	//1920 -> 512, 1080 -> 381 with black pixels on the bottom, total 424
 	//3.75x, 2.47x
 	cv::Mat rgbin;
 	cv::Mat HSVin;
 	cv::Mat img(1080,1920, CV_8UC4, rgbbuff);
-	cv::resize(img,rgbin, cv::Size(650,381));
+	//Resize and scale
+	cv::resize(img,rgbin, cv::Size(650,381)); //512 * 1.27 x 424 * .9
+	//Empty image
 	img = cv::Mat::zeros(424,512,CV_8UC4);
-	img = rgbin(cv::Rect(29, 0, 541, 381));
+	//Crop the part of the image we need
+	img = rgbin(cv::Rect(100, 0, 512, 381)); //position of square, size of square
+
+	//cv::resize(img,rgbin, cv::Size(512,424));
+	//img = rgbin;
 
 	cv::flip(img, rgbin, 1);
 
@@ -139,7 +145,7 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 	cv::Mat circlesstuff;
 	findballs(channels[1], circlesstuff);
 
-	int resolution = krgb.width*380;
+	int resolution = krgb.width*512;
 	for(int i = 0; i < resolution; i++) {
 
 		/*

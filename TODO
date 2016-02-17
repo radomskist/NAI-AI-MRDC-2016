@@ -8,7 +8,6 @@ Kinect general
 	-Stop kinect from flooding logger
 
 Kinect RGB
-	-fit rgb image to depth image
 	-Combine Saturation and Hue for floor detection
 	-dynamic floor coloring (by getting average color of points)
 	-Check path for obsticals
@@ -18,6 +17,8 @@ Kinect RGB
 
 Kinect depth
 	-Check for a plane under long parallel horizontal lines
+		+If plane is too high above horizon throw out
+		+If line is horizontal and above horizon check it out (50% the distance it is above the horizon?)
 	-Check path for obsticals
 	-Range finding request on points
 	-Use blob detection to identify other robots?
@@ -37,9 +38,10 @@ Laptop general:
 	-Nvidia drives (check if openkinect needs anymore nvidia crap)
 	-Fix opengl when opencv is online
 	-Get power in cpp and temperature
-	-Remount swap
+	-Make use .git when uploading changes?
 
 Extras:
+	-Double check rgb and depth allignment
 	-Make coarse path finding go diagnol when can
 	-Make coarse path finding check which path is shortest
 	-Make depth camera check if walls that fail are two walls and a gap
