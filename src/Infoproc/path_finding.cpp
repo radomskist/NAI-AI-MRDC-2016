@@ -1,4 +1,4 @@
-#include "Memory/path_finding.h"
+#include "Infoproc/path_finding.h"
 
 
 path_finding::path_finding(const world_map *set_map) : wmap(set_map), robot(set_map->GetRobot()) {
