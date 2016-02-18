@@ -2,6 +2,7 @@
 
 
 path_finding::path_finding(const world_map *set_map) : wmap(set_map), robot(set_map->GetRobot()) {
+	pathid = 1;
 	int size = width*width;
 	for(int i = 0; i < size; i++) {
 		grid[i].x = i % width;
@@ -84,6 +85,7 @@ bool path_finding::coarsepathfind(obj_point gl) {
 
 	obj_point obj;
 	obj.z = 50;
+
 	curpath.clear();
 	//convert path to obj_point
 	while(current != -1){
@@ -153,13 +155,16 @@ bool path_finding::contains(std::vector<int> search_vect, int tar){
 }
 
 bool path_finding::gotopoint(obj_point findpoint) {
-
 	if(!coarsepathfind(findpoint))
 		return false;
 
+	pathid++;
 	return true;
 }
 
+unsigned int path_finding::GetPathID() const {
+	return pathid;
+}
 const std::vector<obj_point> &path_finding::GetPath() const {
 	return curpath;
 

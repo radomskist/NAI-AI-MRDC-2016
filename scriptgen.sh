@@ -24,7 +24,7 @@ echo "interact" >> "connectrun.sh"
 
 #generate upload and make script
 echo "#!/usr/bin/expect" > "pushcompile.sh"
-echo "spawn scp -r ./src/* $1:$2src" >> "pushcompile.sh"
+echo "spawn rsync -ru --delete ./src/ $1:$2src" >> "pushcompile.sh"
 echo "expect \"password\"" >> "pushcompile.sh"
 echo "send \"$3\\\r\"" >> "pushcompile.sh"
 echo "interact" >> "pushcompile.sh"

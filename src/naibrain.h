@@ -4,12 +4,13 @@
 
 #include "Devices/webcam.h"
 #include "Devices/kinect_man.h"
+#include "Devices/chipcomm.h"
 #include "Memory/world_map.h"
 #include "Memory/path_finding.h"
+#include "Infoproc/localize.h"
 #include "Infoproc/driveman.h"
 #include "Infoproc/states/base_state.h"
 #include "Infoproc/states/test_state.h"
-#include "Devices/chipcomm.h"
 
 #include "utils/nimg.h"
 #include "utils/nexcep.hpp"
@@ -34,7 +35,6 @@ class naibrain {
 		bool KStatus(); /*returns whether or not kinect is working*/
 
 	private:
-		inline void approximate();
 		/*devices*/
 		kinectman* kinect_manager; /*kinect manager object*/
  		std::vector<nimg*> Images; /*List of images from sensors*/
@@ -45,6 +45,7 @@ class naibrain {
 		path_finding pfind; /*path find object*/
 		std::stack<base_state*> states; /*list of states*/
 		drive_man driveman; /*driving manager*/
+		localizer locsys; /*localization system*/
 		
 };
 

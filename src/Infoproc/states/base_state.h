@@ -11,6 +11,7 @@ class base_state {
 		virtual bool Process() = 0; //Process information
 		std::string &commands(); //Which commands to run
 		virtual base_state *endstate() = 0; //Which state to go into next?
+		virtual void SetStat(bool) {};
 
 	protected:
 		std::string commlist;

@@ -3,6 +3,14 @@ General:
 	-Need to build test course
 	-Need colored balls (golf and soft ball)
 	-Need to fix kinect lense
+	-Make window that prints values
+		+Battery
+		+CPU temp
+		+What drivemanager is doing
+		+Any important info
+		+Get power in cpp and temperature
+	-Multithread
+	-Move memory folder contents to infoproc
 
 Kinect general
 	-Stop kinect from flooding logger
@@ -10,6 +18,7 @@ Kinect general
 Kinect RGB
 	-Combine Saturation and Hue for floor detection
 	-dynamic floor coloring (by getting average color of points)
+		+cant see floor if too close to wall
 	-Check path for obsticals
 	-Check color of balls
 	-Recognize key points
@@ -33,12 +42,10 @@ AI:
 
 SDL:
 	-Fix crashing from mouse events
+	-Optimize opengl window
 
 Laptop general:
 	-Nvidia drives (check if openkinect needs anymore nvidia crap)
-	-Fix opengl when opencv is online
-	-Get power in cpp and temperature
-	-Make use .git when uploading changes?
 
 Extras:
 	-Double check rgb and depth allignment
