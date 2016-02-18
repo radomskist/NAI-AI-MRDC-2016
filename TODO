@@ -39,6 +39,7 @@ Web camera
 AI:
 	-Look for posts on edge of map?
 	-Fine path finding
+	-Fix bug with turning weird angles
 
 SDL:
 	-Fix crashing from mouse events

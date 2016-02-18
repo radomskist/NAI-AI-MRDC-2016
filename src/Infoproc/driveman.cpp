@@ -88,6 +88,9 @@ bool drive_man::tick() {
 	if(((dir == 90 || dir == 270 ) && (abs(curpath[currentnode-1].x - robot->pos.x) < 50))
 	 || ((dir == 0 || dir == 180) && (abs(curpath[currentnode-1].y - robot->pos.y) < 50))) {
 		currentnode--;
+		if(currentnode == 0)
+			return true;
+
 		if((curpath[currentnode].x - curpath[currentnode-1].x) != 0)
 			curpath[currentnode].x < curpath[currentnode-1].x ? dir = 90 : dir = 270;
 		else
@@ -115,9 +118,9 @@ bool drive_man::tick() {
 					currentpath = "RL 20!";
 					ss << "RL " << robot->rot - dir;
 				}
-				else if (robot->rot > dir){
+				else if (robot->rot < dir){
 					currentpath = "RR 20!";
-					ss << "RR " << robot->rot - dir;
+					ss << "RR " << dir - robot->rot;
 				}
 				else {
 					currentpath = "RR 20!";
@@ -131,9 +134,9 @@ bool drive_man::tick() {
 					currentpath = "RR 20!";
 					ss << "RR " << dir - robot->rot;
 				}
-				else if (anchor > dir){
+				else if (robot->rot > dir){
 					currentpath = "RL 20!";
-					ss << "RL " << dir - robot->rot;
+					ss << "RL " << robot->rot - dir;
 				}
 				else {
 					currentpath = "RL 20!";
