@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "Devices/img_depth.h"
-#include "Devices/img_rgb.h"
+#include "Infoproc/kinect/img_depth.h"
+#include "Infoproc/kinect/img_rgb.h"
 #include "Memory/objects.hpp"
 #include "utils/nexcep.hpp"
 #include "utils/nimg.h"

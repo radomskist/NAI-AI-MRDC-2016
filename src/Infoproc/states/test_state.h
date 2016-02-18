@@ -9,9 +9,12 @@ class test_state : public base_state {
 		~test_state();
 		bool Process();
 		base_state *endstate();
+		void SetStat(bool);
 
 	private:
+		int pathstat;
 		path_finding &pfind;
+		unsigned int curpath;
 
 
 

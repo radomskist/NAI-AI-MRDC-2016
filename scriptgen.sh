@@ -13,22 +13,22 @@ if [ $# -lt 3 ];	then
 fi
 
 #generate connect + run script
-echo "#!/usr/expect" > "connectrun.sh"
+echo "#!/usr/bin/expect" > "connectrun.sh"
 echo "spawn ssh -t -Y -C $1 \"cd $2;sudo ./NaiBrain\"" >> "connectrun.sh"
-echo "expect \"password:\"\"" >> "connectrun.sh"
-echo "send \"$3\\\r\"" >> "connectrun.sh"
 echo "expect \"password:\"" >> "connectrun.sh"
 echo "send \"$3\\\r\"" >> "connectrun.sh"
-echo "\"interact\"" >> "connectrun.sh"
+echo "expect \"*sudo*:\"" >> "connectrun.sh"
+echo "send \"$3\\\r\"" >> "connectrun.sh"
+echo "interact" >> "connectrun.sh"
 
 
 #generate upload and make script
 echo "#!/usr/bin/expect" > "pushcompile.sh"
-echo "spawn scp -r ./src/* $1:$2/src" >> "pushcompile.sh"
+echo "spawn rsync -ru --delete ./src/ $1:$2src" >> "pushcompile.sh"
 echo "expect \"password\"" >> "pushcompile.sh"
 echo "send \"$3\\\r\"" >> "pushcompile.sh"
 echo "interact" >> "pushcompile.sh"
-echo "spawn ssh niurobotics@10.42.0.1 \"cd /home/niurobotics/nai/; make clean; make\"" >> "pushcompile.sh"
+echo "spawn ssh $1 \"cd $2; make clean; make\"" >> "pushcompile.sh"
 echo "expect \"password\"" >> "pushcompile.sh"
 echo "send \"NAI\\\r\"" >> "pushcompile.sh"
 echo "interact" >> "pushcompile.sh"

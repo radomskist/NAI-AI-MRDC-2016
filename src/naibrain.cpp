@@ -1,6 +1,6 @@
 #include "naibrain.h"
 
-naibrain::naibrain() : pfind(GetMap()), driveman(&pfind, wmap.GetRobot()) {
+naibrain::naibrain() : pfind(GetMap()), driveman(&pfind, wmap.GetRobot()), locsys(driveman, wmap.GetRobot()) {
 	kinect_manager = 0;
 	//Initializing kinect manager
 
@@ -21,7 +21,6 @@ naibrain::naibrain() : pfind(GetMap()), driveman(&pfind, wmap.GetRobot()) {
 		bcwebcam = NULL;
 		std::cout << "Webcam initialization failed: " << e.what() << std::endl;
 	}
-
 	states.push(new test_state(GetMap(), GetPfind()));
 }
 
@@ -50,33 +49,21 @@ void naibrain::tick() {
 	if(kinect_manager != NULL) {
 		kinect_manager->ProcessImages();
 
-		bool left,right;
-		driveman.SetChecks(kinect_manager->PathCheck(left,right),left,right);
+		bool left,right,front;
+		front = kinect_manager->PathCheck(left,right);
+		driveman.SetChecks(front,left,right);
 	}
 	states.top()->Process();
 	driveman.runcom(states.top()->commands());
-	driveman.tick();
-	approximate();
+	states.top()->SetStat(driveman.tick());
 
+	obj_point dinc;
+	float dang;
+
+	if(locsys.approximate(dinc, dang)) 
+		wmap.SetRobotAttr(dinc, dang);
 }
 
-void naibrain::approximate() {
-	obj_point dinc; //drive incriment
-	float dang; //drive angle
-
-	const obj_cube *robot = wmap.GetRobot();
-
-	//TODO still go through with kinect localize?
-	//We didn't move a tall if this is the case
-	if(!driveman.GetEst(dinc,dang))
-		return;
-
-	dinc.x += robot->pos.x;
-	dinc.y += robot->pos.y;
-	dinc.z = 50;
-
-	wmap.SetRobotAttr(dinc, robot->rot + dang);
-}
 
 std::vector<nimg*>  &naibrain::GetImages(unsigned int imgmask) {
 	Images.clear();

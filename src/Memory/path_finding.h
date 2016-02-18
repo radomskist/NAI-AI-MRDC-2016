@@ -35,7 +35,9 @@ class path_finding {
 		bool findpathtoobj(std::string);
 		bool searchat(obj_point);
 		bool gotopoint(obj_point);
+		bool pathstatus();
 		const std::vector<obj_point> &GetPath() const;
+		unsigned int GetPathID() const;
 		
 
 	private:
@@ -51,6 +53,7 @@ class path_finding {
 		int width = 11;
 		const world_map *wmap;
 		const obj_cube *robot;
+		unsigned int pathid;
 
 		std::vector<obj_point> curpath;
 

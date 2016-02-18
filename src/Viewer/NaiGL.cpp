@@ -225,7 +225,6 @@ void naigl::setpath(const std::vector<obj_point> set_newpath) {
 	}
 	pathlength = newpath.size();
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*pathlength, &newpath[0], GL_DYNAMIC_DRAW);
-	draw();
 }
 
 inline void easypush(std::vector<float> &push, obj_point &point) {
@@ -341,8 +340,6 @@ void naigl::setents(const std::vector<obj_cube> &add_objs) {
 	glBindBuffer(GL_ARRAY_BUFFER,
 		objbuffer[1]);
 	glBufferSubData(GL_ARRAY_BUFFER,0, sizeof(float)*cubevertslen, &cubecolorverts[0]);
-
-	draw();
 }
 
 
@@ -379,10 +376,10 @@ void naigl::setplanes(const std::vector<obj_plane> &add_newplane) {
 	glBindBuffer(GL_ARRAY_BUFFER,
 		planebuffer[1]);
 	glBufferSubData(GL_ARRAY_BUFFER,0, sizeof(float)*planecolors.size(), &planecolors[0]);
-	draw();
 }	
 
 void naigl::draw() {
+	SDL_GL_MakeCurrent(win,nglcont);
 	view = glm::rotate(glm::mat4(1), urotation, glm::vec3(1.0f,0.0f,0.0f));
 	view = glm::rotate(view, lrotation, glm::vec3(0.0f,0.0f,1.0f));
 	view = glm::translate(view, glm::vec3(ypos, xpos, -1500.0f));

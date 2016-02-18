@@ -4,6 +4,8 @@
 #include "utils/ntime.hpp"
 #include "Memory/path_finding.h"
 #include "Memory/objects.hpp"
+
+#include <sstream>
 /*
 	* This manages all the driving of the actual robot
 	* and connection to arduino
@@ -13,27 +15,42 @@ class drive_man {
 	public:
 		drive_man(const path_finding *, const obj_cube *);
 		~drive_man();
-		void tick();
+		bool tick(); //returns if doing a path
 		bool runcom(std::string&);
 		void SetChecks(bool,bool,bool);
 		bool GetEst(obj_point &, float &);
 
 	private:
 		inline bool movecheck(std::string&);
-		inline bool checkpath();
+		inline bool obstvoid(); //obsticalavoid
+		inline void execcom(); //execute command
+		//inline void execcom(std::string&,); //execute command without rest of class
 
 		ccomm *drivechip; /*Arduino chip*/
-		bool front,right,left;
-		unsigned int delay;
+		const path_finding *pfind; /*path find object*/
+		const obj_cube *robot; /*nai robot*/
+		unsigned int delay, delaytime; //Delay between sending commands
+
+		/*commands*/
 		std::string override;
 		std::string currentpath;
-		int dir;
-		int currentnode;
-		const obj_cube *robot;
-		const path_finding *pfind;
+		std::vector<std::string> commandhist;
 
+		/*path info*/
+		int dir;
+		unsigned int cpathid;
+		int currentnode; //Current node we're in
+		bool front,right,left; //Can we go in these directions
+
+
+		/*estimation*/
+		bool est;
+		int turntol; //Tolerance for turning degree
+		float drivespeed, turnspeed; //Approximately how fast we move
 		float estiangle;
+		int difference; //difference between delay and milliseconds
 		obj_point estimv;
+
 };
 
 #endif

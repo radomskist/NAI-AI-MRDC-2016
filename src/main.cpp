@@ -148,8 +148,10 @@ int main(int argc, char** argv)
 			MainWin.SetImg(mainbrain.GetImages(kmode));
 			addcube.pop_back();
 			addcube.push_back(*newbot);
+			//TODO optimize
 			glwin->setents(addcube);
 			glwin->setpath(mainbrain.GetPfind().GetPath());
+			glwin->draw();
 		}
 	}
 

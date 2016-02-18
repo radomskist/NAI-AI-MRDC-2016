@@ -1,4 +1,4 @@
-#include "Devices/img_rgb.h"
+#include "Infoproc/kinect/img_rgb.h"
 
 imgrgb::imgrgb() {
 	krgb.flags = KRGB;
@@ -72,9 +72,9 @@ void imgrgb::findground(cv::Mat &hsvin) {
 //return forward
 bool imgrgb::GroundCheck(bool &left, bool &right) {
 	int ypos = 300 * 512;
-
-	left = groundmat.data[204 + ypos] && groundmat.data[102 + ypos];
-	right = groundmat.data[306 + ypos] && groundmat.data[408 + ypos];
+	int yposup = 250 * 512;
+	left = groundmat.data[204 + ypos] && groundmat.data[102 + ypos] && groundmat.data[153 + yposup];
+	right = groundmat.data[306 + ypos] && groundmat.data[408 + ypos] && groundmat.data[357 + yposup];
 	return groundmat.data[256 + ypos] && groundmat.data[204 + ypos] && groundmat.data[306 + ypos];
 }
 
@@ -120,13 +120,22 @@ void imgrgb::findballs(cv::Mat &hsvin, cv::Mat &circlemat) {
 
 void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 	//Image needs to be scaled down
-	//1920 -> 512, 1080 -> 424
+	//1920 -> 512, 1080 -> 381 with black pixels on the bottom, total 424
 	//3.75x, 2.47x
-	cv::Mat img(1080,1920, CV_8UC4, rgbbuff);
 	cv::Mat rgbin;
 	cv::Mat HSVin;
-	rgbin = img(cv::Rect(190, 0, 1539, 1080));
-	cv::resize(rgbin,img, cv::Size(512,380));
+	cv::Mat img(1080,1920, CV_8UC4, rgbbuff);
+	//Resize and scale
+	cv::resize(img,rgbin, cv::Size(650,381)); //512 * 1.27 x 424 * .9
+	//cv::resize(img,rgbin, cv::Size(512,424)); //512 * 1.27 x 424 * .9
+
+	//Empty image
+	img = cv::Mat::zeros(424,512,CV_8UC4);
+	//Crop the part of the image we need
+	img = rgbin(cv::Rect(100, 0, 512, 381)); //position of square, size of square
+
+	//cv::resize(img,rgbin, cv::Size(512,424));
+	//img = rgbin;
 	cv::flip(img, rgbin, 1);
 
 	cv::cvtColor(rgbin,HSVin,CV_BGR2HSV);
@@ -137,7 +146,7 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 	cv::Mat circlesstuff;
 	findballs(channels[1], circlesstuff);
 
-	int resolution = krgb.width*380;
+	int resolution = krgb.width*381;
 	for(int i = 0; i < resolution; i++) {
 
 		/*
@@ -150,7 +159,7 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 		//if(cannystuff.data[i])
 		//	krgb.data[i*4 + 2] = cannystuff.data[i];	
 
-		//krgb.data[i*4 + 3] = 0;	
+		//krgb.data[i*4 + 3] = 0;
 		if(circlesstuff.data[i]) {
 			krgb.data[i*4] = 0;
 			krgb.data[i*4 + 1] = circlesstuff.data[i];
@@ -169,6 +178,7 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 	channels[1].release();
 	channels[2].release();
 	//matcircle.release();
+
 }
 
 nimg *imgrgb::GetImg() {

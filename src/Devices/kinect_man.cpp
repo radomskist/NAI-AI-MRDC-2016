@@ -8,6 +8,7 @@ kinectman::kinectman() {
 	f2init = new libfreenect2::Freenect2;
 	f2dev = NULL;
 	f2pipe = NULL;
+	nailist = NULL;
 
 	//Checking num of devices
 	if(f2init->enumerateDevices() == 0) {
@@ -59,7 +60,8 @@ bool kinectman::PathCheck(bool &left , bool& right) {
 
 void kinectman::clean() {
 
-	nailist->release(nfmap);
+	if(nailist != NULL)
+		nailist->release(nfmap);
 
 	if(f2dev != NULL) {
 		f2dev->stop();
