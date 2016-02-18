@@ -9,9 +9,9 @@ bool kimgplane = true;
 imgd::imgd() : kdepth(512,424,3), filteredimg(424, 512, CV_8UC1) {
 	lineest = false; //Predict where lines might be?
 	pixdist = 10; //Distance between pixels when testing flatness of plane
-	slopeerrorrange = 100; //Range of error when seeing if plane is flat
+	slopeerrorrange = 2; //Range of error when seeing if plane is flat
 	kdepth.flags = KDEP;
-	failpercent = .5; //Percent of wall spots that can fail but still be accepted. To avoid noise problems
+	failpercent = .1; //Percent of wall spots that can fail but still be accepted. To avoid noise problems
 
 	kdepth.data = new unsigned char[kdepth.width * kdepth.height * kdepth.depth];
 	freezetime = GetSec();
@@ -288,7 +288,7 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 	processplane.push_back(newpoint);
 
 
-	if(extremeone < 500 || extremetwo < 500 || extremethree < 500 || extremefour < 500) {
+	if(extremeone < 5 || extremetwo < 5 || extremethree < 5 || extremefour < 5) {
 		processplane.erase(processplane.begin());
 		return;
 	}
@@ -397,10 +397,10 @@ inline int imgd::averagepoints(cv::Point avg) {
 		return 0;
 
 	int yspot = avg.y*kdepth.width;
-	int total = datahold[avg.x + yspot];
+	int total = filteredimg.data[avg.x + yspot];
 
-	total += datahold[avg.x + 1 + yspot];
-	total += datahold[avg.x - 1 + yspot];
+	total += filteredimg.data[avg.x + 1 + yspot];
+	total += filteredimg.data[avg.x - 1 + yspot];
 	total *= 0.33f;
 
 	return total;
@@ -410,7 +410,6 @@ inline int imgd::averagepoints(cv::Point avg) {
 void imgd::ProcessImg(unsigned char *depthbuff) {
 	//Casting data to a float, which is what it's suppose to be (instead of what it gives you for some reason)
 	datahold = (float *)&depthbuff[4];
-	filteredimg.release();
 
 	kdepth.flags = KDEP;
 	unsigned char normalized;
@@ -496,7 +495,6 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 		}
 
 	}
-
 	outimg.release();
 	outimg2.release();
 	outimg3.release();
