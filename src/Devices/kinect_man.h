@@ -5,7 +5,7 @@
 
 #include "Infoproc/kinect/img_depth.h"
 #include "Infoproc/kinect/img_rgb.h"
-#include "Memory/objects.hpp"
+#include "Infoproc/objects.hpp"
 #include "utils/nexcep.hpp"
 #include "utils/nimg.h"
 

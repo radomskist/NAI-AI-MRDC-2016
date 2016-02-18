@@ -6,7 +6,7 @@ bool kimgline = true;
 bool kimgplane = true;
 
 
-imgd::imgd() : kdepth(512,424,3) {
+imgd::imgd() : kdepth(512,424,3), filteredimg(424, 512, CV_8UC1) {
 	lineest = false; //Predict where lines might be?
 	pixdist = 10; //Distance between pixels when testing flatness of plane
 	slopeerrorrange = 100; //Range of error when seeing if plane is flat
@@ -410,19 +410,19 @@ inline int imgd::averagepoints(cv::Point avg) {
 void imgd::ProcessImg(unsigned char *depthbuff) {
 	//Casting data to a float, which is what it's suppose to be (instead of what it gives you for some reason)
 	datahold = (float *)&depthbuff[4];
+	filteredimg.release();
 
 	kdepth.flags = KDEP;
 	unsigned char normalized;
 	unsigned resolution = kdepth.width * kdepth.height;
 	
 	/*flipping the image*/
-	cv::Mat img(424, 512, CV_8UC1); //Mat for edges
 	for(int j = 0; j < kdepth.height; j++) {
 		int currentrow = j*kdepth.width;
 		for(int i = 0; i < kdepth.width; i++) {
 			////normalize kinect range to 255
 			normalized = datahold[currentrow + (kdepth.width -1 - i)] * 0.06375f; //(4500.0f - 500.0f)/(255)
-			img.data[currentrow + i] = normalized;
+			filteredimg.data[currentrow + i] = normalized;
 		}
 	}
 	vector<cv::KeyPoint> keypoints;
@@ -433,10 +433,10 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 	cv::Mat outimg3 = cv::Mat::zeros(424,512,CV_8UC1); //Mat for planes
 
 	try {
-		cv::morphologyEx(img, outimg, cv::MORPH_OPEN, cv::Mat()); //Phasing out blobs
-		cv::morphologyEx(outimg, img, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(11, 11))); //Closing gaps
+		cv::morphologyEx(filteredimg, outimg, cv::MORPH_OPEN, cv::Mat()); //Phasing out blobs
+		cv::morphologyEx(outimg, filteredimg, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(11, 11))); //Closing gaps
 
-		cv::Canny(img, outimg2, 80, 80, 3, false); //Detecting edges
+		cv::Canny(filteredimg, outimg2, 80, 80, 3, false); //Detecting edges
 		cv::morphologyEx(outimg2, outimg, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(11, 11))); //Closing gaps 
 		cv::dilate(outimg, outimg, cv::Mat(), cv::Point(0,0),1);
 
@@ -474,9 +474,9 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 			kdepth.data[i*3 + 2] = 0;
 		}
 		else {
-			kdepth.data[i*3] = img.data[i];
-			kdepth.data[i*3 + 1] = img.data[i];
-			kdepth.data[i*3 + 2] = img.data[i];
+			kdepth.data[i*3] = filteredimg.data[i];
+			kdepth.data[i*3 + 1] = filteredimg.data[i];
+			kdepth.data[i*3 + 2] = filteredimg.data[i];
 		}
 
 		if(kimgplane && outimg3.data[i]) {
@@ -497,7 +497,6 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 
 	}
 
-	img.release();
 	outimg.release();
 	outimg2.release();
 	outimg3.release();

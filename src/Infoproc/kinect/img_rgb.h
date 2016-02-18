@@ -5,7 +5,7 @@
 
 #include "utils/nimg.h"
 #include "utils/ntime.hpp"
-#include "Memory/objects.hpp"
+#include "Infoproc/objects.hpp"
 #include <vector>
 #include <array>
 #include <math.h>
