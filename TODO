@@ -8,20 +8,12 @@ General:
 		+CPU temp
 		+What drivemanager is doing
 		+Any important info
-		+Get power in cpp and temperature
-	-Multithread
-	-Move memory folder contents to infoproc
-
-Kinect general
-	-Stop kinect from flooding logger
 
 Kinect RGB
-	-Combine Saturation and Hue for floor detection
 	-dynamic floor coloring (by getting average color of points)
 		+cant see floor if too close to wall
 	-Check path for obsticals
 	-Check color of balls
-	-Recognize key points
 	-QR reading
 
 Kinect depth
@@ -30,7 +22,6 @@ Kinect depth
 		+If line is horizontal and above horizon check it out (50% the distance it is above the horizon?)
 	-Check path for obsticals
 	-Range finding request on points
-	-Use blob detection to identify other robots?
 
 Web camera
 	-Ball color identification needs to be done
@@ -39,20 +30,27 @@ Web camera
 AI:
 	-Look for posts on edge of map?
 	-Fine path finding
-	-Fix bug with turning weird angles
 
 SDL:
 	-Fix crashing from mouse events
-	-Optimize opengl window
-		+Make sure no gl things are called when context isn't current
-
-Laptop general:
-	-Nvidia drives (check if openkinect needs anymore nvidia crap)
+		+Could have been fixed with opengl fix
+		+Crashing might be due to OpenGL and OpenCV not working together
 
 Extras:
+	(kinect)
 	-Double check rgb and depth allignment
+	-Stop kinect from flooding logger
+	(AI)
 	-Make coarse path finding go diagnol when can
 	-Make coarse path finding check which path is shortest
+	(sdl)
+	-Generate ID# for map so it only updates when changed
+	-Optimize opengl window
+		+Make sure no gl things are called when context isn't current
+	(laptop)
+	-Multithread
+	-Nvidia drives (check if openkinect needs anymore nvidia crap)
+	(Depth)
 	-Make depth camera check if walls that fail are two walls and a gap
-	-Generate ID# for path and map so it only updates when changed
+	-Use blob detection to identify other robots?
 
