@@ -1,6 +1,6 @@
 #ifndef NAI_LOCALIZER
 #define NAI_LOCALIZER
-#include "Memory/world_map.h"
+#include "Infoproc/world_map.h"
 #include "Infoproc/driveman.h"
 
 class localizer {

@@ -3,7 +3,7 @@
 
 #include "utils/ntime.hpp"
 #include "Viewer/window.h"
-#include "Memory/objects.hpp"
+#include "Infoproc/objects.hpp"
 
 #include <GL/glew.h>
 #include <GL/gl.h>

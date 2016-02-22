@@ -1,4 +1,4 @@
-#include "Memory/world_map.h"
+#include "Infoproc/world_map.h"
 
 
 world_map::world_map() : robot("NAI") {

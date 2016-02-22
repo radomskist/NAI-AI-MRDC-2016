@@ -5,7 +5,7 @@
 
 #include "utils/nimg.h"
 #include "utils/ntime.hpp"
-#include "Memory/objects.hpp"
+#include "Infoproc/objects.hpp"
 #include <vector>
 #include <array>
 #include <math.h>
@@ -29,7 +29,9 @@ class imgd {
 		imgd();
 		~imgd();
 
-		void ProcessImg(unsigned char *);
+
+		float GetDist(unsigned int);
+		void ProcessImg(unsigned char *,std::vector<obj_plane> &);
 		nimg *GetImg();
 
 	private:
@@ -59,7 +61,7 @@ class imgd {
 		float *datahold;
 		int failpercent;
 		unsigned int freezetime;
-
+		cv::Mat filteredimg;
 };
 
 #endif

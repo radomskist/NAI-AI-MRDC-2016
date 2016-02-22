@@ -1,6 +1,6 @@
 #ifndef NAI_PATH_FINDING
 #define NAI_PATH_FINDING
-#include "Memory/world_map.h"
+#include "Infoproc/world_map.h"
 #include <vector>
 #include <algorithm>
 #include <iostream> 

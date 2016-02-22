@@ -1,7 +1,7 @@
 #ifndef NAI_STATE_TEST
 #define NAI_STATE_TEST
 #include "Infoproc/states/base_state.h"
-#include "Memory/path_finding.h"
+#include "Infoproc/path_finding.h"
 class test_state : public base_state {
 
 	public:

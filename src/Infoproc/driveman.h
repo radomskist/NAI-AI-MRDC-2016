@@ -2,8 +2,8 @@
 #define NAI_DRIVE_MANAGER
 #include "Devices/chipcomm.h"
 #include "utils/ntime.hpp"
-#include "Memory/path_finding.h"
-#include "Memory/objects.hpp"
+#include "Infoproc/path_finding.h"
+#include "Infoproc/objects.hpp"
 
 #include <sstream>
 /*

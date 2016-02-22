@@ -8,7 +8,7 @@
 	points to travel to?
 
 ****************************************************************/
-#include "Memory/objects.hpp"
+#include "Infoproc/objects.hpp"
 
 class world_map {
 	public:

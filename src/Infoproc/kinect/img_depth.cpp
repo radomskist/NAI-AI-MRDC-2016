@@ -1,17 +1,19 @@
 #include "Infoproc/kinect/img_depth.h"
 using namespace std;
+
+//TODO: clean up this disgusting lazyness
 bool kimgdep = true;
 bool kimgedge = true;
 bool kimgline = true;
 bool kimgplane = true;
 
 
-imgd::imgd() : kdepth(512,424,3) {
+imgd::imgd() : kdepth(512,424,3), filteredimg(424, 512, CV_8UC1) {
 	lineest = false; //Predict where lines might be?
 	pixdist = 10; //Distance between pixels when testing flatness of plane
-	slopeerrorrange = 100; //Range of error when seeing if plane is flat
+	slopeerrorrange = 2; //Range of error when seeing if plane is flat
 	kdepth.flags = KDEP;
-	failpercent = .5; //Percent of wall spots that can fail but still be accepted. To avoid noise problems
+	failpercent = .1; //Percent of wall spots that can fail but still be accepted. To avoid noise problems
 
 	kdepth.data = new unsigned char[kdepth.width * kdepth.height * kdepth.depth];
 	freezetime = GetSec();
@@ -288,7 +290,7 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 	processplane.push_back(newpoint);
 
 
-	if(extremeone < 500 || extremetwo < 500 || extremethree < 500 || extremefour < 500) {
+	if(extremeone < 5 || extremetwo < 5 || extremethree < 5 || extremefour < 5) {
 		processplane.erase(processplane.begin());
 		return;
 	}
@@ -351,44 +353,52 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 		kdepth.flags = KDEP | KFREEZE;
 		freezetime = GetSec() + 1;
 	}
-/*
-	newpoint[0] = closest;
-	newpoint[1] = verticle[i][1];
-	newpoint[2] = corner;
-	newpoint[3] = furthest;
-*/
 
 	//half xkinect FOV = 35.3
-	obj_plane newplane(1,1);
 	obj_point corner;
 	float screenpos = corner.x - 256;
 
+	/***********************
+	CONVERTING TO OBJ_PLANE
+	***********************/
 	// 0.616101226 = 35.3 (half of the kinects FOV) converted to radians
 	// the position of the point on the screen frm the center of the verticle axis
 	// .003906 = 1/256, which is half of the width (512)
+
 	obj_point pointhold;
-	pointhold.z = 300;
-/*
-	float depthspot = processplane[0][0].x + 5 + ((processplane[0][0].y + 5)* pixwidth);
+	obj_plane newplane(1,1);
+	//Only check top 2 points
+	for(int i = 0; i < 2; i++) {
+		int depthspot;
 
-	pointhold.y = datahold[depthspot] * sin(35.3*screenpos*0.00390625);
-	pointhold.x = datahold[depthspot] * sin(54.7*screenpos*0.00390625);
-	newplane.p[0] = pointhold;
+		//TODO: bottom points to see if too distorted to be a wall?
+		if(i == 0)
+			depthspot = processplane[0][0].x + 5 + ((processplane[0][0].y + 5)* kdepth.width);
+		else
+			depthspot = processplane[0][3].x - 5 + ((processplane[0][3].y - 5)* kdepth.width);
 
-	
-	corner.y = 300;
-	//corner.x = processplane[0][0] * sin(
-	//corner.z = processplane[0][0]
+		pointhold.x = processplane[0][i*3].x - 256.0f; //Distance from center
+		pointhold.y = sqrt((datahold[depthspot] * datahold[depthspot]) - (processplane[0][i*3].x * processplane[0][i*3].x)); //forward
 
-	newplane.p[0] =  corner processplane[0][0];
-	newplane.p[1] =  corner processplane[0][1];
-	corner.y = 0;
-	newplane.p[2] =  corner processplane[0][2];
-	newplane.p[3] =  corner processplane[0][3];
-	
+		if(i == 0) {
+			pointhold.z = 300;
+			newplane.p[0] = pointhold;
+			pointhold.z = 0;
+			newplane.p[1] = pointhold;
+		}
+		else {
+			pointhold.z = 300;
+			newplane.p[3] = pointhold;
+			pointhold.z = 0;
+			newplane.p[2] = pointhold;
+		}
+	}
 
-	returnplane.push_back(newplane);*/
+	returnplane.push_back(newplane);
 
+}
+float imgd::GetDist(unsigned int atpos) {
+	return datahold[atpos];
 }
 
 inline int imgd::averagepoints(cv::Point avg) {
@@ -397,17 +407,16 @@ inline int imgd::averagepoints(cv::Point avg) {
 		return 0;
 
 	int yspot = avg.y*kdepth.width;
-	int total = datahold[avg.x + yspot];
+	int total = filteredimg.data[avg.x + yspot];
 
-	total += datahold[avg.x + 1 + yspot];
-	total += datahold[avg.x - 1 + yspot];
+	total += filteredimg.data[avg.x + 1 + yspot];
+	total += filteredimg.data[avg.x - 1 + yspot];
 	total *= 0.33f;
 
 	return total;
 }
 
-/*Two pixel slope check suggested by Joel*/
-void imgd::ProcessImg(unsigned char *depthbuff) {
+void imgd::ProcessImg(unsigned char *depthbuff,std::vector<obj_plane> &planeset) {
 	//Casting data to a float, which is what it's suppose to be (instead of what it gives you for some reason)
 	datahold = (float *)&depthbuff[4];
 
@@ -416,13 +425,12 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 	unsigned resolution = kdepth.width * kdepth.height;
 	
 	/*flipping the image*/
-	cv::Mat img(424, 512, CV_8UC1); //Mat for edges
 	for(int j = 0; j < kdepth.height; j++) {
 		int currentrow = j*kdepth.width;
 		for(int i = 0; i < kdepth.width; i++) {
 			////normalize kinect range to 255
 			normalized = datahold[currentrow + (kdepth.width -1 - i)] * 0.06375f; //(4500.0f - 500.0f)/(255)
-			img.data[currentrow + i] = normalized;
+			filteredimg.data[currentrow + i] = normalized;
 		}
 	}
 	vector<cv::KeyPoint> keypoints;
@@ -433,23 +441,26 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 	cv::Mat outimg3 = cv::Mat::zeros(424,512,CV_8UC1); //Mat for planes
 
 	try {
-		cv::morphologyEx(img, outimg, cv::MORPH_OPEN, cv::Mat()); //Phasing out blobs
-		cv::morphologyEx(outimg, img, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(11, 11))); //Closing gaps
+		//Doing some serious noise cleaning
+		cv::morphologyEx(filteredimg, outimg, cv::MORPH_OPEN, cv::Mat()); //Phasing out blobs
+		cv::morphologyEx(outimg, filteredimg, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(11, 11))); //Closing gaps
 
-		cv::Canny(img, outimg2, 80, 80, 3, false); //Detecting edges
+		cv::Canny(filteredimg, outimg2, 80, 80, 3, false); //Detecting edges
 		cv::morphologyEx(outimg2, outimg, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(11, 11))); //Closing gaps 
 		cv::dilate(outimg, outimg, cv::Mat(), cv::Point(0,0),1);
-
 		outimg2.setTo(cv::Scalar(0,0,0));
+
 		//for(int i = 0; i < keypoints.size(); i++)
 		//	cv::circle(outimg, keypoints[i].pt, keypoints[i].size, cv::Scalar(0,0,0),-1); //Removing them
 		cv::HoughLinesP(outimg, lines, 2, 0.017, 30, 70, 10);
+		std::vector<std::array<cv::Point,2>> pointset; //horizontal points
+		std::vector<std::array<cv::Point,2>> vertset; //verticle points
 
-		std::vector<std::array<cv::Point,2>> pointset;
-		std::vector<std::array<cv::Point,2>> vertset;
-		std::vector<std::array<cv::Point,4>> planepoints = ProcessLines(lines,pointset,vertset);
-		std::vector<obj_plane> planeset = CalculatePlanes(pointset,vertset,planepoints);
+		//Image to plane processing is done in these two functions
+		std::vector<std::array<cv::Point,4>> planepoints = ProcessLines(lines,pointset,vertset); //turning lines into planes
+		planeset = CalculatePlanes(pointset,vertset,planepoints); //converting image planes into obj planes (also check if valid)
 
+		//This is all for image drawing
 		for(int i = 0; i < pointset.size(); i++ ) {
 		    cv::line(outimg2, pointset[i][0], pointset[i][1], cv::Scalar(255,255,255), 3, 8);
 		}
@@ -466,7 +477,6 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 		std::cout << e.what()  << std::endl;
 	}
 
-	//Converting the float into a proper RGB image (rather than 4 split up parts of one float)
 	for(int i = 0; i < resolution; i++) {
 		if(!kimgdep) {
 			kdepth.data[i*3] = 0;
@@ -474,9 +484,9 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 			kdepth.data[i*3 + 2] = 0;
 		}
 		else {
-			kdepth.data[i*3] = img.data[i];
-			kdepth.data[i*3 + 1] = img.data[i];
-			kdepth.data[i*3 + 2] = img.data[i];
+			kdepth.data[i*3] = filteredimg.data[i];
+			kdepth.data[i*3 + 1] = filteredimg.data[i];
+			kdepth.data[i*3 + 2] = filteredimg.data[i];
 		}
 
 		if(kimgplane && outimg3.data[i]) {
@@ -496,8 +506,6 @@ void imgd::ProcessImg(unsigned char *depthbuff) {
 		}
 
 	}
-
-	img.release();
 	outimg.release();
 	outimg2.release();
 	outimg3.release();

@@ -15,7 +15,7 @@ drive_man::drive_man(const path_finding * set_pfind, const obj_cube *set_rob) : 
 
 	/*Callibrations*/
 	delay = 150; // in milliseconds
-	drivespeed = 160*.001*delay; //speed per seconds converted for delay
+	drivespeed = 183*.001*delay; //speed per seconds converted for delay
 	turnspeed = 32*.001*delay;
 	turntol = 5; //Turning tolerance before considered to be straight
 
@@ -67,7 +67,6 @@ bool drive_man::tick() {
 		return false;
 
 	difference = 0;
-	//TODO compensate simulation for delay due to lag
 	unsigned int milli = GetMilli();
 	if(delaytime < milli) {
 		difference = (milli/delaytime); //divided by 250
@@ -88,6 +87,9 @@ bool drive_man::tick() {
 	if(((dir == 90 || dir == 270 ) && (abs(curpath[currentnode-1].x - robot->pos.x) < 50))
 	 || ((dir == 0 || dir == 180) && (abs(curpath[currentnode-1].y - robot->pos.y) < 50))) {
 		currentnode--;
+		if(currentnode == 0)
+			return true;
+
 		if((curpath[currentnode].x - curpath[currentnode-1].x) != 0)
 			curpath[currentnode].x < curpath[currentnode-1].x ? dir = 90 : dir = 270;
 		else
@@ -115,9 +117,9 @@ bool drive_man::tick() {
 					currentpath = "RL 20!";
 					ss << "RL " << robot->rot - dir;
 				}
-				else if (robot->rot > dir){
+				else if (robot->rot < dir){
 					currentpath = "RR 20!";
-					ss << "RR " << robot->rot - dir;
+					ss << "RR " << dir - robot->rot;
 				}
 				else {
 					currentpath = "RR 20!";
@@ -131,9 +133,9 @@ bool drive_man::tick() {
 					currentpath = "RR 20!";
 					ss << "RR " << dir - robot->rot;
 				}
-				else if (anchor > dir){
+				else if (robot->rot > dir){
 					currentpath = "RL 20!";
-					ss << "RL " << dir - robot->rot;
+					ss << "RL " << robot->rot - dir;
 				}
 				else {
 					currentpath = "RL 20!";
@@ -145,7 +147,6 @@ bool drive_man::tick() {
 		/******************************************/
 	/*logging where we're going*/
 	//commandhist
-	std::cout << commandhist.back() << std::endl;
 	}
 
 	if(obstvoid())
