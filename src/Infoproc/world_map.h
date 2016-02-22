@@ -9,6 +9,7 @@
 
 ****************************************************************/
 #include "Infoproc/objects.hpp"
+#include <math.h>
 
 class world_map {
 	public:
@@ -22,6 +23,7 @@ class world_map {
 		void addobjs(std::vector<obj_base>&);
 		void gentest();
 		void SetRobotAttr(obj_point,float);
+		void AddPlanes(std::vector<obj_plane> &);
 
 	private:
 		obj_cube robot; //rot, 90 = positive down the x axis, 0 = positive down the y axis, 180 = negative down y axis, 270 = negative down x axis
