@@ -81,6 +81,10 @@ nimg *kinectman::GetRGBImg() {
 	return rgb_proc.GetImg();
 }
 
+std::vector<obj_plane>& kinectman::GetPlanes() { 
+	return planeset;
+}
+
 bool kinectman::ProcessImages() {
 	if(f2dev == NULL)
 		return false;
@@ -93,7 +97,7 @@ bool kinectman::ProcessImages() {
 		return false;
 
 	//Processing depth
-	depth_proc.ProcessImg(nfmap[libfreenect2::Frame::Depth]->data);
+	depth_proc.ProcessImg(nfmap[libfreenect2::Frame::Depth]->data,planeset);
 	//RGB process
 	rgb_proc.ProcessImg(nfmap[libfreenect2::Frame::Color]->data);
 

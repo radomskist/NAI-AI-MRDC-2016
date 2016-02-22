@@ -37,18 +37,20 @@ class kinectman {
 		kinectman();
 		~kinectman();
 
+		bool ProcessImages(); //Proccess the images and sets the buffer values
 		bool PathCheck(bool &, bool&);
+		std::vector<obj_plane>& GetPlanes();
 
 		nimg *GetDepthImg();
 		nimg *GetRGBImg();
 
-		bool ProcessImages(); //Proccess the images and sets the buffer values
 
 	private:
 		void clean();
 
 		/*whether or not freenect is connected*/
 		bool nectfailed;
+		std::vector<obj_plane> planeset;
 
 		/*freenect values*/
  		libfreenect2::Freenect2Device *f2dev;

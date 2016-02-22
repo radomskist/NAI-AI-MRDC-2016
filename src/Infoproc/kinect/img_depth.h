@@ -29,7 +29,9 @@ class imgd {
 		imgd();
 		~imgd();
 
-		void ProcessImg(unsigned char *);
+
+		float GetDist(unsigned int);
+		void ProcessImg(unsigned char *,std::vector<obj_plane> &);
 		nimg *GetImg();
 
 	private:
@@ -60,7 +62,6 @@ class imgd {
 		int failpercent;
 		unsigned int freezetime;
 		cv::Mat filteredimg;
-
 };
 
 #endif

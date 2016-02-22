@@ -36,7 +36,9 @@ void imgrgb::findground(cv::Mat &hsvin) {
 	groundmat.release();
 	groundmat = cv::Mat::zeros(380,512,CV_8UC1);
 
-	cv::threshold(hsvin,img2, 140.0, 250.0, cv::THRESH_BINARY);
+	//cv::threshold(hsvin,img2, 50, 60, cv::THRESH_BINARY);
+	cv::inRange(hsvin,25, 65,img2); //TODO: Find in range of this
+	//hsvin = img2;
 	cv::morphologyEx(img2, img3, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(30, 30)));
 	std::vector<std::vector<cv::Point>> contours;
 	std::vector<cv::Vec4i> hierarchy;
@@ -144,7 +146,7 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 	cv::Mat HSIMG;
 
 	/*finding the ground*/
-	cv::addWeighted(channels[1], .2, channels[2], .8, 0, HSIMG);
+	cv::addWeighted(channels[0], .5, channels[1], .5, 0, HSIMG);
 	findground(HSIMG);
 
 	cv::Mat circlesstuff;
@@ -153,13 +155,15 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 	int resolution = krgb.width*381;
 	for(int i = 0; i < resolution; i++) {
 
-		/*
-		krgb.data[i*4] = rgbin.data[i*4];
+		
+		/*krgb.data[i*4] = rgbin.data[i*4];
 		krgb.data[i*4 + 1] = rgbin.data[i*4+1];
 		krgb.data[i*4 + 2] = rgbin.data[i*4+2];*/
 		krgb.data[i*4] = HSIMG.data[i];
 		krgb.data[i*4 + 1] = HSIMG.data[i];
 		krgb.data[i*4 + 2] = HSIMG.data[i];
+
+
 		//if(cannystuff.data[i])
 		//	krgb.data[i*4 + 2] = cannystuff.data[i];	
 
