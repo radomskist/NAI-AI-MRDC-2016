@@ -355,9 +355,6 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 	}
 
 	//half xkinect FOV = 35.3
-	obj_point corner;
-	float screenpos = corner.x - 256;
-
 	/***********************
 	CONVERTING TO OBJ_PLANE
 	***********************/
@@ -375,10 +372,12 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 		if(i == 0)
 			depthspot = processplane[0][0].x + 5 + ((processplane[0][0].y + 5)* kdepth.width);
 		else
-			depthspot = processplane[0][3].x - 5 + ((processplane[0][3].y - 5)* kdepth.width);
+			depthspot = processplane[0][3].x - 5 + ((processplane[0][3].y + 5)* kdepth.width);
 
-		pointhold.x = processplane[0][i*3].x - 256.0f; //Distance from center
-		pointhold.y = sqrt((datahold[depthspot] * datahold[depthspot]) - (processplane[0][i*3].x * processplane[0][i*3].x)); //forward
+		pointhold.y = ((256.0f - processplane[0][i*3].x)/256.0f) * (datahold[depthspot] * sin(0.616101226)); //Distance from center
+
+		float pointval = averagepoints(depthspot);
+		pointhold.x = sqrt(abs(pointval*pointval - (processplane[0][i*3].x * processplane[0][i*3].x))); //forward
 
 		if(i == 0) {
 			pointhold.z = 300;
@@ -392,18 +391,34 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 			pointhold.z = 0;
 			newplane.p[2] = pointhold;
 		}
+
 	}
 
 	returnplane.push_back(newplane);
 
 }
 float imgd::GetDist(unsigned int atpos) {
-	return datahold[atpos];
+	return averagepoints(atpos);
 }
+
+inline float imgd::averagepoints(unsigned int point) {
+	//Checking if in range
+	if(kdepth.width - (point / kdepth.width) < 3 || (point / kdepth.width) < 3)
+		return 0;
+
+	//Reverse calculating filter because noise is too bad on kinect
+	float total = filteredimg.data[point];
+	total += filteredimg.data[point + 1];
+	total += filteredimg.data[point - 1];
+	total *= 5.228757647  ; //(4500.0f - 500.0f)/(255) * 1/3
+
+	return total;
+}
+
 
 inline int imgd::averagepoints(cv::Point avg) {
 	//Checking if in range
-	if(kdepth.width - avg.x < 3 && avg.x < kdepth.width - 3)
+	if(kdepth.width - avg.x < 3 || avg.x < 3)
 		return 0;
 
 	int yspot = avg.y*kdepth.width;
@@ -429,7 +444,7 @@ void imgd::ProcessImg(unsigned char *depthbuff,std::vector<obj_plane> &planeset)
 		int currentrow = j*kdepth.width;
 		for(int i = 0; i < kdepth.width; i++) {
 			////normalize kinect range to 255
-			normalized = datahold[currentrow + (kdepth.width -1 - i)] * 0.06375f; //(4500.0f - 500.0f)/(255)
+			normalized = datahold[currentrow + (kdepth.width -1 - i)] * 0.06375f; //(255)/(4500.0f - 500.0f)
 			filteredimg.data[currentrow + i] = normalized;
 		}
 	}

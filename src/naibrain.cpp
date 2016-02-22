@@ -48,6 +48,7 @@ void naibrain::gentest() {
 void naibrain::tick() {
 	if(kinect_manager != NULL) {
 		kinect_manager->ProcessImages();
+		wmap.AddPlanes(kinect_manager->GetPlanes());
 
 		bool left,right,front;
 		front = kinect_manager->PathCheck(left,right);
@@ -60,8 +61,8 @@ void naibrain::tick() {
 	obj_point dinc;
 	float dang;
 
-	if(locsys.approximate(dinc, dang)) 
-		wmap.SetRobotAttr(dinc, dang);
+	//if(locsys.approximate(dinc, dang)) 
+	//	wmap.SetRobotAttr(dinc, dang);
 }
 
 

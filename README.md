@@ -2,7 +2,9 @@
 
 ##Requires:
 Open Kinect 2:
+
 https://github.com/OpenKinect/libfreenect2
+
 http://openkinect.org/wiki/Main_Page
 
 

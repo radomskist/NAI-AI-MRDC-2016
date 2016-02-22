@@ -134,13 +134,11 @@ int main(int argc, char** argv)
 		const world_map *wmap = mainbrain.GetMap();
 		unsigned int kmode = KDEP | KRGB | KFREEZE;
 
-		mainbrain.gentest();
+		//mainbrain.gentest();
 		std::vector<obj_cube> addcube;
 		const obj_cube *newbot = wmap->GetRobot();
 		addcube.push_back(*newbot);
 		naigl *glwin = MainWin.GetGL();
-		glwin->setents(addcube);
-		glwin->setplanes(wmap->GetPlanes());
 
 		while(MainWin.running()) {
 			mainbrain.tick();
@@ -149,6 +147,7 @@ int main(int argc, char** argv)
 			addcube.pop_back();
 			addcube.push_back(*newbot);
 			//TODO optimize
+			glwin->setplanes(wmap->GetPlanes());
 			glwin->setents(addcube);
 			glwin->setpath(mainbrain.GetPfind().GetPath());
 			glwin->draw();

@@ -37,7 +37,7 @@ class imgd {
 	private:
 		//averages area around a point
 		inline int averagepoints(cv::Point);
-
+		inline float averagepoints(unsigned int);
 		//Merges all lines together and estimates where unseen lines might be.
 		//returns a vector of estimated lines 
 		//Arguments, vector of lines as input, vector of horizontal lines to return, vector of verticle lines to return
