@@ -13,7 +13,7 @@ world_map::world_map() : robot("NAI") {
 	robot.color[1] = 0.0f;
 	robot.color[2] = 0.76f;
 	maptodate = false;
-	robot.rot = 1.6;
+	robot.rot = 1.57;
 }
 
 void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
@@ -41,35 +41,50 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 		//If too small skip (due to errors)
 		if(abs(abs(setplanes[j].p[0].x + setplanes[j].p[0].y) - abs(setplanes[j].p[3].x + setplanes[j].p[3].y)) < 200)
 			continue;
-		
+
+		/*TODO break up into plane per grid*/
 		/*Lining up to grid*/
-		setplanes[j].p[0].x = ((int)(setplanes[j].p[0].x*.0025)) * 400;
-		setplanes[j].p[0].y = ((int)(setplanes[j].p[0].y*.0025)) * 400;
-		setplanes[j].p[3].x = ((int)(setplanes[j].p[3].x*.0025)) * 400;
-		setplanes[j].p[3].y = ((int)(setplanes[j].p[3].y*.0025)) * 400;
+		for(int i = 0; i < 2; i++) {
+			int mod = (int)(setplanes[j].p[i*3].x) % 400;
+
+			if(mod > 200)
+				setplanes[j].p[i*3].x = ((int)(setplanes[j].p[0].x*.0025 + 1)) * 400 - 1;// making sure it doesnt go into the next grid
+			else
+				setplanes[j].p[i*3].x = (int)(setplanes[j].p[0].x*.0025) * 400;
+
+			mod = (int)(setplanes[j].p[i*3].y) % 400;
+			if(mod > 200)
+				setplanes[j].p[i*3].y = ((int)(setplanes[j].p[0].y*.0025 + 1)) * 400 - 1;// making sure it doesnt go into the next grid
+			else
+				setplanes[j].p[i*3].y = (int)(setplanes[j].p[0].y*.0025) * 400;
+
+		}
+
+		std::cout << setplanes[j].p[0].x << "," << setplanes[j].p[0].y << "   " << setplanes[j].p[3].x << "," << setplanes[j].p[3].y << std::endl;
+		/*making sure higher is on bot*/
+		if(setplanes[j].p[0].x - 10 > setplanes[j].p[3].x || setplanes[j].p[0].y - 10 > setplanes[j].p[3].y) {
+			obj_point temp;
+			temp = setplanes[j].p[0];
+			setplanes[j].p[0] = setplanes[j].p[3];
+			setplanes[j].p[3] = temp;
+		}
 
 		setplanes[j].p[1] = setplanes[j].p[0];
 		setplanes[j].p[1].z = 0;
 		setplanes[j].p[2] = setplanes[j].p[3];
 		setplanes[j].p[3].z = 0;
-		
-		/*TODO break up into plane per grid*/
-
 
 		/*checking if plane exists*/
 		bool match = false;
 		for(int k = 0; k < plane_list.size(); k++) {
-			if(abs(plane_list[k].p[0].x - setplanes[k].p[0].x) > 10)
-				continue;
 
-			if(abs(plane_list[k].p[0].y - setplanes[k].p[0].y) > 10)
+			if(abs(plane_list[k].p[0].x - setplanes[j].p[0].x) > 10 || abs(plane_list[k].p[0].y - setplanes[j].p[0].y) > 10)
 				continue;
 
 			/*TODO: Count how many times this plane is matched*/
 			match = true;
 			break;
 		}
-
 		if(!match)
 			plane_list.push_back(setplanes[j]);
 	}

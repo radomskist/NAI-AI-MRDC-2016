@@ -1,3 +1,7 @@
+Being taken care of by other members:
+	-Ball color identification needs to be done
+	-QR reading
+
 NAI TODO:
 General:
 	-Need to build test course
@@ -8,6 +12,7 @@ General:
 		+CPU temp
 		+What drivemanager is doing
 		+Any important info
+	-Fix crashing
 
 Kinect
 	-Save approx location of robot when images where taken?
@@ -15,29 +20,23 @@ Kinect
 Kinect RGB
 	-dynamic floor coloring (by getting average color of points)
 		+cant see floor if too close to wall
-	-Check path for obsticals
 	-Check color of balls
-	-QR reading
 
 Kinect depth
+	-Localizataion
+		+remember where wall closest to center was last time it was seen.
 	-Check for a plane under long parallel horizontal lines
 		+If plane is too high above horizon throw out
 		+If line is horizontal and above horizon check it out (50% the distance it is above the horizon?)
 	-Check path for obsticals (if floor detection fails)
 
 Web camera
-	-Ball color identification needs to be done
 	-See where golf ball dispenser is
 
 AI:
 	-Look for posts on edge of map?
 	-Fine path finding
 	-Keep track of how many times planes fail to verify and succeed
-
-SDL (Fixed?):
-	-Fix crashing from mouse events
-		+Could have been fixed with opengl fix
-		+Crashing might be due to OpenGL and OpenCV not working together
 
 Extras:
 	(kinect)
