@@ -24,6 +24,7 @@ class naigl : public basewin {
 		~naigl();
 
 		void draw();
+		void makecurrent();
 		void setplanes(const std::vector<obj_plane> &);
 		void setpath(const std::vector<obj_point> );
 		void setents(const std::vector<obj_cube> &);

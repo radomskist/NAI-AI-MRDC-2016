@@ -141,15 +141,21 @@ int main(int argc, char** argv)
 		naigl *glwin = MainWin.GetGL();
 
 		while(MainWin.running()) {
+			//std::cout << "Tick" << std::endl;
 			mainbrain.tick();
+			//std::cout << "WIndow" << std::endl;
 			MainWin.GetKeys();
 			MainWin.SetImg(mainbrain.GetImages(kmode));
+			//std::cout << "OpengL" << std::endl;
 			addcube.pop_back();
 			addcube.push_back(*newbot);
 			//TODO optimize
+			glwin->makecurrent();
 			glwin->setplanes(wmap->GetPlanes());
 			glwin->setents(addcube);
 			glwin->setpath(mainbrain.GetPfind().GetPath());
+			//std::cout << "Draw"<< std::endl;
+			//glwin->makecurrent();
 			glwin->draw();
 		}
 	}

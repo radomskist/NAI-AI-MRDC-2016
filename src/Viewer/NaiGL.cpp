@@ -378,8 +378,11 @@ void naigl::setplanes(const std::vector<obj_plane> &add_newplane) {
 	glBufferSubData(GL_ARRAY_BUFFER,0, sizeof(float)*planecolors.size(), &planecolors[0]);
 }	
 
-void naigl::draw() {
+void naigl::makecurrent() {
 	SDL_GL_MakeCurrent(win,nglcont);
+}
+
+void naigl::draw() {
 	view = glm::rotate(glm::mat4(1), urotation, glm::vec3(1.0f,0.0f,0.0f));
 	view = glm::rotate(view, lrotation, glm::vec3(0.0f,0.0f,1.0f));
 	view = glm::translate(view, glm::vec3(ypos, xpos, -1500.0f));
