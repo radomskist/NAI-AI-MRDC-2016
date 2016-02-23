@@ -13,13 +13,13 @@ General:
 		+What drivemanager is doing
 		+Any important info
 	-Fix crashing
+	-Alternative to X forwarding
+		+Way too slow to startup
 
 Kinect
 	-Save approx location of robot when images where taken?
 
 Kinect RGB
-	-dynamic floor coloring (by getting average color of points)
-		+cant see floor if too close to wall
 	-Check color of balls
 
 Kinect depth
@@ -42,6 +42,7 @@ Extras:
 	(kinect)
 	-Double check rgb and depth allignment
 	-Stop kinect from flooding logger
+	-store found floor color and go off that
 	(AI)
 	-Make coarse path finding go diagnol when can
 	-Make coarse path finding check which path is shortest

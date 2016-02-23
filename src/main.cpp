@@ -134,7 +134,7 @@ int main(int argc, char** argv)
 		const world_map *wmap = mainbrain.GetMap();
 		unsigned int kmode = KDEP | KRGB | KFREEZE;
 
-		//mainbrain.gentest();
+		mainbrain.gentest();
 		std::vector<obj_cube> addcube;
 		const obj_cube *newbot = wmap->GetRobot();
 		addcube.push_back(*newbot);

@@ -39,6 +39,7 @@ class imgrgb {
 		inline void findground(cv::Mat&);
 		inline void findballs(cv::Mat&, cv::Mat&);
 
+		unsigned char floorcolor;
 		nimg krgb;
 		cv::Mat groundmat;
 		cv::Ptr<cv::SimpleBlobDetector> balldet;

@@ -61,8 +61,8 @@ void naibrain::tick() {
 	obj_point dinc;
 	float dang;
 
-	//if(locsys.approximate(dinc, dang)) 
-	//	wmap.SetRobotAttr(dinc, dang);
+	if(locsys.approximate(dinc, dang)) 
+		wmap.SetRobotAttr(dinc, dang);
 }
 
 
