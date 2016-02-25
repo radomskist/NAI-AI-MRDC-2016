@@ -1,6 +1,9 @@
 #include "Devices/kinect_man.h"
 
-kinectman::kinectman() {
+kinectman::kinectman(unsigned char set_color) : rgb_proc(ballcolor) {
+
+	floory = 300;
+	ballcolor = set_color;
 	/*********************
 	Initializing freenect
 	*********************/
@@ -54,8 +57,13 @@ kinectman::kinectman() {
 
 bool kinectman::PathCheck(bool &left , bool& right) {
 
-	return rgb_proc.GroundCheck(left,right);
+	//If RGB fails do a second scan
+	bool returnforward;
 
+	if(!(returnforward = rgb_proc.GroundCheck(left,right)))
+		return depth_proc.ScanGround(left,right);
+
+	return returnforward;
 }
 
 void kinectman::clean() {

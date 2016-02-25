@@ -33,11 +33,15 @@ class imgd {
 		float GetDist(unsigned int);
 		void ProcessImg(unsigned char *,std::vector<obj_plane> &);
 		nimg *GetImg();
+		bool ScanGround(bool&,bool&);
+		void FloorCheck();
+
 
 	private:
 		//averages area around a point
 		inline int averagepoints(cv::Point);
 		inline float averagepoints(unsigned int);
+		inline unsigned char averagepointsc(unsigned int);
 		//Merges all lines together and estimates where unseen lines might be.
 		//returns a vector of estimated lines 
 		//Arguments, vector of lines as input, vector of horizontal lines to return, vector of verticle lines to return
@@ -53,6 +57,11 @@ class imgd {
 		//Also cuts up a plane into mini planes if it discovers that the plane has a gap
 		//Takes in a vector of points to a plane as input, vector of planes as output
 		inline void ConvertToObj(std::vector<std::array<cv::Point,4>> &, std::vector<obj_plane>&);
+
+		bool initialized;
+		unsigned int floory;
+		unsigned char floordist;
+		unsigned int horizontalchecky;
 
 		nimg kdepth;
 		int slopeerrorrange;

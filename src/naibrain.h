@@ -35,6 +35,8 @@ class naibrain {
 		bool KStatus(); /*returns whether or not kinect is working*/
 
 	private:
+		unsigned char ballcolor;
+
 		/*devices*/
 		kinectman* kinect_manager; /*kinect manager object*/
  		std::vector<nimg*> Images; /*List of images from sensors*/

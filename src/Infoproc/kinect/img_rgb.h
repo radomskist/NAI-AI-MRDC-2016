@@ -26,19 +26,25 @@
 
 class imgrgb {
 	public:
-		imgrgb();
+		imgrgb(unsigned char);
 		~imgrgb();
 
 		void ProcessImg(unsigned char *);
 		nimg *GetImg();
 
+		//TODO filter the image for green (QR code), blue (QR code), black (Posts), and our ball color
+		void ScanForKeypoints() {};
+
 		//return forward
 		bool GroundCheck(bool &, bool&);
 
 	private:
+		int floortol;
+		unsigned int floory;
 		inline void findground(cv::Mat&);
 		inline void findballs(cv::Mat&, cv::Mat&);
 
+		unsigned char ballcolor;
 		unsigned char floorcolor;
 		nimg krgb;
 		cv::Mat groundmat;

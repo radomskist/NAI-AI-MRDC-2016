@@ -1,6 +1,18 @@
+TO TEST:
+	Secondary floor detection
+		-Check path for obsticals (if floor detection fails) (DONE?)
+
+	-Check for a plane under long parallel horizontal lines
+		+If plane is too high above horizon throw out
+		+If line is horizontal and above horizon check it out (50% the distance it is above the horizon?)
+
+
 Being taken care of by other members:
-	-Ball color identification needs to be done
-	-QR reading
+		-Ball color identification needs to be done
+		-QR reading
+
+	-Look for posts on edge of map?
+
 
 NAI TODO:
 General:
@@ -20,21 +32,17 @@ Kinect
 	-Save approx location of robot when images where taken?
 
 Kinect RGB
-	-Check color of balls
+	-Scan for key points
 
 Kinect depth
 	-Localizataion
 		+remember where wall closest to center was last time it was seen.
-	-Check for a plane under long parallel horizontal lines
-		+If plane is too high above horizon throw out
-		+If line is horizontal and above horizon check it out (50% the distance it is above the horizon?)
-	-Check path for obsticals (if floor detection fails)
+	+Remember floor color for successful check
 
 Web camera
 	-See where golf ball dispenser is
 
 AI:
-	-Look for posts on edge of map?
 	-Fine path finding
 	-Keep track of how many times planes fail to verify and succeed
 
