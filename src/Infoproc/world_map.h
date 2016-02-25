@@ -29,6 +29,7 @@ class world_map {
 		obj_cube robot; //rot, 90 = positive down the x axis, 0 = positive down the y axis, 180 = negative down y axis, 270 = negative down x axis
 		std::vector<obj_cube> entities_list;
 		std::vector<obj_plane> plane_list;
+		std::vector<int> plane_count; //how many times has this plane been successfully found;
 
 		bool maptodate;
 

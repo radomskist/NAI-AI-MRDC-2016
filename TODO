@@ -1,12 +1,3 @@
-TO TEST:
-	Secondary floor detection
-		-Check path for obsticals (if floor detection fails) (DONE?)
-
-	-Check for a plane under long parallel horizontal lines
-		+If plane is too high above horizon throw out
-		+If line is horizontal and above horizon check it out (50% the distance it is above the horizon?)
-
-
 Being taken care of by other members:
 		-Ball color identification needs to be done
 		-QR reading
@@ -39,9 +30,6 @@ Kinect depth
 		+remember where wall closest to center was last time it was seen.
 	+Remember floor color for successful check
 
-Web camera
-	-See where golf ball dispenser is
-
 AI:
 	-Fine path finding
 	-Keep track of how many times planes fail to verify and succeed
@@ -64,4 +52,5 @@ Extras:
 	(Depth)
 	-Make depth camera check if walls that fail are two walls and a gap
 	-Use blob detection to identify other robots?
-
+	(Web camera)
+	-See where golf ball dispenser is

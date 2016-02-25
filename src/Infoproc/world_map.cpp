@@ -83,12 +83,15 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 			if(abs(plane_list[k].p[0].x - setplanes[j].p[0].x) > 10 || abs(plane_list[k].p[0].y - setplanes[j].p[0].y) > 10)
 				continue;
 
-			/*TODO: Count how many times this plane is matched*/
 			match = true;
+			plane_count[k] += 1;
 			break;
 		}
-		if(!match)
+		if(!match) {
 			plane_list.push_back(setplanes[j]);
+			plane_count.push_back(0);
+		}
+		/*TODO: Purge planes that fail sequential counts*/
 	}
 }
 

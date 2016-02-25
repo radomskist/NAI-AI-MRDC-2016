@@ -139,9 +139,7 @@ int main(int argc, char** argv)
 		const obj_cube *newbot = wmap->GetRobot();
 		addcube.push_back(*newbot);
 		naigl *glwin = MainWin.GetGL();
-
 		while(MainWin.running()) {
-			//std::cout << "Start" << std::endl;
 			mainbrain.tick();
 			MainWin.GetKeys();
 			MainWin.SetImg(mainbrain.GetImages(kmode));
@@ -154,7 +152,6 @@ int main(int argc, char** argv)
 			glwin->setpath(mainbrain.GetPfind().GetPath());
 			//glwin->makecurrent();
 			glwin->draw();
-			//std::cout << "main loop end" << std::endl;
 		}
 		std::cout << "Exiting" << std::endl;
 	}

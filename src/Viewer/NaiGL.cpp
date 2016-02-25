@@ -242,8 +242,8 @@ void naigl::setents(const std::vector<obj_cube> &add_objs) {
 		obj_cube newobj = add_objs[i];
 		obj_point center = newobj.pos;
 		float nh, nw;
-		nh = newobj.height / 2;
-		nw = newobj.width / 2;
+		nh = newobj.height * .5;
+		nw = newobj.width * .5;
 
 		//Generating corners
 		//TODO optimize
@@ -383,7 +383,6 @@ void naigl::makecurrent() {
 }
 
 void naigl::draw() {
-	std::cout << "Start" << std::endl;
 	view = glm::rotate(glm::mat4(1), urotation, glm::vec3(1.0f,0.0f,0.0f));
 	view = glm::rotate(view, lrotation, glm::vec3(0.0f,0.0f,1.0f));
 	view = glm::translate(view, glm::vec3(ypos, xpos, -1500.0f));
@@ -391,27 +390,23 @@ void naigl::draw() {
 	glUniformMatrix4fv(viewuni, 1, 	0,  glm::value_ptr(view));
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glBindVertexArray(naivao);
-	std::cout << "drawing array 1" << std::endl;
 	glDrawArrays(GL_TRIANGLES,0, sizeof(ground) + sizeof(float)*planeverts.size());
 	glBindVertexArray(naivaoobj);
-	std::cout << "Drawing array 2" << std::endl;
 	glDrawArrays(GL_TRIANGLES,0, sizeof(float)*cubevertslen);
-	std::cout << "Checking if true" << std::endl;
+
 	if(linedepth)
 		glDisable(GL_DEPTH_TEST);
 	// Lets you see through walls
 	glBindVertexArray(naivaopath);
 	glDrawArrays(GL_LINE_STRIP,0, pathlength/3);
-	std::cout << "Done with lines" << std::endl;
+
 	if(linedepth)
 		glEnable(GL_DEPTH_TEST);
 
-	std::cout << "Flush" << std::endl;
 	glFlush();
-	std::cout << "Swap" << std::endl;
 	SDL_GL_SwapWindow(win);
-	std::cout << "End" << std::endl;
 }
+
 naigl::~naigl() {
 	SDL_GL_DeleteContext(nglcont); 
 

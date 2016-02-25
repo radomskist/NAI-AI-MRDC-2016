@@ -3,7 +3,7 @@
 naibrain::naibrain() : pfind(GetMap()), driveman(&pfind, wmap.GetRobot()), locsys(driveman, wmap.GetRobot()) {
 	kinect_manager = 0;
 	//Initializing kinect manager
-	ballcolor;
+	ballcolor = 175;
 	try {
 		kinect_manager = new kinectman(ballcolor);
 	}
@@ -22,11 +22,6 @@ naibrain::naibrain() : pfind(GetMap()), driveman(&pfind, wmap.GetRobot()), locsy
 		std::cout << "Webcam initialization failed: " << e.what() << std::endl;
 	}
 	states.push(new test_state(GetMap(), GetPfind()));
-
-	//Initiailizing kinect
-	kinect_manager->ProcessImages();
-	bool no;
-	kinect_manager->PathCheck(no,no);
 }
 
 naibrain::~naibrain() {
@@ -51,6 +46,7 @@ void naibrain::gentest() {
 
 }
 void naibrain::tick() {
+	std::cout<< "Kinect" << std::endl;
 	if(kinect_manager != NULL) {
 		kinect_manager->ProcessImages();
 		wmap.AddPlanes(kinect_manager->GetPlanes());
@@ -59,15 +55,17 @@ void naibrain::tick() {
 		front = kinect_manager->PathCheck(left,right);
 		driveman.SetChecks(front,left,right);
 	}
+	std::cout << "Process" << std::endl;
 	states.top()->Process();
 	driveman.runcom(states.top()->commands());
 	states.top()->SetStat(driveman.tick());
 
 	obj_point dinc;
 	float dang;
-
+	std::cout << "Estimation" << std::endl;
 	if(locsys.approximate(dinc, dang)) 
 		wmap.SetRobotAttr(dinc, dang);
+	std::cout << "End" << std::endl;
 }
 
 
