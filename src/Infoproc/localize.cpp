@@ -23,10 +23,10 @@ bool localizer::approximate(obj_point& dinc, float& dang){//drive incriment, dri
 	dinc.z = 50;
 	dang += robot->rot;
 
-	if(dang > 360)
-		dang -= 360;
+	if(dang > 6.28)
+		dang -= 6.28;
 	else if(dang < 0)
-		dang += 360;
+		dang += 6.28;
 
 	return true;
 }

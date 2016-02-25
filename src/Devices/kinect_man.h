@@ -34,7 +34,7 @@ enum {NAI_DIS_CAM, NAI_DIS_DEP, NAI_DIS_MIX} nai_dismode; /*Modes in enum form*/
 
 class kinectman {
 	public:
-		kinectman();
+		kinectman(unsigned char);
 		~kinectman();
 
 		bool ProcessImages(); //Proccess the images and sets the buffer values
@@ -46,8 +46,11 @@ class kinectman {
 
 
 	private:
-		void clean();
+		unsigned char ballcolor;
+		unsigned int floory; //y location of floor on images;
 
+		void clean();
+		
 		/*whether or not freenect is connected*/
 		bool nectfailed;
 		std::vector<obj_plane> planeset;

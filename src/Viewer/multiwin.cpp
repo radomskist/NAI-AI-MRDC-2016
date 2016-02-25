@@ -46,7 +46,7 @@ void multiwin::GetKeys() {
 			kimgline = !kimgline;
 		else if(event.key.keysym.sym == SDLK_4 && event.type == SDL_KEYDOWN)
 			kimgplane = !kimgplane;
-		else if(event.key.keysym.sym == SDLK_ESCAPE)
+		else if(event.key.keysym.sym == SDLK_ESCAPE && event.type == SDL_KEYDOWN)
 			isrunning = false;
 		else if(event.key.keysym.sym == SDLK_F11 && event.type == SDL_KEYDOWN) {
 				kdepth.SetPos(0,0);

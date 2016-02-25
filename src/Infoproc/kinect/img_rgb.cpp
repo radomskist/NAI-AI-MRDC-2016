@@ -1,13 +1,17 @@
 #include "Infoproc/kinect/img_rgb.h"
 
-imgrgb::imgrgb() {
+imgrgb::imgrgb(unsigned char set_color) {
+	floory = 300; //TODO make it load from config file
+
+	ballcolor = set_color;
 	krgb.flags = KRGB;
 	krgb.width = 512;
 	krgb.height = 424;
 	krgb.depth = 4;
 	krgb.data = new unsigned char[krgb.width*krgb.height*krgb.depth];
 	groundmat = cv::Mat::zeros(380,512,CV_8UC1);
-
+	floorcolor = 0;
+	floortol = 20;
 
 	cv::SimpleBlobDetector::Params ballparam;
 	ballparam.minDistBetweenBlobs = 0.0f;
@@ -36,28 +40,55 @@ void imgrgb::findground(cv::Mat &hsvin) {
 	groundmat.release();
 	groundmat = cv::Mat::zeros(380,512,CV_8UC1);
 
-	//cv::threshold(hsvin,img2, 140, 220, cv::THRESH_BINARY);
-	cv::inRange(hsvin,190, 235,img2); //TODO: Find in range of this
+	/*getting range of values to set the floor as*/
+	unsigned char low = 255;
+	unsigned char high = 0;
+	int ypos = 512*floory;
+	for(int i = 0; i < 3; i++) {
+		unsigned char set = hsvin.data[ypos + 204+102*i];
+		if(set < low)
+			low = set;
+
+		if (set > high)
+			high = set;
+	}
+
+	//Seeing if floor color matches
+	unsigned char avg = (low + high) / 2;
+
+	if(floorcolor == 0)
+		floorcolor = avg;
+	else if(abs(avg - floorcolor) > floortol)
+		return;
+	
+	if(low > 10)
+		low -= floortol *.5f;
+	if(high < 245)
+		high += floortol *.5f;
+
+	cv::inRange(hsvin, low, high,img2);
 	cv::morphologyEx(img2, img3, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(10,10)));
-	//hsvin = img3;
+
 	std::vector<std::vector<cv::Point>> contours;
 	std::vector<cv::Vec4i> hierarchy;
 	cv::findContours(img3,contours,hierarchy,cv::CHAIN_APPROX_NONE,cv::RETR_LIST);
 	
-	//TODO optimize this crap
+	//TODO clean this crap
 	for(int i = 0; i < contours.size(); i++) {
 		int testpoints = 0;
-		if (cv::pointPolygonTest(contours[i], cv::Point(102,300), false) >= 0) 
+		if (cv::pointPolygonTest(contours[i], cv::Point(102,floory), false) >= 0) 
 			testpoints++;
-		if (cv::pointPolygonTest(contours[i], cv::Point(204,300), false) >= 0) 
+		if (cv::pointPolygonTest(contours[i], cv::Point(204,floory), false) >= 0) 
 			testpoints++;
-		if (cv::pointPolygonTest(contours[i], cv::Point(256,300), false) >= 0) 
+		if (cv::pointPolygonTest(contours[i], cv::Point(256,floory), false) >= 0) 
 			testpoints++;
-		if (cv::pointPolygonTest(contours[i], cv::Point(306,300), false) >= 0) 
+		if (cv::pointPolygonTest(contours[i], cv::Point(306,floory), false) >= 0) 
 			testpoints++;
-		if (cv::pointPolygonTest(contours[i], cv::Point(408,300), false) >= 0) 
+		if (cv::pointPolygonTest(contours[i], cv::Point(408,floory), false) >= 0) 
 			testpoints++;
 
+		//If full screen is blue theres problems
+		//cv::contourArea(contours[i]) > 153600
 		if(testpoints < 2) {
 			contours.erase(contours.begin() + i);
 			i--;
@@ -73,14 +104,14 @@ void imgrgb::findground(cv::Mat &hsvin) {
 
 //return forward
 bool imgrgb::GroundCheck(bool &left, bool &right) {
-	int ypos = 300 * 512;
-	int yposup = 250 * 512;
+	int ypos = floory * 512;
+	int yposup = (floory - 20) * 512;
 	left = groundmat.data[204 + ypos] && groundmat.data[102 + ypos] && groundmat.data[153 + yposup];
 	right = groundmat.data[306 + ypos] && groundmat.data[408 + ypos] && groundmat.data[357 + yposup];
 	return groundmat.data[256 + ypos] && groundmat.data[204 + ypos] && groundmat.data[306 + ypos];
 }
 
-
+//TODO REWRITE
 void imgrgb::findballs(cv::Mat &hsvin, cv::Mat &circlemat) {
 	circlemat.release();
 	circlemat = cv::Mat::zeros(380,512,CV_8UC1);
@@ -146,18 +177,17 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 	cv::Mat HVIMG;
 
 	/*finding the ground*/
-	cv::addWeighted(channels[0], .7, channels[2], .3, 0, HVIMG);
+	HVIMG = channels[1]* .65 + channels[2]*.35;
 	findground(HVIMG);
-	findground(channels[2]);
 	cv::Mat circlesstuff;
-	findballs(channels[1], circlesstuff);
+	findballs(channels[0], circlesstuff);
 
 	int resolution = krgb.width*381;
 	for(int i = 0; i < resolution; i++) {
 
-		krgb.data[i*4] = HVIMG.data[i];
-		krgb.data[i*4 + 1] = HVIMG.data[i];
-		krgb.data[i*4 + 2] = HVIMG.data[i];
+		krgb.data[i*4] = channels[0].data[i];
+		krgb.data[i*4 + 1] = channels[0].data[i];
+		krgb.data[i*4 + 2] = channels[0].data[i];
 		/*
 		krgb.data[i*4] = rgbin.data[i*4];
 		krgb.data[i*4 + 1] = rgbin.data[i*4+1];

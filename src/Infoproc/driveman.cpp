@@ -16,8 +16,8 @@ drive_man::drive_man(const path_finding * set_pfind, const obj_cube *set_rob) : 
 	/*Callibrations*/
 	delay = 150; // in milliseconds
 	drivespeed = 183*.001*delay; //speed per seconds converted for delay
-	turnspeed = 32*.001*delay;
-	turntol = 5; //Turning tolerance before considered to be straight
+	turnspeed = .56*.001*delay;
+	turntol = .09; //Turning tolerance before considered to be straight
 
 	try {
 		drivechip = naicom::createcomm("NaiDrive");
@@ -77,26 +77,26 @@ bool drive_man::tick() {
 
 	/*if we're rotating see if we're on track or not*/
 	if((currentpath[0] == 'R'))  {
-		if(abs(dir - robot->rot) < turntol) {
+		if(fabs(dir - robot->rot) < turntol) {
 			commandhist.push_back(std::string("MV!"));
 			currentpath = "MV 90!";
 		}
 	}
-
 	/*Are we in new node?*/
-	if(((dir == 90 || dir == 270 ) && (abs(curpath[currentnode-1].x - robot->pos.x) < 50))
-	 || ((dir == 0 || dir == 180) && (abs(curpath[currentnode-1].y - robot->pos.y) < 50))) {
+	if(((abs(dir - 1.57) < .09 || abs(dir - 4.71) < .09 ) && (abs(curpath[currentnode-1].x - robot->pos.x) < 20))
+	 || ((dir < .09  || abs(dir - 3.14) < .09) && (abs(curpath[currentnode-1].y - robot->pos.y) < 20))) {
+
 		currentnode--;
 		if(currentnode == 0)
 			return true;
 
-		if((curpath[currentnode].x - curpath[currentnode-1].x) != 0)
-			curpath[currentnode].x < curpath[currentnode-1].x ? dir = 90 : dir = 270;
+		if(abs(curpath[currentnode].x - curpath[currentnode-1].x) != 0)
+			curpath[currentnode].x < curpath[currentnode-1].x ? dir = 1.57 : dir = 4.71;
 		else
-			curpath[currentnode].y < curpath[currentnode-1].y ? dir = 0 : dir = 180;
+			curpath[currentnode].y < curpath[currentnode-1].y ? dir = 0 : dir = 3.14;
 
 		//Getting direction
-		int dircompare = dir - robot->rot;
+		float dircompare = abs(dir - robot->rot);
 		/*driving foward if within tolerance*/
 		if(abs(dircompare) < turntol) {
 			commandhist.push_back(std::string("MV!"));
@@ -111,8 +111,8 @@ bool drive_man::tick() {
 			std::stringstream ss;
 
 			/*Greater than 180*/
-			if(robot->rot > 180) {
-				anchor = robot->rot - 180;
+			if(robot->rot > 3.14) {
+				anchor = robot->rot - 3.14;
 				if(robot->rot > dir && dir > anchor) {
 					currentpath = "RL 20!";
 					ss << "RL " << robot->rot - dir;
@@ -123,12 +123,12 @@ bool drive_man::tick() {
 				}
 				else {
 					currentpath = "RR 20!";
-					ss << "RR " << ((180+robot->rot) - (180+dir));
+					ss << "RR " << ((3.14+robot->rot) - (3.14+dir));
 				}
 			}
 			/*Less than 180*/
 			else {
-				anchor = robot->rot + 180;
+				anchor = robot->rot + 3.14;
 				if(robot->rot < dir && dir < anchor) {
 					currentpath = "RR 20!";
 					ss << "RR " << dir - robot->rot;
@@ -139,7 +139,7 @@ bool drive_man::tick() {
 				}
 				else {
 					currentpath = "RL 20!";
-					ss << "RL " << ((180+dir) - (180+robot->rot));
+					ss << "RL " << ((3.14+dir) - (3.14+robot->rot));
 				}
 			}
 			commandhist.push_back(ss.str());
@@ -161,10 +161,10 @@ void drive_man::execcom() {
 
 	if(currentpath[0] == 'M' && currentpath[1] == 'V') {
 		int estimove = difference * drivespeed;
-		if(dir == 270 || dir == 90)
-			(dir == 90) ? estimv.x += estimove : estimv.x -= estimove;
+		if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
+			(abs(dir - 1.57) < .05) ? estimv.x += estimove : estimv.x -= estimove;
 		else
-			(dir == 0) ? estimv.y += estimove : estimv.y -= estimove;
+			(dir < .05) ? estimv.y += estimove : estimv.y -= estimove;
 	}
 	else if(currentpath[0] == 'R' && currentpath[1] == 'R') {
 		float estang = turnspeed*difference;

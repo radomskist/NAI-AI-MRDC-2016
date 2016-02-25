@@ -37,7 +37,7 @@ class drive_man {
 		std::vector<std::string> commandhist;
 
 		/*path info*/
-		int dir;
+		float dir;
 		unsigned int cpathid;
 		int currentnode; //Current node we're in
 		bool front,right,left; //Can we go in these directions
@@ -45,7 +45,7 @@ class drive_man {
 
 		/*estimation*/
 		bool est;
-		int turntol; //Tolerance for turning degree
+		float turntol; //Tolerance for turning degree
 		float drivespeed, turnspeed; //Approximately how fast we move
 		float estiangle;
 		int difference; //difference between delay and milliseconds

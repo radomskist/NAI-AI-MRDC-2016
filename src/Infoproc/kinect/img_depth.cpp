@@ -9,6 +9,10 @@ bool kimgplane = true;
 
 
 imgd::imgd() : kdepth(512,424,3), filteredimg(424, 512, CV_8UC1) {
+
+	//TODO make load from config
+	horizontalchecky = 175; //How high should a line be to check if its the top of a wall
+	floory = 400; 
 	lineest = false; //Predict where lines might be?
 	pixdist = 10; //Distance between pixels when testing flatness of plane
 	slopeerrorrange = 2; //Range of error when seeing if plane is flat
@@ -17,10 +21,39 @@ imgd::imgd() : kdepth(512,424,3), filteredimg(424, 512, CV_8UC1) {
 
 	kdepth.data = new unsigned char[kdepth.width * kdepth.height * kdepth.depth];
 	freezetime = GetSec();
+	floordist = 0;
 }
 
 imgd::~imgd() {
 
+}
+
+bool imgd::ScanGround(bool& left, bool& right) { 
+	int ypos = 512*floory;
+
+	//Getting average distance of floor
+	if(floordist == 0) {
+		int avg = 0;
+		for(int i = 0; i < 3; i++) 
+			avg += filteredimg.data[ypos + 200+56*i];
+		floordist = avg*.333f;
+	}
+	
+	int count = 0;
+	for(int i = 0; i < 2; i++) 
+		count += (abs(filteredimg.data[ypos + 102+56*i] - floordist) < 2 && filteredimg.data[ypos + 102+56*i] != 0);	//This might be dangerous
+
+	left = (count == 2);
+	count = 0;
+	for(int i = 0; i < 2; i++) 
+		count += (abs(filteredimg.data[ypos + 354+56*i] - floordist) < 2 && filteredimg.data[ypos + 354+56*i] != 0);
+
+	right = (count == 2);
+	count = 0;
+	for(int i = 0; i < 3; i++) 
+		count += (abs(filteredimg.data[ypos + 200+56*i] - floordist) < 2 && filteredimg.data[ypos + 200+56*i] != 0);
+
+	return (count == 3);	
 }
 
 std::vector<std::array<cv::Point,4>> imgd::ProcessLines(std::vector<cv::Vec4i> &lines, std::vector<std::array<cv::Point,2>> &horizontal, std::vector<std::array<cv::Point,2>> &verticle) {
@@ -234,6 +267,31 @@ std::vector<obj_plane> imgd::CalculatePlanes(std::vector<std::array<cv::Point,2>
 				returnvec.insert(returnvec.end(), newarray.begin(), newarray.end());
 		}
 	}
+
+	for(int i = 0; i < horizontal.size(); i++) {
+		if(horizontal[i][0].y < horizontalchecky && horizontal[i][1].y < horizontalchecky && abs(horizontal[i][0].y - horizontal[i][1].y) < 75) {
+			std::array<cv::Point,4> newarray;
+
+			//Making sure is on the left
+			if(horizontal[i][0].x < horizontal[i][1].x) {
+				newarray[0] = horizontal[i][0];
+				newarray[3] = horizontal[i][1];
+			} else {
+				newarray[0] = horizontal[i][1];
+				newarray[3] = horizontal[i][0];
+			}
+			cv::Point addpoint = newarray[0];
+			addpoint.y = addpoint.y + 100;
+			newarray[1] = addpoint;
+
+			addpoint = newarray[3];
+			addpoint.y = addpoint.y + 100;
+			newarray[2] = addpoint;
+
+			returnvec.push_back(newarray);
+		}
+	}
+
 	horizontal.insert(horizontal.end(),verticle.begin(),verticle.end());
 	return planelist;
 }
@@ -361,7 +419,6 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 	// 0.616101226 = 35.3 (half of the kinects FOV) converted to radians
 	// the position of the point on the screen frm the center of the verticle axis
 	// .003906 = 1/256, which is half of the width (512)
-
 	obj_point pointhold;
 	obj_plane newplane(1,1);
 	//Only check top 2 points
@@ -395,11 +452,26 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 	}
 
 	returnplane.push_back(newplane);
-
 }
+
 float imgd::GetDist(unsigned int atpos) {
 	return averagepoints(atpos);
 }
+
+inline unsigned char imgd::averagepointsc(unsigned int point) {
+	//Checking if in range
+	if(kdepth.width - (point / kdepth.width) < 3 || (point / kdepth.width) < 3)
+		return 0;
+
+	//Reverse calculating filter because noise is too bad on kinect
+	float total = filteredimg.data[point];
+	total += filteredimg.data[point + 1];
+	total += filteredimg.data[point - 1];
+	total *= 0.33f;
+
+	return total;
+}
+
 
 inline float imgd::averagepoints(unsigned int point) {
 	//Checking if in range

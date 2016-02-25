@@ -102,7 +102,7 @@ int main(int argc, char** argv)
 			imgref.data[i*4+1] = b[i*4 + 1 + 72];
 			imgref.data[i*4+2] = b[i*4 + 2 + 72];
 		}
-		imgrgb depthtest;
+		imgrgb depthtest(105);
 		depthtest.ProcessImg(imgref.data);
 		test_win.setimg(depthtest.GetImg());
 
@@ -134,19 +134,17 @@ int main(int argc, char** argv)
 		const world_map *wmap = mainbrain.GetMap();
 		unsigned int kmode = KDEP | KRGB | KFREEZE;
 
-		//mainbrain.gentest();
+		mainbrain.gentest();
 		std::vector<obj_cube> addcube;
 		const obj_cube *newbot = wmap->GetRobot();
 		addcube.push_back(*newbot);
 		naigl *glwin = MainWin.GetGL();
 
 		while(MainWin.running()) {
-			//std::cout << "Tick" << std::endl;
+			//std::cout << "Start" << std::endl;
 			mainbrain.tick();
-			//std::cout << "WIndow" << std::endl;
 			MainWin.GetKeys();
 			MainWin.SetImg(mainbrain.GetImages(kmode));
-			//std::cout << "OpengL" << std::endl;
 			addcube.pop_back();
 			addcube.push_back(*newbot);
 			//TODO optimize
@@ -154,10 +152,11 @@ int main(int argc, char** argv)
 			glwin->setplanes(wmap->GetPlanes());
 			glwin->setents(addcube);
 			glwin->setpath(mainbrain.GetPfind().GetPath());
-			//std::cout << "Draw"<< std::endl;
 			//glwin->makecurrent();
 			glwin->draw();
+			//std::cout << "main loop end" << std::endl;
 		}
+		std::cout << "Exiting" << std::endl;
 	}
 
 	//Closing program

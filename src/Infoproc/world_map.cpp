@@ -13,7 +13,7 @@ world_map::world_map() : robot("NAI") {
 	robot.color[1] = 0.0f;
 	robot.color[2] = 0.76f;
 	maptodate = false;
-	robot.rot = 1.57;
+	robot.rot = 0;
 }
 
 void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
@@ -35,7 +35,6 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 			//Setting 0 and 3
 			setplanes[j].p[i*3].x = nplx;
 			setplanes[j].p[i*3].y = nply;
-
 		}
 
 		//If too small skip (due to errors)
@@ -60,7 +59,10 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 
 		}
 
-		std::cout << setplanes[j].p[0].x << "," << setplanes[j].p[0].y << "   " << setplanes[j].p[3].x << "," << setplanes[j].p[3].y << std::endl;
+		//Making sure no diagnol
+		if(abs(setplanes[j].p[3].x - setplanes[j].p[0].x) > 10 && abs(setplanes[j].p[3].y - setplanes[j].p[0].y) > 10)
+			continue;
+
 		/*making sure higher is on bot*/
 		if(setplanes[j].p[0].x - 10 > setplanes[j].p[3].x || setplanes[j].p[0].y - 10 > setplanes[j].p[3].y) {
 			obj_point temp;
