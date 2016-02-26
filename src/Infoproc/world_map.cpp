@@ -9,11 +9,12 @@ world_map::world_map() : robot("NAI") {
 	robot.width = 300;
 	robot.height = 100;
 
+	//Opengl render color
 	robot.color[0] = 0.5f;
 	robot.color[1] = 0.0f;
 	robot.color[2] = 0.76f;
 	maptodate = false;
-	robot.rot = 0;
+	robot.rot = 1.57;
 }
 
 void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
@@ -25,8 +26,8 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 			float plx = setplanes[j].p[i*3].x * 0.32808399; //dist forward converted from mm to 1/100 of a foot
 			float ply = setplanes[j].p[i*3].y * 0.32808399; //dist from center of cam
 
-			float sang = sin(1.57);
-			float cang = cos(1.57);
+			float sang = sin(robot.rot);
+			float cang = cos(robot.rot);
 
 			//Applying rotation matrix
 			float nplx = robot.pos.x + plx*cang - ply*sang;

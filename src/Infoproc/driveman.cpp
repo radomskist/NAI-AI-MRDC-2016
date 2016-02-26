@@ -83,17 +83,17 @@ bool drive_man::tick() {
 		}
 	}
 	/*Are we in new node?*/
-	if(((abs(dir - 1.57) < .09 || abs(dir - 4.71) < .09 ) && (abs(curpath[currentnode-1].x - robot->pos.x) < 20))
-	 || ((dir < .09  || abs(dir - 3.14) < .09) && (abs(curpath[currentnode-1].y - robot->pos.y) < 20))) {
+	if(((dir < .09  || abs(dir - 3.14) < .09)&& (abs(curpath[currentnode-1].x - robot->pos.x) < 20))
+	 || ((abs(dir - 1.57) < .09 || abs(dir - 4.71) < .09 ) && (abs(curpath[currentnode-1].y - robot->pos.y) < 20))) {
 
 		currentnode--;
 		if(currentnode == 0)
 			return true;
 
 		if(abs(curpath[currentnode].x - curpath[currentnode-1].x) != 0)
-			curpath[currentnode].x < curpath[currentnode-1].x ? dir = 1.57 : dir = 4.71;
+			curpath[currentnode].x < curpath[currentnode-1].x ? dir = 0 : dir = 3.14;
 		else
-			curpath[currentnode].y < curpath[currentnode-1].y ? dir = 0 : dir = 3.14;
+			curpath[currentnode].y < curpath[currentnode-1].y ? dir = 1.57 : dir = 4.71;
 
 		//Getting direction
 		float dircompare = abs(dir - robot->rot);
@@ -162,9 +162,9 @@ void drive_man::execcom() {
 	if(currentpath[0] == 'M' && currentpath[1] == 'V') {
 		int estimove = difference * drivespeed;
 		if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
-			(abs(dir - 1.57) < .05) ? estimv.x += estimove : estimv.x -= estimove;
+			(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
 		else
-			(dir < .05) ? estimv.y += estimove : estimv.y -= estimove;
+			(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
 	}
 	else if(currentpath[0] == 'R' && currentpath[1] == 'R') {
 		float estang = turnspeed*difference;
