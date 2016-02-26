@@ -35,6 +35,12 @@ http://opencv.org/downloads.html
 
 http://opencv.org/
 
+Zbar-Tools:
+
+http://zbar.sourceforge.net/
+
+	sudo apt-get install zbar-tools
+
 
 ##Special folders
 Create a depends folder in the main directory to have libraries such as libusb and freenect2 in them.

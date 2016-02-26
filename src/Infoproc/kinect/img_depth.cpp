@@ -12,7 +12,7 @@ imgd::imgd() : kdepth(512,424,3), filteredimg(424, 512, CV_8UC1) {
 
 	//TODO make load from config
 	horizontalchecky = 175; //How high should a line be to check if its the top of a wall
-	floory = 400; 
+	floory = 300; 
 	lineest = false; //Predict where lines might be?
 	pixdist = 10; //Distance between pixels when testing flatness of plane
 	slopeerrorrange = 2; //Range of error when seeing if plane is flat
@@ -28,32 +28,39 @@ imgd::~imgd() {
 
 }
 
-bool imgd::ScanGround(bool& left, bool& right) { 
-	int ypos = 512*floory;
+bool imgd::ScanGround(bool& left, bool& right) {
+	unsigned int ydown = 512*floory;
 
 	//Getting average distance of floor
 	if(floordist == 0) {
 		int avg = 0;
 		for(int i = 0; i < 3; i++) 
-			avg += filteredimg.data[ypos + 200+56*i];
+			avg += averagepointsc(ydown + 200+(56*i));
+
 		floordist = avg*.333f;
+
+		if(floordist == 0)
+			return false;
+		else
+			return true;
 	}
 	
+
 	int count = 0;
 	for(int i = 0; i < 2; i++) 
-		count += (abs(filteredimg.data[ypos + 102+56*i] - floordist) < 2 && filteredimg.data[ypos + 102+56*i] != 0);	//This might be dangerous
+		count += (abs(averagepointsc(ydown + 102+56*i) - floordist) < 5);	//This might be dangerous
 
 	left = (count == 2);
 	count = 0;
 	for(int i = 0; i < 2; i++) 
-		count += (abs(filteredimg.data[ypos + 354+56*i] - floordist) < 2 && filteredimg.data[ypos + 354+56*i] != 0);
+		count += (abs(averagepointsc(ydown + 354+56*i) - floordist) < 5);
 
 	right = (count == 2);
 	count = 0;
-	for(int i = 0; i < 3; i++) 
-		count += (abs(filteredimg.data[ypos + 200+56*i] - floordist) < 2 && filteredimg.data[ypos + 200+56*i] != 0);
+	for(int i = 0; i < 10; i++) 
+		count += (abs(averagepointsc(ydown + 186+14*i) - floordist) < 4);
 
-	return (count == 3);	
+	return (count > 6);	
 }
 
 std::vector<std::array<cv::Point,4>> imgd::ProcessLines(std::vector<cv::Vec4i> &lines, std::vector<std::array<cv::Point,2>> &horizontal, std::vector<std::array<cv::Point,2>> &verticle) {
@@ -431,7 +438,7 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 		else
 			depthspot = processplane[0][3].x - 5 + ((processplane[0][3].y + 5)* kdepth.width);
 
-		pointhold.y = ((256.0f - processplane[0][i*3].x)/256.0f) * (datahold[depthspot] * sin(0.616101226)); //Distance from center
+		pointhold.y = ((256.0f - processplane[0][i*3].x)/256.0f) * (averagepoints(depthspot) * sin(0.616101226)); //Distance from center
 
 		float pointval = averagepoints(depthspot);
 		pointhold.x = sqrt(abs(pointval*pointval - (processplane[0][i*3].x * processplane[0][i*3].x))); //forward
@@ -464,7 +471,7 @@ inline unsigned char imgd::averagepointsc(unsigned int point) {
 		return 0;
 
 	//Reverse calculating filter because noise is too bad on kinect
-	float total = filteredimg.data[point];
+	int total = filteredimg.data[point];
 	total += filteredimg.data[point + 1];
 	total += filteredimg.data[point - 1];
 	total *= 0.33f;

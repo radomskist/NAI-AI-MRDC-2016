@@ -9,11 +9,12 @@ world_map::world_map() : robot("NAI") {
 	robot.width = 300;
 	robot.height = 100;
 
+	//Opengl render color
 	robot.color[0] = 0.5f;
 	robot.color[1] = 0.0f;
 	robot.color[2] = 0.76f;
 	maptodate = false;
-	robot.rot = 0;
+	robot.rot = 1.57;
 }
 
 void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
@@ -25,8 +26,8 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 			float plx = setplanes[j].p[i*3].x * 0.32808399; //dist forward converted from mm to 1/100 of a foot
 			float ply = setplanes[j].p[i*3].y * 0.32808399; //dist from center of cam
 
-			float sang = sin(1.57);
-			float cang = cos(1.57);
+			float sang = sin(robot.rot);
+			float cang = cos(robot.rot);
 
 			//Applying rotation matrix
 			float nplx = robot.pos.x + plx*cang - ply*sang;
@@ -37,8 +38,9 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 			setplanes[j].p[i*3].y = nply;
 		}
 
+		std::cout << setplanes[j].p[0].x + setplanes[j].p[0].y << "  " << setplanes[j].p[3].x + setplanes[j].p[3].y << std::endl;
 		//If too small skip (due to errors)
-		if(abs(abs(setplanes[j].p[0].x + setplanes[j].p[0].y) - abs(setplanes[j].p[3].x + setplanes[j].p[3].y)) < 200)
+		if(abs((setplanes[j].p[0].x + setplanes[j].p[0].y) - (setplanes[j].p[3].x + setplanes[j].p[3].y)) < 150)
 			continue;
 
 		/*TODO break up into plane per grid*/
@@ -83,12 +85,15 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 			if(abs(plane_list[k].p[0].x - setplanes[j].p[0].x) > 10 || abs(plane_list[k].p[0].y - setplanes[j].p[0].y) > 10)
 				continue;
 
-			/*TODO: Count how many times this plane is matched*/
 			match = true;
+			plane_count[k] += 1;
 			break;
 		}
-		if(!match)
+		if(!match) {
 			plane_list.push_back(setplanes[j]);
+			plane_count.push_back(0);
+		}
+		/*TODO: Purge planes that fail sequential counts*/
 	}
 }
 

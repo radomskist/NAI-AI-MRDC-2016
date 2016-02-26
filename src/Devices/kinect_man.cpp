@@ -1,6 +1,6 @@
 #include "Devices/kinect_man.h"
 
-kinectman::kinectman(unsigned char set_color) : rgb_proc(ballcolor) {
+kinectman::kinectman(unsigned char set_color) : rgb_proc(set_color) {
 
 	floory = 300;
 	ballcolor = set_color;
@@ -52,8 +52,12 @@ kinectman::kinectman(unsigned char set_color) : rgb_proc(ballcolor) {
 	f2dev->setIrAndDepthFrameListener(nailist);
 	f2dev->start();
 
+	bool no;
+	ProcessImages();
+	depth_proc.ScanGround(no,no);
 	std::cout << "\nNaiEye: Video initialized!" << std::endl;
 }
+
 
 bool kinectman::PathCheck(bool &left , bool& right) {
 
