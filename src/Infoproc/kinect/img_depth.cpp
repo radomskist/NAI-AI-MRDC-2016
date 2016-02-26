@@ -438,7 +438,7 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 		else
 			depthspot = processplane[0][3].x - 5 + ((processplane[0][3].y + 5)* kdepth.width);
 
-		pointhold.y = ((256.0f - processplane[0][i*3].x)/256.0f) * (datahold[depthspot] * sin(0.616101226)); //Distance from center
+		pointhold.y = ((256.0f - processplane[0][i*3].x)/256.0f) * (averagepoints(depthspot) * sin(0.616101226)); //Distance from center
 
 		float pointval = averagepoints(depthspot);
 		pointhold.x = sqrt(abs(pointval*pointval - (processplane[0][i*3].x * processplane[0][i*3].x))); //forward

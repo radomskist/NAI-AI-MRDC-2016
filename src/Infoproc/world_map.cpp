@@ -38,8 +38,9 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 			setplanes[j].p[i*3].y = nply;
 		}
 
+		std::cout << setplanes[j].p[0].x + setplanes[j].p[0].y << "  " << setplanes[j].p[3].x + setplanes[j].p[3].y << std::endl;
 		//If too small skip (due to errors)
-		if(abs(abs(setplanes[j].p[0].x + setplanes[j].p[0].y) - abs(setplanes[j].p[3].x + setplanes[j].p[3].y)) < 200)
+		if(abs((setplanes[j].p[0].x + setplanes[j].p[0].y) - (setplanes[j].p[3].x + setplanes[j].p[3].y)) < 150)
 			continue;
 
 		/*TODO break up into plane per grid*/
