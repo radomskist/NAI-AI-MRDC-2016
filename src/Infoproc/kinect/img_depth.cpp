@@ -48,19 +48,19 @@ bool imgd::ScanGround(bool& left, bool& right) {
 
 	int count = 0;
 	for(int i = 0; i < 2; i++) 
-		count += (abs(averagepointsc(ydown + 102+56*i) - floordist) < 5 && averagepointsc(ydown + 102+56*i) != 0);	//This might be dangerous
+		count += (abs(averagepointsc(ydown + 102+56*i) - floordist) < 5);	//This might be dangerous
 
 	left = (count == 2);
 	count = 0;
 	for(int i = 0; i < 2; i++) 
-		count += (abs(averagepointsc(ydown + 354+56*i) - floordist) < 5 && averagepointsc(ydown + 354+56*i) != 0);
+		count += (abs(averagepointsc(ydown + 354+56*i) - floordist) < 5);
 
 	right = (count == 2);
 	count = 0;
-	for(int i = 0; i < 3; i++) 
-		count += (abs(averagepointsc(ydown + 200+56*i) - floordist) < 4 && averagepointsc(ydown + 200+56*i) != 0);
+	for(int i = 0; i < 10; i++) 
+		count += (abs(averagepointsc(ydown + 186+14*i) - floordist) < 4);
 
-	return (count == 3);	
+	return (count > 6);	
 }
 
 std::vector<std::array<cv::Point,4>> imgd::ProcessLines(std::vector<cv::Vec4i> &lines, std::vector<std::array<cv::Point,2>> &horizontal, std::vector<std::array<cv::Point,2>> &verticle) {

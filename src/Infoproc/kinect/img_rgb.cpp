@@ -138,10 +138,8 @@ void imgrgb::findballs(cv::Mat &hsvin, cv::Mat &circlemat) {
 		if(!(circlelist[i].pt.x > 30 && circlelist[i].pt.x < 480 && circlelist[i].pt.y < 350 && circlelist[i].pt.y > 200))
 			continue;
 
-		std::cout << circlelist[i].pt.x << " - " << hsvin.rows << "  "  << circlelist[i].pt.y << " - " << hsvin.cols << std::endl;
 		std::vector<cv::Vec3f> circles;
 		cv::Mat temp = hsvin(cv::Rect(circlelist[i].pt.x - 30, circlelist[i].pt.y - 30, 60, 60));
-		std::cout << "OY VEY" << std::endl;
 		cv::Mat croparea;
 		cv::inRange(temp, ballcolor-15, ballcolor+15,temp);
 		cv::Canny(temp, croparea, 50, 150, 3 );
