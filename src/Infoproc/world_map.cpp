@@ -23,6 +23,7 @@ world_map::world_map() : robot("NAI") {
 		grid[i].x = i % width;
 		grid[i].y = i / width;
 		grid[i].tags = 0;
+		grid[i].likelyness = 0;
 	}
 }
 
@@ -48,25 +49,27 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 		}
 
 		//If too small skip (due to errors)
-		if(abs((setplanes[j].p[0].x + setplanes[j].p[0].y) - (setplanes[j].p[3].x + setplanes[j].p[3].y)) < 150)
+		if(abs((setplanes[j].p[0].x + setplanes[j].p[0].y) - (setplanes[j].p[3].x + setplanes[j].p[3].y)) < 125)
 			continue;
 
-		/*TODO break up into plane per grid*/
 		/*Lining up to grid*/
 		for(int i = 0; i < 2; i++) {
 			int mod = (int)(setplanes[j].p[i*3].x) % 400;
 
+			int dirmod = 2;
+			if(abs(dirmod = 1.57) > 10 || abs(dirmod = 4.71) > 10)
+				dirmod = -2;
+
 			if(mod > 200)
-				setplanes[j].p[i*3].x = ((int)(setplanes[j].p[0].x*.0025 + 1)) * 400 + 1;// making sure it goes into the next grid
+				setplanes[j].p[i*3].x = ((int)(setplanes[j].p[0].x*.0025 + 1)) * 400 - dirmod;// making sure it doesnt go into the next grid
 			else
-				setplanes[j].p[i*3].x = (int)(setplanes[j].p[0].x*.0025) * 400 + 2;
+				setplanes[j].p[i*3].x = (int)(setplanes[j].p[0].x*.0025) * 400;
 
 			mod = (int)(setplanes[j].p[i*3].y) % 400;
 			if(mod > 200)
-				setplanes[j].p[i*3].y = ((int)(setplanes[j].p[0].y*.0025 + 1)) * 400 + 1;
+				setplanes[j].p[i*3].y = ((int)(setplanes[j].p[0].y*.0025 + 1)) * 400 + dirmod;
 			else
-				setplanes[j].p[i*3].y = (int)(setplanes[j].p[0].y*.0025) * 400 + 2;
-
+				setplanes[j].p[i*3].y = (int)(setplanes[j].p[0].y*.0025) * 400;
 		}
 
 		//Making sure no diagnol
@@ -87,6 +90,31 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 		setplanes[j].p[3].z = 0;
 
 		/*checking if plane exists*/
+		//if X
+		if(setplanes[j].p[0].x - setplanes[j].p[3].x < 10) 
+			for(int k = plane_list[j].p[0].x; k < setplanes[j].p[3].x; k += 400) {
+				int gridspot = plane_list[j].p[0].x * .0025 + 400 + (plane_list[j].p[0].y * .0025 * width);
+				if(gridspot > 121 || gridspot < 0 || plane_list[j].p[k].y * .0025 >= width)
+					break;
+
+				if(grid[gridspot].tags & non_traversable) 
+					grid[gridspot].likelyness += 5;
+				else 
+					grid[gridspot].likelyness = 10;
+			}
+		else
+			for(int k = plane_list[j].p[0].y; k < setplanes[j].p[3].y; k += 400) {
+				int gridspot = plane_list[j].p[0].x * .0025 + ((plane_list[j].p[0].y + 400)* .0025 * width);
+				if(gridspot > 121 || gridspot < 0 || plane_list[j].p[k].y * .0025 >= width)
+					break;
+
+				if(grid[gridspot].tags & non_traversable) 
+					grid[gridspot].likelyness += 5;
+				else 
+					grid[gridspot].likelyness = 10;
+			}
+		//TODO rewrite how rendered wall is placed
+		//Make it do a cube in a square instead of the actual plane
 		bool match = false;
 		for(int k = 0; k < plane_list.size(); k++) {
 
@@ -126,7 +154,6 @@ void world_map::GetGrid(grid_space *set_grid) const {
 		set_grid[i].x = grid[i].x;
 		set_grid[i].y = grid[i].y;
 		set_grid[i].tags = grid[i].tags;
-
 	}
 }
 
@@ -136,7 +163,6 @@ void world_map::updategrid() {
 	for(std::vector<obj_plane>::const_iterator i = plane_list.begin(); i != plane_list.end(); i++){
 		int st,en;
 		int mag = 1;
-
 
 		int x,y,x1,y1;
 		x = i->p[0].x / 400;

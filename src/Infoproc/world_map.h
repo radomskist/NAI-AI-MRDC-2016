@@ -14,6 +14,7 @@
 struct grid_space{
 	int weight,parent,x,y;  //parent is the grid array iterator of the parent grid space
 	uint8_t tags;
+	int likelyness;
 };
 
 

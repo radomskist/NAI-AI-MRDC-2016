@@ -20,6 +20,7 @@ General:
 		+Way too slow to startup
 
 Kinect
+	-Make sure had a second to warm up
 	-Save approx location of robot when images where taken?
 
 Kinect RGB

@@ -91,7 +91,7 @@ bool drive_man::tick() {
 			return true;
 
 		if(abs(curpath[currentnode].x - curpath[currentnode-1].x) != 0)
-			curpath[currentnode].x < curpath[currentnode-1].x ? dir = 3.14 : dir = 0 ;
+			curpath[currentnode].x < curpath[currentnode-1].x ? dir = 0 : dir = 3.14;
 		else
 			curpath[currentnode].y < curpath[currentnode-1].y ? dir = 1.57 : dir = 4.71;
 
@@ -115,15 +115,15 @@ bool drive_man::tick() {
 			if(robot->rot > 3.14) {
 				anchor = robot->rot - 3.14;
 				if(robot->rot > dir && dir > anchor) {
-					currentpath = "RL 20!";
-					ss << "RL " << robot->rot - dir;
+					currentpath = "RR 20!";
+					ss << "RR " << robot->rot - dir;
 				}
 				else if (robot->rot < dir){
-					currentpath = "RR 20!";
-					ss << "RR " << dir - robot->rot;
+					currentpath = "RL 20!";
+					ss << "RL " << dir - robot->rot;
 				}
 				else {
-					currentpath = "RR 20!";
+					currentpath = "RL 20!";
 					ss << "RR " << ((3.14+robot->rot) - (3.14+dir));
 				}
 			}
@@ -131,16 +131,16 @@ bool drive_man::tick() {
 			else {
 				anchor = robot->rot + 3.14;
 				if(robot->rot < dir && dir < anchor) {
-					currentpath = "RR 20!";
-					ss << "RR " << dir - robot->rot;
+					currentpath = "RL 20!";
+					ss << "RL " << dir - robot->rot;
 				}
 				else if (robot->rot > dir){
-					currentpath = "RL 20!";
-					ss << "RL " << robot->rot - dir;
+					currentpath = "RR 20!";
+					ss << "RR " << robot->rot - dir;
 				}
 				else {
-					currentpath = "RL 20!";
-					ss << "RL " << ((3.14+dir) - (3.14+robot->rot));
+					currentpath = "RR 20!";
+					ss << "RR " << ((3.14+dir) - (3.14+robot->rot));
 				}
 			}
 			commandhist.push_back(ss.str());
@@ -165,15 +165,15 @@ void drive_man::execcom() {
 		if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
 			(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
 		else
-			(dir < .05) ? estimv.x -= estimove : estimv.x += estimove;
+			(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
 	}
 	else if(currentpath[0] == 'R' && currentpath[1] == 'R') {
 		float estang = turnspeed*difference;
-		estiangle += estang;
+		estiangle -= estang;
 	}
 	else if(currentpath[0] == 'R' && currentpath[1] == 'L'){
 		float estang = turnspeed*difference;
-		estiangle -= estang;
+		estiangle += estang;
 	}
 	est = true;
 }
