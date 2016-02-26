@@ -91,9 +91,10 @@ bool drive_man::tick() {
 			return true;
 
 		if(abs(curpath[currentnode].x - curpath[currentnode-1].x) != 0)
-			curpath[currentnode].x < curpath[currentnode-1].x ? dir = 0 : dir = 3.14;
+			curpath[currentnode].x < curpath[currentnode-1].x ? dir = 3.14 : dir = 0 ;
 		else
 			curpath[currentnode].y < curpath[currentnode-1].y ? dir = 1.57 : dir = 4.71;
+
 
 		//Getting direction
 		float dircompare = abs(dir - robot->rot);
@@ -164,7 +165,7 @@ void drive_man::execcom() {
 		if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
 			(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
 		else
-			(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
+			(dir < .05) ? estimv.x -= estimove : estimv.x += estimove;
 	}
 	else if(currentpath[0] == 'R' && currentpath[1] == 'R') {
 		float estang = turnspeed*difference;

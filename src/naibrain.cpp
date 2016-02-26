@@ -6,7 +6,7 @@ naibrain::naibrain() : pfind(GetMap()), driveman(&pfind, wmap.GetRobot()), locsy
 	//red = 175
 	//blue = ~100
 	//green = 50
-	//painted green = 90
+	//painted green = 86
 	ballcolor = 89;
 	try {
 		kinect_manager = new kinectman(ballcolor);
@@ -51,19 +51,18 @@ void naibrain::gentest() {
 }
 void naibrain::tick() {
 	if(kinect_manager != NULL) {
-		std::cout<< "Kinect" << std::endl;
+		//std::cout<< "Kinect" << std::endl;
 		kinect_manager->ProcessImages();
-		std::cout << "Adding planes" << std::endl;
+		//std::cout << "Adding planes" << std::endl;
 		wmap.AddPlanes(kinect_manager->GetPlanes());
 
 		bool left,right,front;
-		std::cout << "Path check" << std::endl;
+		//std::cout << "Path check" << std::endl;
 		front = kinect_manager->PathCheck(left,right);
-		std::cout << "Drive manager check" << std::endl;
+		//std::cout << "Drive manager check" << std::endl;
 		driveman.SetChecks(front,left,right);
-		std::cout << "End" << std::endl;
+		//std::cout << "End" << std::endl;
 	}
-
 	states.top()->Process();
 	driveman.runcom(states.top()->commands());
 	states.top()->SetStat(driveman.tick());

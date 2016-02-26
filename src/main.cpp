@@ -130,6 +130,7 @@ int main(int argc, char** argv)
 		}
 	}
 	else {
+
 		multiwin MainWin;
 		const world_map *wmap = mainbrain.GetMap();
 		unsigned int kmode = KDEP | KRGB | KFREEZE;
@@ -139,6 +140,7 @@ int main(int argc, char** argv)
 		const obj_cube *newbot = wmap->GetRobot();
 		addcube.push_back(*newbot);
 		naigl *glwin = MainWin.GetGL();
+
 		while(MainWin.running()) {
 			mainbrain.tick();
 			MainWin.GetKeys();

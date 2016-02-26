@@ -33,6 +33,8 @@ Kinect depth
 AI:
 	-Fine path finding
 	-Keep track of how many times planes fail to verify and succeed
+	-Worldmap stores grid instead of path finding
+		+To prevent regenerating it and for fast checks
 
 Extras:
 	(kinect)

@@ -15,6 +15,15 @@ world_map::world_map() : robot("NAI") {
 	robot.color[2] = 0.76f;
 	maptodate = false;
 	robot.rot = 1.57;
+
+	width = 11;
+	size = width*width;
+
+	for(int i = 0; i < size; i++) {
+		grid[i].x = i % width;
+		grid[i].y = i / width;
+		grid[i].tags = 0;
+	}
 }
 
 void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
@@ -38,7 +47,6 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 			setplanes[j].p[i*3].y = nply;
 		}
 
-		std::cout << setplanes[j].p[0].x + setplanes[j].p[0].y << "  " << setplanes[j].p[3].x + setplanes[j].p[3].y << std::endl;
 		//If too small skip (due to errors)
 		if(abs((setplanes[j].p[0].x + setplanes[j].p[0].y) - (setplanes[j].p[3].x + setplanes[j].p[3].y)) < 150)
 			continue;
@@ -49,15 +57,15 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 			int mod = (int)(setplanes[j].p[i*3].x) % 400;
 
 			if(mod > 200)
-				setplanes[j].p[i*3].x = ((int)(setplanes[j].p[0].x*.0025 + 1)) * 400 - 1;// making sure it doesnt go into the next grid
+				setplanes[j].p[i*3].x = ((int)(setplanes[j].p[0].x*.0025 + 1)) * 400 + 1;// making sure it goes into the next grid
 			else
-				setplanes[j].p[i*3].x = (int)(setplanes[j].p[0].x*.0025) * 400;
+				setplanes[j].p[i*3].x = (int)(setplanes[j].p[0].x*.0025) * 400 + 2;
 
 			mod = (int)(setplanes[j].p[i*3].y) % 400;
 			if(mod > 200)
-				setplanes[j].p[i*3].y = ((int)(setplanes[j].p[0].y*.0025 + 1)) * 400 - 1;// making sure it doesnt go into the next grid
+				setplanes[j].p[i*3].y = ((int)(setplanes[j].p[0].y*.0025 + 1)) * 400 + 1;
 			else
-				setplanes[j].p[i*3].y = (int)(setplanes[j].p[0].y*.0025) * 400;
+				setplanes[j].p[i*3].y = (int)(setplanes[j].p[0].y*.0025) * 400 + 2;
 
 		}
 
@@ -86,16 +94,76 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 				continue;
 
 			match = true;
-			plane_count[k] += 1;
+			if(plane_count[k] <= 100)
+				plane_count[k] += 10;
+
 			break;
 		}
 		if(!match) {
 			plane_list.push_back(setplanes[j]);
-			plane_count.push_back(0);
+			plane_count.push_back(10);
 		}
-		/*TODO: Purge planes that fail sequential counts*/
+	}
+	if(setplanes.size() != 0)
+		updategrid();
+}
+
+
+//Removing any planes that fail the test
+void world_map::checkplanes() {
+	/*if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05) {
+		// 1.57 = looking positive Y
+		// 4.71 = negative y
+	}
+	else {
+		//3.14 = positive x
+		//0 = negative x
+	}*/
+}
+
+void world_map::GetGrid(grid_space *set_grid) const {
+	for(int i = 0; i < 121; i++) {
+		set_grid[i].x = grid[i].x;
+		set_grid[i].y = grid[i].y;
+		set_grid[i].tags = grid[i].tags;
+
 	}
 }
+
+void world_map::updategrid() {
+	obj_point corners[2];
+
+	for(std::vector<obj_plane>::const_iterator i = plane_list.begin(); i != plane_list.end(); i++){
+		int st,en;
+		int mag = 1;
+
+
+		int x,y,x1,y1;
+		x = i->p[0].x / 400;
+		y = i->p[0].y / 400;
+		x1 = i->p[3].x / 400;
+		y1 = i->p[3].y / 400;
+
+		if(x - x1 == 0)
+			mag = width;
+
+		st = x + (y * width);
+		en = x1 + (y1 * width);
+
+		//Flipping values if st is higher
+		if(st > en) {
+			int temp = st;
+			st = en;
+			en = temp;
+		}
+
+		while(st < en) {
+			grid[st].tags |= non_traversable;
+			st += mag;
+		}
+	}
+}
+
 
 world_map::~world_map() {
 	
@@ -135,6 +203,7 @@ void world_map::gentest() {
 	newplane.p[2].x = 400; newplane.p[2].y = 800; newplane.p[2].z = 400;
 	newplane.p[3].x = 400; newplane.p[3].y = 800; newplane.p[3].z = 0;
 	plane_list.push_back(newplane);
+	updategrid();
 	
 }
 
