@@ -11,11 +11,11 @@ bool kimgplane = true;
 imgd::imgd() : kdepth(512,424,3), filteredimg(424, 512, CV_8UC1) {
 
 	//TODO make load from config
-	horizontalchecky = 175; //How high should a line be to check if its the top of a wall
+	horizontalchecky = 150; //How high should a line be to check if its the top of a wall
 	floory = 300; 
 	lineest = false; //Predict where lines might be?
 	pixdist = 10; //Distance between pixels when testing flatness of plane
-	slopeerrorrange = 2; //Range of error when seeing if plane is flat
+	slopeerrorrange = 5; //Range of error when seeing if plane is flat
 	kdepth.flags = KDEP;
 	failpercent = .1; //Percent of wall spots that can fail but still be accepted. To avoid noise problems
 
@@ -350,10 +350,6 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 	newpoint[3] = getextreme;
 	int extremefour = averagepoints(getextreme);
 
-	/*
-	THIS DRAWS THE MIDLINE FOR DEBUGGING*/	
-	processplane.push_back(newpoint);
-
 
 	if(extremeone < 5 || extremetwo < 5 || extremethree < 5 || extremefour < 5) {
 		processplane.erase(processplane.begin());
@@ -418,6 +414,10 @@ void imgd::ConvertToObj(std::vector<std::array<cv::Point,4>> &processplane, std:
 		kdepth.flags = KDEP | KFREEZE;
 		freezetime = GetSec() + 1;
 	}
+
+	/*
+	THIS DRAWS THE MIDLINE FOR DEBUGGING*/	
+	processplane.push_back(newpoint);
 
 	//half xkinect FOV = 35.3
 	/***********************

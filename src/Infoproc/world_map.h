@@ -42,6 +42,7 @@ class world_map {
 		const std::vector<obj_wall> &GetPlanes() const;
 		const obj_cube *GetRobot() const;
 		void GetGrid(grid_space *) const;
+		unsigned int GetMapVersion() const;
 		void checkplanes(float[5]);
 		void updategrid();
 
@@ -57,6 +58,7 @@ class world_map {
 		std::vector<int> plane_count; //how many times has this plane been successfully found;
 
 		//grid data
+		unsigned int mapversion;
 		grid_space grid[121];
 		int maptodate; //map version # to see if needs updating
 		unsigned int width,size;

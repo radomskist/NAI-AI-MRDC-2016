@@ -6,6 +6,7 @@ world_map::world_map() : robot("NAI") {
 	robot.pos.y = 200;
 	robot.pos.z = 50;
 
+	mapversion = 0;
 	robot.width = 300;
 	robot.height = 100;
 
@@ -27,6 +28,10 @@ world_map::world_map() : robot("NAI") {
 	}
 }
 
+unsigned int world_map::GetMapVersion() const {
+	return mapversion;
+}
+
 void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 
 	//Translating the plane from local to world coordinates
@@ -36,23 +41,21 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 			float plx = setplanes[j].p[i*3].x * 0.32808399; //dist forward converted from mm to 1/100 of a foot
 			float ply = setplanes[j].p[i*3].y * 0.32808399; //dist from center of cam
 
-
 			float sang = sin(robot.rot);
 			float cang = cos(robot.rot);
 
 			//Applying rotation matrix
 			float nplx = robot.pos.x + plx*cang - ply*sang;
 			float nply = robot.pos.y + plx*sang + ply*cang;
-			std::cout << nply << std::endl;
 
 			//Setting 0 and 3
 			setplanes[j].p[i*3].x = nplx;
 			setplanes[j].p[i*3].y = nply;
 		}
-
 		//If too small skip (due to errors)
-		if((abs(setplanes[j].p[0].x - setplanes[j].p[3].x) + abs(setplanes[j].p[0].y - setplanes[j].p[3].y)) < 150)
-			continue;
+		//if((abs(setplanes[j].p[0].x - setplanes[j].p[3].x) + abs(setplanes[j].p[0].y - setplanes[j].p[3].y)) < 10)
+		//	continue;
+		std::cout << setplanes[j].p[0].x << "," << setplanes[j].p[0].y << std::endl;
 
 		/*Lining up to grid*/
 		obj_plane tempplane(1,1);
@@ -62,49 +65,40 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 			//This is rounding to the nearest grid space depending on the angle that we're looking at
 
 			//setting up direction mod for x axis
-			int dirmod = 0;
-			if(abs(robot.rot - 1.57) > 10)
-				dirmod = 1;
-			else if(abs(robot.rot - 4.71) > 10)
-				dirmod = -1;
+			int dirmody = 0;
+			int dirmodx = 0;
+			if(robot.rot < .1 || abs(robot.rot - 6.14) < .1) {
+				dirmodx = 1;
+				dirmody = 0;
+			}
+			else if(abs(robot.rot - 3.14) < .1) {
+				dirmodx = 0;
+				dirmody = -1;
+			}
+			//Setting up for Y axis
+			else if(abs(robot.rot - 1.57) < .1) {
+				dirmodx = 0;
+				dirmody = 1;
+			}
+			else if(abs(robot.rot - 4.71) < .1) {
+				dirmodx = -1;
+				dirmody = 0;
+			}
 
 			//rounding x
-			if(dirmod != 0) {
-				if(mod > 200)
-					tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025 + dirmod*2);// making sure it goes into the next grid
-				else
-					tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025 + dirmod);
-			}
-			else {
-				if(mod > 200)
-					tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025);// making sure it doesnt go into the next grid
-				else
-					tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025);
-			}
+			if(mod > 200)
+				tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025 + dirmodx);// making sure it goes into the next grid
+			else
+				tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025 );
 
-			//Setting up for Y axis
-			if(dirmod != 0){
-				if(robot.rot > 10 || abs(robot.rot - 6.14) > 10)
-					dirmod = -1;
-				else if(abs(robot.rot - 3.14) > 10)
-					dirmod = 1;
-				else
-					dirmod = 0;
-			}
 
 			mod = (int)(setplanes[j].p[i*3].y) % 400;
 			//rounding y
-			if(dirmod != 0)  {
-				if(mod > 200)
-					tempplane.p[i*3].y = (int)(setplanes[j].p[i*3].y*.0025 + dirmod*2);// making sure it goes into the next grid
-				else
-					tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].y*.0025 + dirmod);
-			}
+			if(mod > 200) 
+				tempplane.p[i*3].y = (int)(setplanes[j].p[i*3].y*.0025 + dirmody);// making sure it goes into the next grid
 			else
-				if(mod > 200)
-					tempplane.p[i*3].y = (int)(setplanes[j].p[i*3].y*.0025);// making sure it doesnt go into the next grid
-				else
-					tempplane.p[i*3].y = (int)(setplanes[j].p[i*3].y*.0025);
+				tempplane.p[i*3].y = (int)(setplanes[j].p[i*3].y*.0025);// making sure it goes into the next grid
+
 		}
 
 		//Making sure no diagnol
@@ -123,6 +117,8 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 		tempplane.p[1].z = 0;
 		tempplane.p[2] = tempplane.p[3];
 		tempplane.p[3].z = 0;
+
+		std::cout << tempplane.p[0].x << "," << tempplane.p[0].y << std::endl;
 
 		/*checking if plane exists*/
 		//if X
@@ -183,14 +179,69 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 void world_map::checkplanes(float pointvalues[5]) {
 	//for(int i = 0; i < 5; i++)
 	//	std::cout << pointvalues[i] << std::endl;
-	//if(abs(robot.rot - 4.71) < .05 || abs(robot.rot - 1.57) < .05) {
-		// 1.57 = looking positive Y
-		// 4.71 = negative y
-	//}
-	//else {
-		//3.14 = positive x
-		//0 = negative x
-	//}
+
+	//If fails within one gridspace than assume we're misaligned
+	//TODO: this can be error prone, needs heavy testing
+	int dirx = 0;
+	int diry = 0;
+	int pos = robot.pos.x *.0025 + robot.pos.y*width * .0025;
+
+	if(abs(robot.rot - 4.71) < .1)
+		diry = -1;
+	else if (abs(robot.rot - 1.57) < .1) 
+		diry = 1;
+	else if (abs(robot.rot - 3.14) < .1) 
+		dirx = -1;
+	else if (robot.rot < .05) 
+		dirx = 1;
+	else return;
+	bool edgehit = false;
+	int dist = 0;
+	while(!edgehit) {
+	//	std::cout << pos << std::endl;
+		if(grid[pos].tags & non_traversable) 
+			dist = abs(grid[pos].x - robot.pos.x*.0025) + abs(grid[pos].y - robot.pos.y *.0025);
+			
+		//Doing next row
+		pos = pos + dirx + (diry * width);
+		int posy = pos / width;
+		int posx = pos % width;
+		edgehit = (!(posy > width && posy != 0 && posx != width  && posx != 0));
+	}
+	if(dist == 0)
+		return;
+
+
+	/*if(abs(robot.rot - 4.71) < .05 || abs(robot.rot - 1.57) < .05) {
+		int pos = robot.pos.y;
+		if(abs(robot.rot - 4.71) < .05)
+			diry = -1;
+		else if (abs(robot.rot - 1.57) < .05) 
+			diry = 1;
+
+		while(pos < width && pos >= 0) {
+			
+			
+
+			pos += diry;
+			diry = (abs(robot.pos.y - pos)) * 0.5f;
+		}
+	}
+	else if (abs(robot.rot - 3.14) < .05 || (robot.rot < .05)) {
+		int pos = robot.pos.x;
+		if (abs(robot.rot - 3.14) < .05) 
+			dirx = -1;
+		else if (robot.rot < .05) 
+			dirx = 1;
+
+		while(pos < width && pos >= 0) {
+		
+		
+			pos += dirx;
+		}
+	}*/
+
+
 }
 
 void world_map::GetGrid(grid_space *set_grid) const {
@@ -202,6 +253,7 @@ void world_map::GetGrid(grid_space *set_grid) const {
 }
 
 void world_map::updategrid() {
+	mapversion++;
 	for(std::vector<obj_wall>::const_iterator i = plane_list.begin(); i != plane_list.end(); i++) {
 		unsigned int spot = (i->pos.x + (i->pos.y)*width);
 		grid[spot].tags |= non_traversable;
@@ -218,12 +270,8 @@ void world_map::gentest() {
 
 	//one unit = 100th of a foot
 	//so 400 units is 4 feet
-	//Creating a new plane
 
-	//Right now all the slope dictates is color
-	//0 = black
-	//else = gray
-	
+	//Creating a new plane	
 	obj_wall newplane = obj_wall();
 	newplane.pos.y = 1;
 	newplane.width = 200;
