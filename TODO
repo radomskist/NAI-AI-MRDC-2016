@@ -4,6 +4,9 @@ Being taken care of by other members:
 
 	-Look for posts on edge of map?
 
+TEST:
+	-Make sure had a second to warm up
+	-Fix crashing (Might be fixed?)
 
 NAI TODO:
 General:
@@ -15,12 +18,10 @@ General:
 		+CPU temp
 		+What drivemanager is doing
 		+Any important info
-	-Fix crashing
 	-Alternative to X forwarding
 		+Way too slow to startup
 
 Kinect
-	-Make sure had a second to warm up
 	-Save approx location of robot when images where taken?
 
 Kinect RGB
@@ -32,17 +33,14 @@ Kinect depth
 	+Remember floor color for successful check
 
 AI:
-	-Fine path finding
 	-Keep track of how many times planes fail to verify and succeed
-	-Worldmap stores grid instead of path finding
-		+To prevent regenerating it and for fast checks
 
 Extras:
 	(kinect)
 	-Double check rgb and depth allignment
 	-Stop kinect from flooding logger
-	-store found floor color and go off that
 	(AI)
+	-Fine path finding
 	-Make coarse path finding go diagnol when can
 	-Make coarse path finding check which path is shortest
 	(sdl)

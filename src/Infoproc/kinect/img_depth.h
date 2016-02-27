@@ -35,12 +35,11 @@ class imgd {
 		nimg *GetImg();
 		bool ScanGround(bool&,bool&);
 		void FloorCheck();
-
+		float averagepoints(unsigned int);
 
 	private:
 		//averages area around a point
 		inline int averagepoints(cv::Point);
-		inline float averagepoints(unsigned int);
 		inline unsigned char averagepointsc(unsigned int);
 		//Merges all lines together and estimates where unseen lines might be.
 		//returns a vector of estimated lines 

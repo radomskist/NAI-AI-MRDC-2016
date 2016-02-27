@@ -35,7 +35,7 @@ http://opencv.org/downloads.html
 
 http://opencv.org/
 
-Zbar-Tools:
+Zbar-Tools (Future dependency):
 
 http://zbar.sourceforge.net/
 

@@ -8,6 +8,7 @@
 #include "Viewer/multiwin.h"
 #include "Viewer/kinectwin.h"
 #include <fstream>
+#include <unistd.h>
 
 #include "naibrain.h"
 int main(int argc, char** argv)
@@ -130,7 +131,7 @@ int main(int argc, char** argv)
 		}
 	}
 	else {
-
+		sleep(1); //letting kinect warm up
 		multiwin MainWin;
 		const world_map *wmap = mainbrain.GetMap();
 		unsigned int kmode = KDEP | KRGB | KFREEZE;

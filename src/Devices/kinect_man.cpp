@@ -69,6 +69,9 @@ bool kinectman::PathCheck(bool &left , bool& right) {
 
 	return returnforward;
 }
+float kinectman::GetDist(float set_pos) {
+	return depth_proc.averagepoints(set_pos);
+}
 
 void kinectman::clean() {
 

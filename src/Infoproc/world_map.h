@@ -42,7 +42,7 @@ class world_map {
 		const std::vector<obj_wall> &GetPlanes() const;
 		const obj_cube *GetRobot() const;
 		void GetGrid(grid_space *) const;
-		void checkplanes();
+		void checkplanes(float[5]);
 		void updategrid();
 
 		void addobjs(std::vector<obj_base>&);

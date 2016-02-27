@@ -172,15 +172,17 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 
 
 //Removing any planes that fail the test
-void world_map::checkplanes() {
-	/*if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05) {
+void world_map::checkplanes(float pointvalues[5]) {
+	for(int i = 0; i < 5; i++)
+		std::cout << pointvalues[i] << std::endl;
+	//if(abs(robot.rot - 4.71) < .05 || abs(robot.rot - 1.57) < .05) {
 		// 1.57 = looking positive Y
 		// 4.71 = negative y
-	}
-	else {
+	//}
+	//else {
 		//3.14 = positive x
 		//0 = negative x
-	}*/
+	//}
 }
 
 void world_map::GetGrid(grid_space *set_grid) const {
