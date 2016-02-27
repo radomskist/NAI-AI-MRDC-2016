@@ -288,11 +288,11 @@ std::vector<obj_plane> imgd::CalculatePlanes(std::vector<std::array<cv::Point,2>
 				newarray[3] = horizontal[i][0];
 			}
 			cv::Point addpoint = newarray[0];
-			addpoint.y = addpoint.y + 100;
+			addpoint.y = addpoint.y + 80;
 			newarray[1] = addpoint;
 
 			addpoint = newarray[3];
-			addpoint.y = addpoint.y + 100;
+			addpoint.y = addpoint.y + 80;
 			newarray[2] = addpoint;
 
 			returnvec.push_back(newarray);

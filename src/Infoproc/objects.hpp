@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-enum obj_type {UNDEF = 0, POINT = 1, PLANE = 4, CUBE = 8};
+enum obj_type {UNDEF = 0, POINT = 1, PLANE = 4, CUBE = 8, WALL = 64};
 
 struct obj_point {
 	public:
@@ -91,6 +91,19 @@ struct obj_plane : public obj_base {
 				subject to change.
 
 ****************************************************************/
+
+struct obj_wall : public obj_base {
+	public:
+		obj_wall() {
+			type = WALL;
+		}
+
+		obj_point pos;
+		float width, height;
+	private:
+		int type; //Type we're dealing with
+		/*Also used for how many points Regular objects have 1, planes have 4, cubes have 8 (cubes might be for things like other robots and the space they occupy)*/
+};
 
 struct obj_cube : public obj_base {
 	public:

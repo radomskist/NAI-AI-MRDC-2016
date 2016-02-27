@@ -76,12 +76,12 @@ bool drive_man::tick() {
 		return false;
 
 	/*if we're rotating see if we're on track or not*/
-	if((currentpath[0] == 'R'))  {
+	if((currentpath[0] == 'R')) 
 		if(fabs(dir - robot->rot) < turntol) {
 			commandhist.push_back(std::string("MV!"));
 			currentpath = "MV 90!";
 		}
-	}
+
 	/*Are we in new node?*/
 	if(((dir < .09  || abs(dir - 3.14) < .09)&& (abs(curpath[currentnode-1].x - robot->pos.x) < 20))
 	 || ((abs(dir - 1.57) < .09 || abs(dir - 4.71) < .09 ) && (abs(curpath[currentnode-1].y - robot->pos.y) < 20))) {

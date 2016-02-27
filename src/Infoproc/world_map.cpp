@@ -49,88 +49,122 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 		}
 
 		//If too small skip (due to errors)
-		if(abs((setplanes[j].p[0].x + setplanes[j].p[0].y) - (setplanes[j].p[3].x + setplanes[j].p[3].y)) < 125)
+		if((abs(setplanes[j].p[0].x - setplanes[j].p[3].x) + abs(setplanes[j].p[0].y - setplanes[j].p[3].y)) < 150)
 			continue;
 
 		/*Lining up to grid*/
+		obj_plane tempplane(1,1);
 		for(int i = 0; i < 2; i++) {
 			int mod = (int)(setplanes[j].p[i*3].x) % 400;
 
-			int dirmod = 2;
-			if(abs(dirmod = 1.57) > 10 || abs(dirmod = 4.71) > 10)
-				dirmod = -2;
+			int dirmod = 0;
+			if(abs(robot.rot - 1.57) > 10)
+				dirmod = 1;
+			else if(abs(robot.rot - 4.71) > 10)
+				dirmod = -1;
 
-			if(mod > 200)
-				setplanes[j].p[i*3].x = ((int)(setplanes[j].p[0].x*.0025 + 1)) * 400 - dirmod;// making sure it doesnt go into the next grid
+			if(dirmod != 0) 
+				tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025 + dirmod);// making sure it doesnt go into the next grid
 			else
-				setplanes[j].p[i*3].x = (int)(setplanes[j].p[0].x*.0025) * 400;
+				if(mod > 150)
+					tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025);// making sure it doesnt go into the next grid
+				else
+					tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025);
+
+			if(dirmod != 0){
+				if(robot.rot > 10 || abs(robot.rot - 6.14) > 10)
+					dirmod = -1;
+				else if(abs(robot.rot - 3.14) > 10)
+					dirmod = 1;
+				else
+					dirmod = 0;
+			}
 
 			mod = (int)(setplanes[j].p[i*3].y) % 400;
-			if(mod > 200)
-				setplanes[j].p[i*3].y = ((int)(setplanes[j].p[0].y*.0025 + 1)) * 400 + dirmod;
+			if(dirmod != 0) 
+				tempplane.p[i*3].y = (int)(setplanes[j].p[i*3].y*.0025 + dirmod);// making sure it doesnt go into the next grid
 			else
-				setplanes[j].p[i*3].y = (int)(setplanes[j].p[0].y*.0025) * 400;
+				if(mod > 150)
+					tempplane.p[i*3].y = (int)(setplanes[j].p[i*3].y*.0025);// making sure it doesnt go into the next grid
+				else
+					tempplane.p[i*3].y = (int)(setplanes[j].p[i*3].y*.0025);
 		}
 
 		//Making sure no diagnol
-		if(abs(setplanes[j].p[3].x - setplanes[j].p[0].x) > 10 && abs(setplanes[j].p[3].y - setplanes[j].p[0].y) > 10)
+		if(abs(tempplane.p[3].x - tempplane.p[0].x) > 1 && abs(tempplane.p[3].y - tempplane.p[0].y) > 1)
 			continue;
 
 		/*making sure higher is on bot*/
-		if(setplanes[j].p[0].x - 10 > setplanes[j].p[3].x || setplanes[j].p[0].y - 10 > setplanes[j].p[3].y) {
+		if(abs(tempplane.p[0].x - 1) > tempplane.p[3].x || abs(tempplane.p[0].y - 1) > tempplane.p[3].y) {
 			obj_point temp;
-			temp = setplanes[j].p[0];
-			setplanes[j].p[0] = setplanes[j].p[3];
-			setplanes[j].p[3] = temp;
+			temp = tempplane.p[0];
+			tempplane.p[0] = tempplane.p[3];
+			tempplane.p[3] = temp;
 		}
 
-		setplanes[j].p[1] = setplanes[j].p[0];
-		setplanes[j].p[1].z = 0;
-		setplanes[j].p[2] = setplanes[j].p[3];
-		setplanes[j].p[3].z = 0;
+		tempplane.p[1] = tempplane.p[0];
+		tempplane.p[1].z = 0;
+		tempplane.p[2] = tempplane.p[3];
+		tempplane.p[3].z = 0;
 
 		/*checking if plane exists*/
 		//if X
-		if(setplanes[j].p[0].x - setplanes[j].p[3].x < 10) 
-			for(int k = plane_list[j].p[0].x; k < setplanes[j].p[3].x; k += 400) {
-				int gridspot = plane_list[j].p[0].x * .0025 + 400 + (plane_list[j].p[0].y * .0025 * width);
-				if(gridspot > 121 || gridspot < 0 || plane_list[j].p[k].y * .0025 >= width)
+		bool failed = true;
+		if(abs(tempplane.p[0].x - tempplane.p[3].x) > 1) {
+			int start = tempplane.p[0].x + tempplane.p[0].y * width;
+			for(int k = start; k <= tempplane.p[3].y; k++) {
+
+				int gridspot = start + k;
+				if(gridspot > 121 || gridspot < 0) {
+					std::cout << "FAILED " << gridspot << std::endl;
+					failed = true;
 					break;
+				}
+				failed = false;
+				std::cout << "Space: " << (gridspot % width) << "," << (gridspot / width) << std::endl;
 
 				if(grid[gridspot].tags & non_traversable) 
 					grid[gridspot].likelyness += 5;
-				else 
-					grid[gridspot].likelyness = 10;
-			}
-		else
-			for(int k = plane_list[j].p[0].y; k < setplanes[j].p[3].y; k += 400) {
-				int gridspot = plane_list[j].p[0].x * .0025 + ((plane_list[j].p[0].y + 400)* .0025 * width);
-				if(gridspot > 121 || gridspot < 0 || plane_list[j].p[k].y * .0025 >= width)
-					break;
+				else {
+					obj_wall tempwall;
+					tempwall.pos.x = (tempplane.p[0].x + k);
+					tempwall.pos.y = (tempplane.p[0].y);
+					tempwall.pos.z = 150;
+					tempwall.width = 200;
+					tempwall.height = 300;
 
+					grid[gridspot].likelyness = 10;
+					plane_list.push_back(tempwall);
+				}
+			}
+		}
+		else {
+			int start = tempplane.p[0].x + tempplane.p[0].y * width;
+			for(int k = start; k <= tempplane.p[3].y; k++) {
+				int gridspot = start + width*k;
+				if(gridspot > 121 || gridspot < 0) {
+					std::cout << "FAILED " << gridspot << std::endl;
+					failed = true;
+					break;
+				}
+				std::cout << "Space: " << (gridspot % width) << "," << (gridspot / width) << std::endl;
+				failed = false;
 				if(grid[gridspot].tags & non_traversable) 
 					grid[gridspot].likelyness += 5;
-				else 
+				else {
+					obj_wall tempwall;
+					tempwall.pos.x = tempplane.p[0].x;
+					tempwall.pos.y = (tempplane.p[0].y + k);
+					tempwall.pos.z = 150;
+					tempwall.width = 200;
+					tempwall.height = 300;
+
 					grid[gridspot].likelyness = 10;
+					plane_list.push_back(tempwall);
+				}
 			}
-		//TODO rewrite how rendered wall is placed
-		//Make it do a cube in a square instead of the actual plane
-		bool match = false;
-		for(int k = 0; k < plane_list.size(); k++) {
-
-			if(abs(plane_list[k].p[0].x - setplanes[j].p[0].x) > 10 || abs(plane_list[k].p[0].y - setplanes[j].p[0].y) > 10)
-				continue;
-
-			match = true;
-			if(plane_count[k] <= 100)
-				plane_count[k] += 10;
-
-			break;
 		}
-		if(!match) {
-			plane_list.push_back(setplanes[j]);
-			plane_count.push_back(10);
-		}
+
 	}
 	if(setplanes.size() != 0)
 		updategrid();
@@ -158,36 +192,11 @@ void world_map::GetGrid(grid_space *set_grid) const {
 }
 
 void world_map::updategrid() {
-	obj_point corners[2];
-
-	for(std::vector<obj_plane>::const_iterator i = plane_list.begin(); i != plane_list.end(); i++){
-		int st,en;
-		int mag = 1;
-
-		int x,y,x1,y1;
-		x = i->p[0].x / 400;
-		y = i->p[0].y / 400;
-		x1 = i->p[3].x / 400;
-		y1 = i->p[3].y / 400;
-
-		if(x - x1 == 0)
-			mag = width;
-
-		st = x + (y * width);
-		en = x1 + (y1 * width);
-
-		//Flipping values if st is higher
-		if(st > en) {
-			int temp = st;
-			st = en;
-			en = temp;
-		}
-
-		while(st < en) {
-			grid[st].tags |= non_traversable;
-			st += mag;
-		}
+	for(std::vector<obj_wall>::const_iterator i = plane_list.begin(); i != plane_list.end(); i++) {
+		unsigned int spot = (i->pos.x + (i->pos.y)*width);
+		grid[spot].tags |= non_traversable;
 	}
+
 }
 
 
@@ -205,30 +214,22 @@ void world_map::gentest() {
 	//0 = black
 	//else = gray
 	
-	obj_plane newplane = obj_plane(1,1);
-	newplane.p[0].x = 400; newplane.p[0].y = 799; newplane.p[0].z = 400;
-	newplane.p[1].x = 400; newplane.p[1].y = 799; newplane.p[1].z = 0;
-	newplane.p[2].x = 2400; newplane.p[2].y = 799; newplane.p[2].z = 400;
-	newplane.p[3].x = 2400; newplane.p[3].y = 799; newplane.p[3].z = 0;
-	plane_list.push_back(newplane);//Putting the plane in our list
-/*
-	newplane.p[0].x = 800; newplane.p[0].y = 400; newplane.p[0].z = 400;
-	newplane.p[1].x = 800; newplane.p[1].y = 400; newplane.p[1].z = 0;
-	newplane.p[2].x = 800; newplane.p[2].y = 2400; newplane.p[2].z = 400;
-	newplane.p[3].x = 800; newplane.p[3].y = 2400; newplane.p[3].z = 0;
-	plane_list.push_back(newplane);
+	obj_wall newplane = obj_wall();
+	newplane.pos.y = 1;
+	newplane.width = 200;
+	newplane.pos.z = 150;
+	newplane.height = 150;
+	for(int i = 1; i < 6; i++) {
+		newplane.pos.x = i;
+		plane_list.push_back(newplane);
+	}
 
-	newplane.p[0].x = 800; newplane.p[0].y = 400; newplane.p[0].z = 400;
-	newplane.p[1].x = 800; newplane.p[1].y = 400; newplane.p[1].z = 0;
-	newplane.p[2].x = 800; newplane.p[2].y = 2000; newplane.p[2].z = 400;
-	newplane.p[3].x = 800; newplane.p[3].y = 2000; newplane.p[3].z = 0;
-	plane_list.push_back(newplane);
-*/
-	newplane.p[0].x = 400; newplane.p[0].y = 0; newplane.p[0].z = 400;
-	newplane.p[1].x = 400; newplane.p[1].y = 0; newplane.p[1].z = 0;
-	newplane.p[2].x = 400; newplane.p[2].y = 800; newplane.p[2].z = 400;
-	newplane.p[3].x = 400; newplane.p[3].y = 800; newplane.p[3].z = 0;
-	plane_list.push_back(newplane);
+	newplane.pos.x = 1;
+	for(int i = 0; i < 2; i++) {
+		newplane.pos.y = i;
+		plane_list.push_back(newplane);
+	}
+
 	updategrid();
 	
 }
@@ -242,7 +243,7 @@ const obj_cube *world_map::GetRobot() const {
 	return &robot;
 }
 
-const std::vector<obj_plane> &world_map::GetPlanes() const {
+const std::vector<obj_wall> &world_map::GetPlanes() const {
 	return plane_list;
 }
 
