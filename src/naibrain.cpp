@@ -56,7 +56,7 @@ void naibrain::tick() {
 		//std::cout << "Adding planes" << std::endl;
 
 		wmap.AddPlanes(kinect_manager->GetPlanes());
-		float checkpoints[5] = {56, 156, 256, 356,456};
+		float checkpoints[5] = {97336, 97436, 97536, 97636,97736}; //525 * 190 + 56*(i*100)
 		for(int i = 0; i < 5; i++)
 			checkpoints[i] = kinect_manager->GetDist(checkpoints[i]);
 		wmap.checkplanes(checkpoints);
