@@ -76,12 +76,12 @@ bool drive_man::tick() {
 		return false;
 
 	/*if we're rotating see if we're on track or not*/
-	if((currentpath[0] == 'R'))  {
+	if((currentpath[0] == 'R')) 
 		if(fabs(dir - robot->rot) < turntol) {
 			commandhist.push_back(std::string("MV!"));
 			currentpath = "MV 90!";
 		}
-	}
+
 	/*Are we in new node?*/
 	if(((dir < .09  || abs(dir - 3.14) < .09)&& (abs(curpath[currentnode-1].x - robot->pos.x) < 20))
 	 || ((abs(dir - 1.57) < .09 || abs(dir - 4.71) < .09 ) && (abs(curpath[currentnode-1].y - robot->pos.y) < 20))) {
@@ -94,6 +94,7 @@ bool drive_man::tick() {
 			curpath[currentnode].x < curpath[currentnode-1].x ? dir = 0 : dir = 3.14;
 		else
 			curpath[currentnode].y < curpath[currentnode-1].y ? dir = 1.57 : dir = 4.71;
+
 
 		//Getting direction
 		float dircompare = abs(dir - robot->rot);
@@ -114,15 +115,15 @@ bool drive_man::tick() {
 			if(robot->rot > 3.14) {
 				anchor = robot->rot - 3.14;
 				if(robot->rot > dir && dir > anchor) {
-					currentpath = "RL 20!";
-					ss << "RL " << robot->rot - dir;
+					currentpath = "RR 20!";
+					ss << "RR " << robot->rot - dir;
 				}
 				else if (robot->rot < dir){
-					currentpath = "RR 20!";
-					ss << "RR " << dir - robot->rot;
+					currentpath = "RL 20!";
+					ss << "RL " << dir - robot->rot;
 				}
 				else {
-					currentpath = "RR 20!";
+					currentpath = "RL 20!";
 					ss << "RR " << ((3.14+robot->rot) - (3.14+dir));
 				}
 			}
@@ -130,16 +131,16 @@ bool drive_man::tick() {
 			else {
 				anchor = robot->rot + 3.14;
 				if(robot->rot < dir && dir < anchor) {
-					currentpath = "RR 20!";
-					ss << "RR " << dir - robot->rot;
+					currentpath = "RL 20!";
+					ss << "RL " << dir - robot->rot;
 				}
 				else if (robot->rot > dir){
-					currentpath = "RL 20!";
-					ss << "RL " << robot->rot - dir;
+					currentpath = "RR 20!";
+					ss << "RR " << robot->rot - dir;
 				}
 				else {
-					currentpath = "RL 20!";
-					ss << "RL " << ((3.14+dir) - (3.14+robot->rot));
+					currentpath = "RR 20!";
+					ss << "RR " << ((3.14+dir) - (3.14+robot->rot));
 				}
 			}
 			commandhist.push_back(ss.str());
@@ -168,11 +169,11 @@ void drive_man::execcom() {
 	}
 	else if(currentpath[0] == 'R' && currentpath[1] == 'R') {
 		float estang = turnspeed*difference;
-		estiangle += estang;
+		estiangle -= estang;
 	}
 	else if(currentpath[0] == 'R' && currentpath[1] == 'L'){
 		float estang = turnspeed*difference;
-		estiangle -= estang;
+		estiangle += estang;
 	}
 	est = true;
 }

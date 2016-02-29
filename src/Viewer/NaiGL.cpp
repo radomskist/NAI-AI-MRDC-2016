@@ -129,7 +129,7 @@ naigl::naigl() {
 	glGenBuffers(2, &planebuffer[0]);
 	glBindBuffer(GL_ARRAY_BUFFER,
 		planebuffer[0]);
-	glBufferData(GL_ARRAY_BUFFER, int(sizeof(float)*3*4*1000), 0, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, int(sizeof(float)*3*8*1000), 0, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(0,
 		3,
 		GL_FLOAT,
@@ -141,7 +141,7 @@ naigl::naigl() {
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER,
 		planebuffer[1]);
-	glBufferData(GL_ARRAY_BUFFER, int(sizeof(float)*3*4*1000), 0, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, int(sizeof(float)*3*8*1000), 0, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(1,
 		3,
 		GL_FLOAT,
@@ -343,39 +343,121 @@ void naigl::setents(const std::vector<obj_cube> &add_objs) {
 }
 
 
-void naigl::setplanes(const std::vector<obj_plane> &add_newplane) {
+void naigl::setplanes(const std::vector<obj_wall> &add_newplane) {
+
+	std::vector<float> cubeverts;
+	std::vector<float> cubecolorverts;
+	for(int i = 0; i < 18; i++)
+		cubecolorverts.push_back(1.0f);
+
+
 	for(int i = 0; i < add_newplane.size(); i++){
+		obj_wall newobj = add_newplane[i];
+		obj_point center = newobj.pos;
+		center.x = (1 + center.x) * 400 - 200;
+		center.y = (1 + center.y) *400 - 200;
 	
-		obj_plane newplane = add_newplane[i];
+		float nh, nw;
+		nh = newobj.height;
+		nw = newobj.width;
 
-		for(int i = 0; i < 3; i++){
-			planeverts.push_back(newplane.p[i].x);
-			planeverts.push_back(newplane.p[i].y);
-			planeverts.push_back(newplane.p[i].z);
+		//Generating corners
+		//TODO optimize
+		obj_point corners[8];
+		corners[0].x = center.x + nw;
+		corners[0].y = center.y + nw;
+		corners[0].z = center.z + nh;
+
+		corners[1].x = center.x + nw;
+		corners[1].y = center.y + nw;
+		corners[1].z = center.z - nh;
+
+		corners[2].x = center.x + nw;
+		corners[2].y = center.y - nw;
+		corners[2].z = center.z - nh;
+
+		corners[3].x = center.x + nw;
+		corners[3].y = center.y - nw;
+		corners[3].z = center.z + nh;
+
+		corners[4].x = center.x - nw;
+		corners[4].y = center.y - nw;
+		corners[4].z = center.z + nh;
+
+		corners[5].x = center.x - nw;
+		corners[5].y = center.y + nw;
+		corners[5].z = center.z + nh;
+
+		corners[6].x = center.x - nw;
+		corners[6].y = center.y - nw;
+		corners[6].z = center.z - nh;
+
+		corners[7].x = center.x - nw;
+		corners[7].y = center.y + nw;
+		corners[7].z = center.z - nh;
+
+
+		//Generating tris
+		easypush(cubeverts, corners[0]);
+		easypush(cubeverts, corners[1]);
+		easypush(cubeverts, corners[2]);
+		easypush(cubeverts, corners[0]);
+		easypush(cubeverts, corners[3]);
+		easypush(cubeverts, corners[2]);
+
+		easypush(cubeverts, corners[0]);
+		easypush(cubeverts, corners[3]);
+		easypush(cubeverts, corners[4]);
+		easypush(cubeverts, corners[0]);
+		easypush(cubeverts, corners[5]);
+		easypush(cubeverts, corners[4]);
+
+		easypush(cubeverts, corners[0]);
+		easypush(cubeverts, corners[1]);
+		easypush(cubeverts, corners[5]);
+		easypush(cubeverts, corners[1]);
+		easypush(cubeverts, corners[7]);
+		easypush(cubeverts, corners[5]);
+
+		easypush(cubeverts, corners[1]);
+		easypush(cubeverts, corners[2]);
+		easypush(cubeverts, corners[6]);
+		easypush(cubeverts, corners[1]);
+		easypush(cubeverts, corners[7]);
+		easypush(cubeverts, corners[6]);
+
+		easypush(cubeverts, corners[5]);
+		easypush(cubeverts, corners[7]);
+		easypush(cubeverts, corners[6]);
+		easypush(cubeverts, corners[5]);
+		easypush(cubeverts, corners[4]);
+		easypush(cubeverts, corners[6]);
+
+		easypush(cubeverts, corners[3]);
+		easypush(cubeverts, corners[4]);
+		easypush(cubeverts, corners[6]);
+		easypush(cubeverts, corners[3]);
+		easypush(cubeverts, corners[2]);
+		easypush(cubeverts, corners[6]);
+
+		for(int j = 0; j < 36; j++) {
+			cubecolorverts.push_back(.5f);
+			cubecolorverts.push_back(.5f);
+			cubecolorverts.push_back(.5f);
 		}
-
-		for(int i = 1; i < 4; i++){
-			planeverts.push_back(newplane.p[i].x);
-			planeverts.push_back(newplane.p[i].y);
-			planeverts.push_back(newplane.p[i].z);
-		}
-
-		//Putting our plane colors in
-		
-		float setcolor = 1 - (newplane.slopey / 2);
-
-		for(int i = 0; i < 18; i++)
-			planecolors.push_back(setcolor);
 	}
-	
+
 	glBindVertexArray(naivao);
 	glBindBuffer(GL_ARRAY_BUFFER,
 		planebuffer[0]);
+	
+	planelength = sizeof(float) * cubeverts.size();
 	glBufferSubData(GL_ARRAY_BUFFER,0, sizeof(ground), ground);
-	glBufferSubData(GL_ARRAY_BUFFER,sizeof(ground), sizeof(float)*planeverts.size(), &planeverts[0]);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(ground), planelength, &cubeverts[0]);
 	glBindBuffer(GL_ARRAY_BUFFER,
 		planebuffer[1]);
-	glBufferSubData(GL_ARRAY_BUFFER,0, sizeof(float)*planecolors.size(), &planecolors[0]);
+	glBufferSubData(GL_ARRAY_BUFFER,0, planelength, &cubecolorverts[0]);
+
 }	
 
 void naigl::makecurrent() {
@@ -390,7 +472,7 @@ void naigl::draw() {
 	glUniformMatrix4fv(viewuni, 1, 	0,  glm::value_ptr(view));
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glBindVertexArray(naivao);
-	glDrawArrays(GL_TRIANGLES,0, sizeof(ground) + sizeof(float)*planeverts.size());
+	glDrawArrays(GL_TRIANGLES,0, planelength);
 	glBindVertexArray(naivaoobj);
 	glDrawArrays(GL_TRIANGLES,0, sizeof(float)*cubevertslen);
 

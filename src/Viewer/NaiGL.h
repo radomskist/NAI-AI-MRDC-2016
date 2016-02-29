@@ -25,7 +25,7 @@ class naigl : public basewin {
 
 		void draw();
 		void makecurrent();
-		void setplanes(const std::vector<obj_plane> &);
+		void setplanes(const std::vector<obj_wall> &);
 		void setpath(const std::vector<obj_point> );
 		void setents(const std::vector<obj_cube> &);
 		void GetKeys();
@@ -44,6 +44,7 @@ class naigl : public basewin {
 		GLuint objbuffer[2];
 
 		int pathlength;
+		int planelength;
 		int cubevertslen;
 
 		//Math nerd stuff
