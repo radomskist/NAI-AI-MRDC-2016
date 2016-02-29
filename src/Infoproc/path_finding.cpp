@@ -3,11 +3,7 @@
 
 path_finding::path_finding(const world_map *set_map) : wmap(set_map), robot(set_map->GetRobot()) {
 	pathid = 1;
-	int size = width*width;
-	for(int i = 0; i < size; i++) {
-		grid[i].x = i % width;
-		grid[i].y = i / width;
-	}
+
 }
 
 path_finding::~path_finding() {
@@ -18,6 +14,7 @@ path_finding::~path_finding() {
 void path_finding::getneighbors(int pt, std::vector<int> &ret){
 	int x = grid[pt].x;
 	int y = grid[pt].y;
+	
 
 	if(!(x+1 >= 11 || grid[pt].tags & non_traversable))//these ifs only add the neighbor if it is not outside the 11 x 11 grid
 		ret.push_back(x + 1 + y*width);//and if it is traversable
@@ -99,43 +96,13 @@ bool path_finding::coarsepathfind(obj_point gl) {
 }
 
 int path_finding::generate_grid(obj_point &gl){
-	const std::vector<obj_plane> &planes = wmap->GetPlanes();
-	obj_point corners[2];
+	wmap->GetGrid(grid);
+
 	int goal = (gl.x*0.0025) + ((int)(gl.y*0.0025) * 11);
 
 	for(int i = 0; i < 121; ++i) {
 		grid[i].weight = get_dist(i, goal);
 		grid[i].parent = -1;
-		grid[i].tags = none; 
-	}
-
-	for(std::vector<obj_plane>::const_iterator i = planes.begin(); i != planes.end(); i++){
-		int st,en;
-		int mag = 1;
-
-		int x,y,x1,y1;
-		x = i->p[0].x / 400;
-		y = i->p[0].y / 400;
-		x1 = i->p[3].x / 400;
-		y1 = i->p[3].y / 400;
-
-		if(x - x1 == 0)
-			mag = 11;
-
-		st = x + (y * width);
-		en = x1 + (y1 * width);
-
-		//Flipping values if st is higher
-		if(st > en) {
-			int temp = st;
-			st = en;
-			en = temp;
-		}
-
-		while(st < en) {
-			grid[st].tags |= non_traversable;
-			st += mag;
-		}
 	}
 
 	return goal;

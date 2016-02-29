@@ -8,6 +8,7 @@
 #include "Viewer/multiwin.h"
 #include "Viewer/kinectwin.h"
 #include <fstream>
+#include <unistd.h>
 
 #include "naibrain.h"
 int main(int argc, char** argv)
@@ -130,6 +131,7 @@ int main(int argc, char** argv)
 		}
 	}
 	else {
+		sleep(1); //letting kinect warm up
 		multiwin MainWin;
 		const world_map *wmap = mainbrain.GetMap();
 		unsigned int kmode = KDEP | KRGB | KFREEZE;
@@ -139,6 +141,8 @@ int main(int argc, char** argv)
 		const obj_cube *newbot = wmap->GetRobot();
 		addcube.push_back(*newbot);
 		naigl *glwin = MainWin.GetGL();
+
+		unsigned int mapversion = 3000; //random number so knows to update
 		while(MainWin.running()) {
 			mainbrain.tick();
 			MainWin.GetKeys();
@@ -146,12 +150,15 @@ int main(int argc, char** argv)
 			addcube.pop_back();
 			addcube.push_back(*newbot);
 			//TODO optimize
-			glwin->makecurrent();
-			glwin->setplanes(wmap->GetPlanes());
-			glwin->setents(addcube);
-			glwin->setpath(mainbrain.GetPfind().GetPath());
-			//glwin->makecurrent();
-			glwin->draw();
+			if(mapversion != wmap->GetMapVersion()) {
+				mapversion = wmap->GetMapVersion();
+				glwin->makecurrent();
+				glwin->setplanes(wmap->GetPlanes());
+				glwin->setents(addcube);
+				glwin->setpath(mainbrain.GetPfind().GetPath());
+				//glwin->makecurrent();
+				glwin->draw();
+			}
 		}
 		std::cout << "Exiting" << std::endl;
 	}

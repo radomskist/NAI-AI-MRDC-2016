@@ -41,6 +41,7 @@ class kinectman {
 		bool PathCheck(bool &, bool&);
 		std::vector<obj_plane>& GetPlanes();
 
+		float GetDist(float);
 		nimg *GetDepthImg();
 		nimg *GetRGBImg();
 

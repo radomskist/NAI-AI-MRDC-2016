@@ -20,10 +20,10 @@ imgrgb::imgrgb(unsigned char set_color) {
 	ballparam.filterByColor = true;
 	ballparam.filterByCircularity = false;
 	ballparam.filterByArea = true;
-	ballparam.minArea = 2.0f;
+	ballparam.minArea = 1.0f;
 	ballparam.maxArea = 500.0f;
 	ballparam.blobColor = 255;
-	ballparam.minConvexity = .8;
+	ballparam.minConvexity = .95;
 	ballparam.maxConvexity = 1.0;
 
 	balldet = cv::SimpleBlobDetector::create(ballparam); 
@@ -54,12 +54,11 @@ void imgrgb::findground(cv::Mat &hsvin) {
 
 	//Seeing if floor color matches
 	unsigned char avg = (low + high) * .5f;
-
 	if(floorcolor == 0)
 		floorcolor = avg;
 	else if(abs(avg - floorcolor) > floortol)
 		return;
-	
+
 	if(low > 10)
 		low -= floortol;
 	if(high < 245)
@@ -115,7 +114,8 @@ void imgrgb::findballs(cv::Mat &hsvin, cv::Mat &circlemat) {
 	circlemat = cv::Mat::zeros(380,512,CV_8UC1);
 	
 	cv::Mat colorfilter;
-	cv::inRange(hsvin, ballcolor-1, ballcolor+1,colorfilter);
+	cv::inRange(hsvin, ballcolor-3, ballcolor+3,colorfilter);
+
 	cv::Point Point1;
 	Point1.x = 0;
 	Point1.y = 0;
@@ -126,7 +126,7 @@ void imgrgb::findballs(cv::Mat &hsvin, cv::Mat &circlemat) {
 
 	//Clean it
 	for(int i = 0; i < 5; i++)
-		cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,3)));	
+		cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2,2)));	
 
 	std::vector<cv::KeyPoint> circlelist;
 	balldet->detect(colorfilter,circlelist);
@@ -141,12 +141,16 @@ void imgrgb::findballs(cv::Mat &hsvin, cv::Mat &circlemat) {
 		std::vector<cv::Vec3f> circles;
 		cv::Mat temp = hsvin(cv::Rect(circlelist[i].pt.x - 30, circlelist[i].pt.y - 30, 60, 60));
 		cv::Mat croparea;
-		cv::inRange(temp, ballcolor-15, ballcolor+15,temp);
-		cv::Canny(temp, croparea, 50, 150, 3 );
-		cv::HoughCircles(croparea, circles, CV_HOUGH_GRADIENT, 1, 20, 500,25);
+		cv::inRange(temp, ballcolor-10, ballcolor+10,temp);
+		cv::Canny(temp, croparea, 5, 251,3 );
+		if(cv::countNonZero(croparea) > 100)
+			continue;
+		cv::HoughCircles(croparea, circles, CV_HOUGH_GRADIENT, 1, 30, 1,15,0,300);
+
 		//circle(circlemat, cv::Point(circlelist[i].pt.x,circlelist[i].pt.y), 10, cv::Scalar(255,255,255),CV_FILLED, 8,0);
 
-		if(circles.size() != 0)
+		int ypos = (circlelist[i].pt.x + circlelist[i].pt.y*512);
+		if(circles.size() != 0 && temp.data[ypos] != 0 && temp.data[ypos-3] != 0 && temp.data[ypos+3] != 0)
 			circle(circlemat, cv::Point(circlelist[i].pt.x + circles[0][0] - 30, circlelist[i].pt.y + circles[0][1] - 30), circles[0][2], cv::Scalar(255,255,255),CV_FILLED, 8,0);
 
 		croplist.push_back(croparea);
@@ -191,15 +195,15 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 
 	int resolution = krgb.width*381;
 	for(int i = 0; i < resolution; i++) {
-
+		/*
 		krgb.data[i*4] = channels[0].data[i];
 		krgb.data[i*4 + 1] = channels[0].data[i];
 		krgb.data[i*4 + 2] = channels[0].data[i];
-		/*
+		*/
 		krgb.data[i*4] = rgbin.data[i*4];
 		krgb.data[i*4 + 1] = rgbin.data[i*4+1];
 		krgb.data[i*4 + 2] = rgbin.data[i*4+2];
-		*/
+
 
 		//if(cannystuff.data[i])
 		//	krgb.data[i*4 + 2] = cannystuff.data[i];	
@@ -210,8 +214,7 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 			krgb.data[i*4 + 1] = circlesstuff.data[i];
 			krgb.data[i*4 + 2] = 0;
 		}
-		else 
-		if(groundmat.data[i]) {
+		else if(groundmat.data[i]) {
 			krgb.data[i*4] = groundmat.data[i];
 			krgb.data[i*4 + 1] = 0;
 			krgb.data[i*4 + 2] = 0;
