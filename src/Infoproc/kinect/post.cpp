@@ -6,8 +6,8 @@
 #include <cstdlib>
 
 
-using namespace std;
-using namespace cv;
+//using namespace std;
+//using namespace cv;
 
 std::vector<cv::Vec3i> postFind(cv::Mat &source)
 {
@@ -23,6 +23,10 @@ std::vector<cv::Vec3i> postFind(cv::Mat &source)
   have multiple passes at different saturation and indicate different confidence
   scale expected height by distance from cam
   experiment with best way to merge lines from same post
+
+  Notes:
+  uncomment line before push_back for our output statement to leave out lines that
+  lack confidence of 2 or more. 
   */ 
   cv::Mat postRange, postCan, sourceGray; //create images
 
@@ -40,7 +44,7 @@ std::vector<cv::Vec3i> postFind(cv::Mat &source)
     4: Threshold to Zero Inverted
   */  
   //threshold( src, dst, threshold_value, max_BINARY_value,threshold_type );
-  cv::threshold( sourceGray, postRange, 10, 255, 0);
+  cv::threshold( sourceGray, postRange, 30, 255, 0);
 
   cv::Canny(postRange, postCan, 50, 200, 3);  //canny detector to find edges
 
@@ -48,8 +52,7 @@ std::vector<cv::Vec3i> postFind(cv::Mat &source)
   std::vector<cv::Vec4i> lines;
 
   //source img, vec to store in, resolution in pixels, angle in rads, intersections, min length, min gap
-  cv::HoughLinesP(postCan, lines, 1, CV_PI/180, 50, 200, 10);
-
+  cv::HoughLinesP(postCan, lines, 1, CV_PI/180, 30, 55, 10);
 
   cv::Vec4i line1, line2; //vec to store produced points in
 
@@ -63,27 +66,12 @@ std::vector<cv::Vec3i> postFind(cv::Mat &source)
   int uniquePosts = 0;
   int count = 1;
   std::vector<int> total;
-
-  //was getting some really weird behavior if I didn't fill the total array first
-  //still unsure why
-  total.push_back(0);
-  total.push_back(1);
-  total.push_back(2);
-  total.push_back(3);
-  total.push_back(4);
-  total.push_back(5);
-  total.pop_back();
-  total.pop_back();
-  total.pop_back();
-  total.pop_back();
-  total.pop_back();
-  total.pop_back();
   
   for( size_t i=0; i < lines.size(); i++)
   {
     line1 = lines[i];
 
-    //general logic for this loop is if the change in x < the height of a post it's likely not a post
+ //general logic for this loop is if the change in x < the height of a post it's likely not a post
     //so then we average together our post lines and get a good number for the base
     //also the total represents our confidence/ number of lines generated
 
@@ -100,9 +88,15 @@ std::vector<cv::Vec3i> postFind(cv::Mat &source)
       processedLines.push_back(line1);
       total.push_back(1); //set up the counter for this post
       uniquePosts++;
+      lastx = line1[0];
 
     }
-    else if(abs(line1[0] - lastx) <=2 * abs(line1[3] - line1[1]))
+    else if(abs(line1[2]-line1[0]) >= abs(line1[3]-line1[1])) //should catch horizontal lines
+    {
+      //this is a horizontal line
+      //this space is intentionally blank
+    }
+    else if(abs(line1[0] - lastx) <= abs(line1[3] - line1[1]))
     {
       //case if this is another line in our post
       line2 = processedLines[uniquePosts - 1];
@@ -118,7 +112,7 @@ std::vector<cv::Vec3i> postFind(cv::Mat &source)
       count ++; //increment count
       total.pop_back();
       total.push_back(count);
-
+      lastx = line1[0];
     }
     else
     {
@@ -126,33 +120,71 @@ std::vector<cv::Vec3i> postFind(cv::Mat &source)
       total.push_back(1);
       uniquePosts ++;
       count = 1;
-
+      lastx = line1[0];
     }
 
-    lastx = line1[0];
   }
-
+  
+  //could easily avoid using these variables if the assignment statements are making this
+  //innefficient
+  int x, y, t, deltaY, deltaX; //x final, y final, total
   std::vector<cv::Vec3i> lineOut;
   cv::Vec3i basePoint;
+  int slope = 0;  //slope is actually c^2
   for(size_t i = 0; i < processedLines.size(); i++)
   {
     line1 = processedLines[i];
 
-    basePoint[0] = line1[0] / total[i]; //average of xs
-    basePoint[1] = line1[1] / total[i]; //average of ys
-    basePoint[2] = total[i];  //confidence number
+    //cv::line( postRange, cv::Point((line1[0]/t), (line1[1]/t)), cv::Point((line1[2] / t), (line1[3]/t)), cv::Scalar(128,255,255), 3, cv::LINE_AA);
 
-    lineOut.push_back(basePoint);
+    x = line1[0] / total[i]; //average of xs
+    y = line1[1] / total[i]; //average of ys
+    t = total[i];  //confidence number
+    deltaX = (line1[2] / t - line1[0] / t);
+    deltaY = (line1[3] / t - line1[1] / t);
     
+    //now to straighten the lines
+    if(deltaX > 0)
+    {
+      x = x + .5 * deltaX;      
+    }
+    else
+    {
+      x = x - .5 * deltaX;  
+    }
+    
+    if(deltaY > 0)
+    {
+      y = y + .5 * abs(deltaY);  
+    }
+    else
+    {
+      y = y - .5 * abs(deltaY);  
+    } 
+
+    slope = .5 * sqrt( pow( deltaX, 2.0) + pow( deltaY , 2.0));
+ 
+    //first one adds 1/2 delta x to x,
+    //next we add 1/2 delta y to y0
+    //then we subtract 1/2 c^2 from this new y center
+    //this gives us a new basepoint translated as if the line was vertical
+    basePoint[0] = x;
+
+    basePoint[1] = y + slope;
+    basePoint[2] = t;
+  
+    //cv::line( postCan, cv::Point(basePoint[0], basePoint[1]), cv::Point((basePoint[0]), (y - slope)), cv::Scalar(128,255,255), 3, cv::LINE_AA);
+    //if(basePoint[2] >= 2)
+      lineOut.push_back(basePoint);   
   }
   //imshow("source", source); //should show source then lines we detect
   //namedWindow( "Display window", WINDOW_AUTOSIZE );
   //imshow("detected lines", postLines);
-  //imshow("source", source); 
-  //imshow("postCan", img);
+  //cv::imshow("source", postRange); 
+  //cv::imshow("postCan", postCan);
   //imshow("source", postRange);
 
-  //waitKey();
+  //cv::waitKey();
   return lineOut;
 }
 
@@ -160,7 +192,7 @@ int main()
 {
 
   cv::Mat image;
-  image = cv::imread("post.jpg", 1); //read in test image
+  image = cv::imread("posts2.jpeg", 1); //read in test image
 
   std::vector<cv::Vec3i> ayy; //store produced std::vector
   ayy = postFind(image); //load in image
