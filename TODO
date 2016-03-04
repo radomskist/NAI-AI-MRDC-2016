@@ -1,4 +1,5 @@
 Being taken care of by other members:
+==================================
 		-Ball color identification needs to be done
 		-QR reading
 
@@ -13,6 +14,7 @@ Being taken care of by other members:
 
 
 TEST:
+===========================
 	-Make sure had a second to warm up
 	-Fix crashing (Might be fixed?)
 
@@ -22,40 +24,64 @@ TEST:
 		(VLC with Webm settings)
 
 NAI TODO:
+==========================
 General:
-	-Need to build test course
-	-Need colored balls (golf and soft ball)
-	-Need to fix kinect lense
 	-club laptop freezes after sleeping
-
-Kinect
-	-Save approx location of robot when images where taken?
 
 Kinect RGB
 	-Scan for key points
+	-Remember floor color for successful check
 
-Kinect depth
-	-Localizataion
-		+remember where wall closest to center was last time it was seen.
-	+Remember floor color for successful check
-
-States:
+STATES:
 	+Need to do the return, do state, struct
 		+States with arguments might have problems
 		(only  base states take arguments, and states call them themselves?)
-	-Scan state
-	-Goto state
-	-Search state
-	-Open door state
+
+	NOTE WHEN GOING TO DOOR GO TO THE SPACE DIRECTLY INFRONT OF IT
+		=Door will store direction
+
+	NAIBRAIN STATES {
+		>DOOR OPEN STATE
+			+Scan for door
+			+goto door found from scan
+			+goto space infront of door if not
+			+make sure door is closed first
+			+Scan QR code on door
+			+Open door if not closed
+
+		while(loops < dispensers used) {
+			>Go into room
+				+Goto nearest unused dispenser
+
+			>operate dispensers
+				+Line up dispenser
+				+get & check balls
+				+mark dispenser as used
+
+			>Return balls
+		}
+
+		>explore map (open doors and shit)
+	}
+
 
 AI:
+	-Make sure drive manager doesn't get stuck if overshoots node
 	-Check if path is still valid
 	-If path was successful mark each space with -1 likelyness. Meaning there is 0 chance it is a wall.
+	-Verification of walls (qr codes) is -2, meaning it's 100% a wall
+	-Make sure to check if NAI gets stuck
+
 
 Extras:
+=====================
 	(kinect)
+	-Need to fix kinect lense
 	-Double check rgb and depth allignment
 	-Stop kinect from flooding logger
+	-Save approx location of robot when images where taken?
+	-Localizataion
+		+remember where wall closest to center was last time it was seen.
 	(AI)
 	-Fine path finding
 	-Make coarse path finding go diagnol when can

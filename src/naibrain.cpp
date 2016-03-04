@@ -25,7 +25,6 @@ naibrain::naibrain() : pfind(GetMap()), driveman(&pfind, wmap.GetRobot()), locsy
 		bcwebcam = NULL;
 		std::cout << "Webcam initialization failed: " << e.what() << std::endl;
 	}
-	scan_state test(GetMap(),"d:l;s:90;");
 	states.push(new test_state(GetMap(), GetPfind()));
 }
 
@@ -71,11 +70,22 @@ void naibrain::tick() {
 		//std::cout << "End" << std::endl;
 	}
 
-	states.top()->Process();
-	pfind.checkpath();
-	driveman.runcom(states.top()->commands());
-	states.top()->SetStat(driveman.tick());
+	/*Managing states*/
+	if(states.size() != 0) {
+		if(states.top()->IsExit())
+			states.pop();
 
+		states.top()->Process();
+		pfind.checkpath();
+
+		if(states.top()->commands().size() > 0)
+			driveman.runcom(states.top()->commands());
+
+		if(driveman.tick())
+			states.top()->SetStat(std::string("1"));
+	}
+
+	/*approximation*/
 	obj_point dinc;
 	float dang;
 	if(locsys.approximate(dinc, dang)) 

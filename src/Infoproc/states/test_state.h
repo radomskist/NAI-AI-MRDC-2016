@@ -7,16 +7,14 @@ class test_state : public base_state {
 	public:
 		test_state(const world_map*, path_finding &);
 		~test_state();
-		bool Process();
+		int Process();
 		base_state *endstate();
-		void SetStat(bool);
+		void SetStat(std::string);
 
 	private:
 		int pathstat;
 		path_finding &pfind;
 		unsigned int curpath;
-
-
 
 };
 

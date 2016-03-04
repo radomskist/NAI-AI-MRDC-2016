@@ -5,7 +5,7 @@ test_state::test_state(const world_map* set_map, path_finding &set_find) : base_
 	curpath = 0;
 }
 
-bool test_state::Process() {
+int test_state::Process() {
 	if(pathstat == 0) {
 		if(pfind.gotopoint(obj_point(800,800,50))) {
 			pathstat = 1;
@@ -19,11 +19,11 @@ bool test_state::Process() {
 		}
 	}
 
-	return true;
+	return sexit;
 }
 
-void test_state::SetStat(bool set) {
-	if(set && (curpath == pfind.GetPathID())) {
+void test_state::SetStat(std::string set) {
+	if((set[0] != '0') && (curpath == pfind.GetPathID())) {
 		std::cout << "OH BABY" << std::endl;
 		curpath = 0;
 		pathstat++;

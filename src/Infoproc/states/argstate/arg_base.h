@@ -41,10 +41,10 @@ class arg_state : public base_state {
 			return args;
 		}
 
-		virtual bool Process() = 0; //Process information
+		virtual int Process() = 0; //Process information
 
 	private:
-		std::vector<std::array<std::string,2>>  args;
+		std::vector<std::array<std::string,2>> args;
 };
 
 #endif
