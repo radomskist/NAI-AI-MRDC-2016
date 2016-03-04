@@ -4,9 +4,22 @@ Being taken care of by other members:
 
 	-Look for posts on edge of map?
 
+	-Make window that prints values
+		+Battery
+		+CPU temp
+		+What drivemanager is doing
+		+Any important info
+
+
+
 TEST:
 	-Make sure had a second to warm up
 	-Fix crashing (Might be fixed?)
+
+	-RGB + Depth left right middle checks
+
+	-Alternative to X forwarding
+		(VLC with Webm settings)
 
 NAI TODO:
 General:
@@ -14,13 +27,6 @@ General:
 	-Need colored balls (golf and soft ball)
 	-Need to fix kinect lense
 	-club laptop freezes after sleeping
-	-Make window that prints values
-		+Battery
-		+CPU temp
-		+What drivemanager is doing
-		+Any important info
-	-Alternative to X forwarding
-		+Way too slow to startup
 
 Kinect
 	-Save approx location of robot when images where taken?
@@ -33,8 +39,18 @@ Kinect depth
 		+remember where wall closest to center was last time it was seen.
 	+Remember floor color for successful check
 
+States:
+	+Need to do the return, do state, struct
+		+States with arguments might have problems
+		(only  base states take arguments, and states call them themselves?)
+	-Scan state
+	-Goto state
+	-Search state
+	-Open door state
+
 AI:
-	-Keep track of how many times planes fail to verify and succeed
+	-Check if path is still valid
+	-If path was successful mark each space with -1 likelyness. Meaning there is 0 chance it is a wall.
 
 Extras:
 	(kinect)

@@ -12,6 +12,7 @@ class path_finding {
 		path_finding(const world_map*);
 		~path_finding();
 
+		void checkpath();
 		bool findpathtoobj(std::string);
 		bool searchat(obj_point);
 		bool gotopoint(obj_point);
@@ -29,12 +30,14 @@ class path_finding {
 		inline int xy2griterator(int, int);
 		inline int generate_grid(obj_point&);
 	
+		int goal;
 		int width = 11;
 		const world_map *wmap;
 		const obj_cube *robot;
 		unsigned int pathid;
 		grid_space grid[121];
-
+		bool pathgood;
+	
 		std::vector<obj_point> curpath;
 
 	};

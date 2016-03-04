@@ -9,6 +9,10 @@ std::string &base_state::commands() {
 	return commlist;
 }
 
+base_state *base_state::endstate() {
+	return NULL;
+}
+
 base_state::~base_state() {
 
 

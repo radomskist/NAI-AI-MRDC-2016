@@ -3,10 +3,31 @@
 
 path_finding::path_finding(const world_map *set_map) : wmap(set_map), robot(set_map->GetRobot()) {
 	pathid = 1;
-
+	pathgood = true;
+	wmap->InitGrid(grid);
 }
 
 path_finding::~path_finding() {
+}
+
+
+void path_finding::checkpath(){
+	if(pathgood == true) {
+		const grid_space *gridhold = wmap->GetGrid();
+		for(int i = 0; i < curpath.size(); i++) {
+			unsigned int pos = (curpath[i].x*.0025) + (curpath[i].y*.0025)*width;
+
+			if((gridhold[i].tags & non_traversable) && gridhold[i].likelyness < 10)
+					pathgood = false;		
+		}
+	}
+
+	if(!pathgood) {
+		obj_point resetgoal;
+		resetgoal.x = goal % width;
+		resetgoal.y = goal / width;
+		coarsepathfind(resetgoal);
+	}
 }
 
 
@@ -33,7 +54,7 @@ int path_finding::get_dist(int st, int end){
 
 bool path_finding::coarsepathfind(obj_point gl) {
 	int current;
-	int goal = generate_grid(gl);
+	goal = generate_grid(gl);
 	std::stack<int> open_set;
 	obj_point rob_pos_obj = robot->pos;
 
@@ -91,12 +112,17 @@ bool path_finding::coarsepathfind(obj_point gl) {
 		curpath.push_back(obj);
 		current = grid[current].parent;
 	}
-
 	return true;
 }
 
 int path_finding::generate_grid(obj_point &gl){
-	wmap->GetGrid(grid);
+	const grid_space *gridhold = wmap->GetGrid();
+
+	for(int i = 0; i < 121; i++) {
+		grid[i].tags = gridhold[i].tags;
+		if((gridhold[i].tags & non_traversable) && gridhold[i].likelyness < 10)
+			grid[i].tags |= ~non_traversable;
+	}
 
 	int goal = (gl.x*0.0025) + ((int)(gl.y*0.0025) * 11);
 
@@ -125,6 +151,7 @@ bool path_finding::gotopoint(obj_point findpoint) {
 	if(!coarsepathfind(findpoint))
 		return false;
 
+	pathgood = true;
 	pathid++;
 	return true;
 }

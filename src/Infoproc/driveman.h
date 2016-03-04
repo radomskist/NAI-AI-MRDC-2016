@@ -17,13 +17,16 @@ class drive_man {
 		~drive_man();
 		bool tick(); //returns if doing a path
 		bool runcom(std::string&);
-		void SetChecks(bool,bool,bool);
+		void override(bool);
+		const std::string GetCurComm(); //get current command;
+
 		bool GetEst(obj_point &, float &);
 
 	private:
 		inline bool movecheck(std::string&);
 		inline bool obstvoid(); //obsticalavoid
 		inline void execcom(); //execute command
+		inline void execcom(std::string &);
 		//inline void execcom(std::string&,); //execute command without rest of class
 
 		ccomm *drivechip; /*Arduino chip*/
@@ -32,7 +35,6 @@ class drive_man {
 		unsigned int delay, delaytime; //Delay between sending commands
 
 		/*commands*/
-		std::string override;
 		std::string currentpath;
 		std::vector<std::string> commandhist;
 
@@ -40,8 +42,10 @@ class drive_man {
 		float dir;
 		unsigned int cpathid;
 		int currentnode; //Current node we're in
-		bool front,right,left; //Can we go in these directions
 
+		/*override*/
+		bool overridemode;
+		std::string overridecom;
 
 		/*estimation*/
 		bool est;
