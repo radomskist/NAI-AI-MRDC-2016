@@ -23,7 +23,7 @@ enum node_flag{
     dispenser=0x02,
     cannon=0x04,
     goal=0x08,
-    gballbox=0x10,
+    door=0x10,
     my_gballbox=0x20,
     is_robot=0x40,
 	gopened=0x80,

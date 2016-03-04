@@ -21,7 +21,11 @@ scan_state::scan_state(const world_map *set_map, std::string set_args) : arg_sta
 					once = true;
 				break;
 			case 'f': 
-				
+				//searching for door
+				if(tempargs[i][2][1] == 'd') {
+					
+					
+				}
 				
 				break;
 		}

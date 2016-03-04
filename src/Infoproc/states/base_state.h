@@ -24,6 +24,8 @@ class base_state {
 				SS @ = Scan State
 					@ = scan attributes (look at scan_state.h)
 
+				S = State to execute next
+
 			OTHER:
 				RQ: Read QR code
 				*/

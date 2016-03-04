@@ -17,9 +17,8 @@ first_door::~first_door() {
 void first_door::intialize() {
 	const std::vector<obj_cube>& entities = wmap->GetEnts();
 
-	//TODO Do a scan of the area
 	if(!scanattempt){
-		commlist = "SS a:0;f:d;"
+		commlist = "SS a:0;f:d;";
 		comred = true;
 		return;
 	}
@@ -56,22 +55,29 @@ void first_door::intialize() {
 		return;
 	}
 	//Door not found
+	pfind.gotopoint(obj_point(600,2200,50));
 }
 
 int first_door::Process() {
 	if(!readytoopen && !scanning) {
 		intialize();
-		return;
+		return 0;
 	}
+
+	//TODO makesure facing door
 
 	if(!qrread) {
-		commlist = "RQ;"
+		commlist = "RQ;";
 		comred = true;
-		return;
+		return 0;
 	}
-	//Do go through door state
 
-	//Pop
+	//Exit
+	sexit = 1;
+}
+
+base_state *first_door::endstate() {
+	return new go_inside(wmap,pfind);
 }
 
 void first_door::SetStat(std::string set_state) {

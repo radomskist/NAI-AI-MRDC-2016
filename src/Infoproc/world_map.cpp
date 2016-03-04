@@ -3,7 +3,7 @@
 #include <iostream>
 world_map::world_map() : robot("NAI") {
 	robot.pos.x = 200;
-	robot.pos.y = 200;
+	robot.pos.y = 600;
 	robot.pos.z = 50;
 
 	mapversion = 0;
@@ -26,6 +26,20 @@ world_map::world_map() : robot("NAI") {
 		grid[i].tags = 0;
 		grid[i].likelyness = 0;
 	}
+
+	obj_cube mybox("mybox");
+	mybox.color[0] = 1.0;
+	mybox.color[1] = .5;
+	mybox.color[2] = .2;
+	mybox.height = 150;
+	mybox.width = 200;
+	mybox.pos.z = 75;
+	mybox.pos.x = 200;
+	mybox.pos.y = 200;
+
+	grid[0].tags &= my_gballbox;
+	entities_list.push_back(mybox);
+
 }
 
 unsigned int world_map::GetMapVersion() const {
@@ -326,6 +340,7 @@ void world_map::gentest() {
 	testdoor.pos.z = 150;
 	testdoor.pos.x = 1000;
 	testdoor.pos.y = 2200;
+	grid[5 + (11*3)].tags &= (door & ~non_traversable); 
 
 	entities_list.push_back(testdoor);
 	updategrid();

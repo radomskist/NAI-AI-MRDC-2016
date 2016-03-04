@@ -72,8 +72,14 @@ void naibrain::tick() {
 
 	/*Managing states*/
 	if(states.size() != 0) {
-		if(states.top()->IsExit())
+		if(states.top()->IsExit()) {
+			base_state *newstate = states.top()->endstate();
 			states.pop();
+			if(newstate != NULL) {
+				states.push(newstate);
+				delete newstate;
+				}
+		}
 
 		states.top()->Process();
 		pfind.checkpath();

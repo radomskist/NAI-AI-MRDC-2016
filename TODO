@@ -33,24 +33,15 @@ Kinect RGB
 	-Remember floor color for successful check
 
 STATES:
-	+Need to do the return, do state, struct
-		+States with arguments might have problems
-		(only  base states take arguments, and states call them themselves?)
+	-Scan state find object
 
-	NOTE WHEN GOING TO DOOR GO TO THE SPACE DIRECTLY INFRONT OF IT
-		=Door will store direction
+	NAIBRAIN STATE ORDER {
+		>Initial state (ALMOST DONE)
+			+need to make face door before QR scan
 
-	NAIBRAIN STATES {
-		>DOOR OPEN STATE
-			+Scan for door
-			+goto door found from scan
-			+goto space infront of door if not
-			+make sure door is closed first
-			+Scan QR code on door
-			+Open door if not closed
-
-		while(loops < dispensers used) {
+		while(dispensers used < total dispensers) {
 			>Go into room
+				+maksure Goto can open doors on its own
 				+Goto nearest unused dispenser
 
 			>operate dispensers
@@ -66,6 +57,9 @@ STATES:
 
 
 AI:
+	(MAYBE)
+		After the halfway mark make an override which instantly loads the entire actual map into NAIs memory
+
 	-Make sure drive manager doesn't get stuck if overshoots node
 	-Check if path is still valid
 	-If path was successful mark each space with -1 likelyness. Meaning there is 0 chance it is a wall.

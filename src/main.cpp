@@ -155,8 +155,11 @@ int main(int argc, char** argv)
 				glwin->setpath(mainbrain.GetPfind().GetPath());
 				//glwin->makecurrent();
 			}
+			std::vector<obj_cube> cubelist = wmap->GetEnts();
+			cubelist.push_back(*newbot);
 			glwin->makecurrent();
-			glwin->setents(wmap->GetEnts());
+			glwin->setents(cubelist);
+			cubelist.pop_back();
 			glwin->draw();
 		}
 		std::cout << "Exiting" << std::endl;
