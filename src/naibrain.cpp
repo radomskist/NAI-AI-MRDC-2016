@@ -25,7 +25,7 @@ naibrain::naibrain() : pfind(GetMap()), driveman(&pfind, wmap.GetRobot()), locsy
 		bcwebcam = NULL;
 		std::cout << "Webcam initialization failed: " << e.what() << std::endl;
 	}
-	states.push(new test_state(GetMap(), GetPfind()));
+	states.push(new first_door(GetMap(), GetPfind()));
 }
 
 naibrain::~naibrain() {

@@ -147,8 +147,6 @@ int main(int argc, char** argv)
 			mainbrain.tick();
 			MainWin.GetKeys();
 			MainWin.SetImg(mainbrain.GetImages(kmode));
-			addcube.pop_back();
-			addcube.push_back(*newbot);
 			//TODO optimize
 			if(mapversion != wmap->GetMapVersion()) {
 				glwin->makecurrent();
@@ -158,7 +156,7 @@ int main(int argc, char** argv)
 				//glwin->makecurrent();
 			}
 			glwin->makecurrent();
-			glwin->setents(addcube);
+			glwin->setents(wmap->GetEnts());
 			glwin->draw();
 		}
 		std::cout << "Exiting" << std::endl;

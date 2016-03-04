@@ -182,6 +182,8 @@ void world_map::checkplanes(int pointvalues[5]) {
 
 	//If fails within one gridspace than assume we're misaligned
 	//TODO: this can be error prone, needs heavy testing
+
+	//TODO diagonal planes
 	int dirx = 0;
 	int diry = 0;
 	int robx = robot.pos.x *.0025;
@@ -225,12 +227,21 @@ void world_map::checkplanes(int pointvalues[5]) {
 
 	dist *= 400;
 
+	//negative values are gaurenteed values
+	if(grid[pos].likelyness < 0)
+		return;
+
 	//too far away
-	if(pointvalues[2] - dist > 200)
+	if(pointvalues[2] - dist > 200) {
 		grid[pos].likelyness -= 2;
+		if(grid[pos].likelyness < 0)
+			grid[pos].likelyness = 0;
+	}
 	//Within range
 	else if(abs(pointvalues[2] - dist) > 200) {
 		grid[pos].likelyness += 2;
+		if(grid[pos].likelyness < 0)
+			grid[pos].likelyness = 0;
 		return;
 	}
 	//Too close
@@ -289,23 +300,41 @@ void world_map::gentest() {
 	newplane.width = 200;
 	newplane.pos.z = 150;
 	newplane.height = 150;
-	for(int i = 1; i < 6; i++) {
+	for(int i = 2; i < 6; i++) {
 		newplane.pos.x = i;
 		unsigned int spot = (newplane.pos.x + (newplane.pos.y)*width);
 		grid[spot].likelyness = 500;
 		plane_list.push_back(newplane);
 	}
 
-	newplane.pos.x = 1;
-	for(int i = 0; i < 2; i++) {
+	newplane.pos.x = 2;
+	for(int i = 1; i < 5; i++) {
 		newplane.pos.y = i;
 		unsigned int spot = (newplane.pos.x + (newplane.pos.y)*width);
 		grid[spot].likelyness = 500;
 		plane_list.push_back(newplane);
 	}
 
+	//Adding test door
+	obj_cube testdoor("door");
+	testdoor.rot = 3.14;
+	testdoor.color[0] = .2;
+	testdoor.color[1] = .5;
+	testdoor.color[2] = 1.0;
+	testdoor.height = 300;
+	testdoor.width = 400;
+	testdoor.pos.z = 150;
+	testdoor.pos.x = 1000;
+	testdoor.pos.y = 2200;
+
+	entities_list.push_back(testdoor);
 	updategrid();
 	
+}
+
+const std::vector<obj_cube> &world_map::GetEnts() const {
+	return entities_list;
+
 }
 
 void world_map::SetRobotAttr(obj_point set_pos, float set_ang) {

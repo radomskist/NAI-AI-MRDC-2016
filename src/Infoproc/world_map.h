@@ -40,6 +40,7 @@ class world_map {
 
 		//std::vector<2d_obj> GetObjsinview(perspective data) //This will be an optimization feature to check for objects ahead of time
 		const std::vector<obj_wall> &GetPlanes() const;
+		const std::vector<obj_cube> &GetEnts() const;
 		const obj_cube *GetRobot() const;
 		void InitGrid(grid_space *) const;
 		const grid_space *GetGrid() const;

@@ -19,9 +19,13 @@ class base_state {
 				MV # D = move
 					# = angle in radians to drive at (relative to robot. 1.57 = forward)
 					D = Distance to move
-			OTHER:
-				S @ = Scan
+			STATES:
+				
+				SS @ = Scan State
 					@ = scan attributes (look at scan_state.h)
+
+			OTHER:
+				RQ: Read QR code
 				*/
 		virtual base_state *endstate(); //Which state to go into next?
 		virtual void SetStat(std::string) {};

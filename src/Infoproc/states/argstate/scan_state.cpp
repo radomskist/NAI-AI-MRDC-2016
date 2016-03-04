@@ -83,6 +83,7 @@ scan_state::~scan_state() {
 
 int scan_state::Process() { //Process information
 	//TODO scan direction
+	//TODO process 45 degree angles
 	return sexit;
 }
 

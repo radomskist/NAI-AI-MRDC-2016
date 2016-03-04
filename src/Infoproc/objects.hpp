@@ -113,7 +113,7 @@ struct obj_cube : public obj_base {
 			type = CUBE;
 		}
 
-		std::string GetName() {
+		const std::string &GetName() const{
 			return name;
 		}
 
