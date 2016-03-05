@@ -100,6 +100,7 @@ struct obj_wall : public obj_base {
 
 		obj_point pos;
 		float width, height;
+		bool draw;
 	private:
 		int type; //Type we're dealing with
 		/*Also used for how many points Regular objects have 1, planes have 4, cubes have 8 (cubes might be for things like other robots and the space they occupy)*/
@@ -112,7 +113,7 @@ struct obj_cube : public obj_base {
 			type = CUBE;
 		}
 
-		std::string GetName() {
+		const std::string &GetName() const{
 			return name;
 		}
 

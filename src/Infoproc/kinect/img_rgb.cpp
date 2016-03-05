@@ -1,7 +1,7 @@
 #include "Infoproc/kinect/img_rgb.h"
 
 imgrgb::imgrgb(unsigned char set_color) {
-	floory = 350; //TODO make it load from config file
+	floory = 323; //TODO make it load from config file
 
 	ballcolor = set_color;
 	krgb.flags = KRGB;
@@ -103,10 +103,18 @@ void imgrgb::findground(cv::Mat &hsvin) {
 //return forward
 bool imgrgb::GroundCheck(bool &left, bool &right) {
 	int ypos = floory * 512;
-	int yposup = (floory - 20) * 512;
-	left = groundmat.data[204 + ypos] && groundmat.data[102 + ypos] && groundmat.data[153 + yposup];
-	right = groundmat.data[306 + ypos] && groundmat.data[408 + ypos] && groundmat.data[357 + yposup];
-	return groundmat.data[256 + ypos] && groundmat.data[204 + ypos] && groundmat.data[306 + ypos];
+	int yposup = (floory - 46) * 512;
+	left = (groundmat.data[50 + yposup] + groundmat.data[100 + yposup] + groundmat.data[150 + yposup]) > 510;
+	right = (groundmat.data[462 + yposup] + groundmat.data[412 + yposup] + groundmat.data[362 + yposup]) > 510;
+
+	int returnfront = 0;
+	for(int i = 0; i < 8; i++) {
+		if(groundmat.data[32 + ypos + (56*i)])
+			returnfront++;
+		if(groundmat.data[150 + yposup + (15*i)])
+			returnfront++;
+	}
+	return (returnfront > 15);
 }
 
 void imgrgb::findballs(cv::Mat &hsvin, cv::Mat &circlemat) {

@@ -131,7 +131,7 @@ int main(int argc, char** argv)
 		}
 	}
 	else {
-		sleep(1); //letting kinect warm up
+		sleep(2); //letting kinect warm up
 		multiwin MainWin;
 		const world_map *wmap = mainbrain.GetMap();
 		unsigned int kmode = KDEP | KRGB | KFREEZE;
@@ -147,18 +147,20 @@ int main(int argc, char** argv)
 			mainbrain.tick();
 			MainWin.GetKeys();
 			MainWin.SetImg(mainbrain.GetImages(kmode));
-			addcube.pop_back();
-			addcube.push_back(*newbot);
 			//TODO optimize
 			if(mapversion != wmap->GetMapVersion()) {
-				mapversion = wmap->GetMapVersion();
 				glwin->makecurrent();
+				mapversion = wmap->GetMapVersion();
 				glwin->setplanes(wmap->GetPlanes());
-				glwin->setents(addcube);
 				glwin->setpath(mainbrain.GetPfind().GetPath());
 				//glwin->makecurrent();
-				glwin->draw();
 			}
+			std::vector<obj_cube> cubelist = wmap->GetEnts();
+			cubelist.push_back(*newbot);
+			glwin->makecurrent();
+			glwin->setents(cubelist);
+			cubelist.pop_back();
+			glwin->draw();
 		}
 		std::cout << "Exiting" << std::endl;
 	}

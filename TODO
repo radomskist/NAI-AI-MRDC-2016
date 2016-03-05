@@ -1,46 +1,90 @@
 Being taken care of by other members:
+==================================
 		-Ball color identification needs to be done
 		-QR reading
 
 	-Look for posts on edge of map?
 
-TEST:
-	-Make sure had a second to warm up
-	-Fix crashing (Might be fixed?)
-
-NAI TODO:
-General:
-	-Need to build test course
-	-Need colored balls (golf and soft ball)
-	-Need to fix kinect lense
-	-club laptop freezes after sleeping
 	-Make window that prints values
 		+Battery
 		+CPU temp
 		+What drivemanager is doing
 		+Any important info
-	-Alternative to X forwarding
-		+Way too slow to startup
 
-Kinect
-	-Save approx location of robot when images where taken?
+
+
+TEST:
+===========================
+	-Make sure had a second to warm up
+	-Fix crashing (Might be fixed?)
+
+	-RGB + Depth left right middle checks
+
+	-Alternative to X forwarding
+		(VLC with Webm settings)
+
+NAI TODO:
+==========================
+General:
+	-club laptop freezes after sleeping
 
 Kinect RGB
-	-Scan for key points
+	-Remember floor color for successful check
 
-Kinect depth
-	-Localizataion
-		+remember where wall closest to center was last time it was seen.
-	+Remember floor color for successful check
+STATES:
+	-Scan state find object
+		+Scan for key points
+
+	NAIBRAIN STATE ORDER {
+		>Initial state (DONE! Needs testing)
+
+		while(dispensers used < total dispensers) {
+			>Go into room (initialized)
+				+make sure Goto can open doors on its own
+					-If next space has a door
+					-Go into door open space
+				+Goto nearest unused dispenser
+
+			>operate dispensers (initialized)
+				+Line up dispenser
+				+get & check balls
+				+mark dispenser as used
+
+			>Return balls (initialized
+		}
+
+		(extra)
+		>explore map 
+			+open doors,etc for extra points
+	}
+
 
 AI:
-	-Keep track of how many times planes fail to verify and succeed
+	(MAYBE)
+		After the halfway mark make an override which instantly loads the entire actual map into NAIs memory
+
+	-Make sure drive manager doesn't get stuck if overshoots node
+	-Check if path is still valid
+	-If path was successful mark each space with -1 likelyness. Meaning there is 0 chance it is a wall.
+	-Verification of walls (qr codes) is -2, meaning it's 100% a wall
+	-Make sure to check if NAI gets stuck
+	-World map needs support for doors
+		>add entities to memory map grid
+		>Drive manager has to know what to do when gets to door (go into door open state)
+		>likelyness for doors
+	-Make sure objects located aren't outside of the map (if 0 on depth assume +4.5 meters)
 
 Extras:
+=====================
 	(kinect)
+	-Need to fix kinect lense
 	-Double check rgb and depth allignment
 	-Stop kinect from flooding logger
+	-Save approx location of robot when images where taken?
+	-Localizataion
+		+remember where wall closest to center was last time it was seen.
 	(AI)
+	-Make path finding not assume goal isn't blocked
 	-Fine path finding
 	-Make coarse path finding go diagnol when can
 	-Make coarse path finding check which path is shortest

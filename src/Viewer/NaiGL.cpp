@@ -352,6 +352,8 @@ void naigl::setplanes(const std::vector<obj_wall> &add_newplane) {
 
 
 	for(int i = 0; i < add_newplane.size(); i++){
+		if(!add_newplane[i].draw)
+			continue;
 		obj_wall newobj = add_newplane[i];
 		obj_point center = newobj.pos;
 		center.x = (1 + center.x) * 400 - 200;

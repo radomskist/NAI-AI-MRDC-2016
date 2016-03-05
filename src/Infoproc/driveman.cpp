@@ -8,10 +8,8 @@ drive_man::drive_man(const path_finding * set_pfind, const obj_cube *set_rob) : 
 	estimv.x = 0;
 	estimv.y = 0;
 	cpathid = 0;
-	front = true;
-	left = true;
-	right = true;
 	est = false;
+	overridemode = false;
 
 	/*Callibrations*/
 	delay = 150; // in milliseconds
@@ -34,32 +32,31 @@ bool drive_man::runcom(std::string &command) {
 	if(command.empty() || drivechip == NULL)
 		return false;
 
-	override = command;
 	return false;
 }
 
-//Can we go left, front, or right?
-void drive_man::SetChecks(bool sfront, bool sleft, bool sright) {
-	front = sfront;
-	left = sleft;
-	right = sright;
+void drive_man::override(bool set) {
+	overridemode = set;
+}
+
+const std::string drive_man::GetCurComm() {
+	return currentpath;
 }
 
 bool drive_man::tick() {
 	//TODO readd override for when the path is completed
-
 	if(pfind->GetPath().size() == 0)
 		return false;
 
 	//Is it a new path or is path finished?
-	if(currentnode == 0) {
-		if(pfind->GetPathID() != cpathid) { //If new path
-			currentnode = pfind->GetPath().size();
-			cpathid = pfind->GetPathID();
-		}
-		else 
-			return true;
+	if(pfind->GetPathID() != cpathid) { //If new path
+		currentnode = pfind->GetPath().size();
+		cpathid = pfind->GetPathID();
 	}
+
+	if(currentnode == 0) 
+		return true;
+	
 
 	const std::vector<obj_point> &curpath = pfind->GetPath();
 	/***Checking if path is valid***/
@@ -69,7 +66,6 @@ bool drive_man::tick() {
 	difference = 0;
 	unsigned int milli = GetMilli();
 	if(delaytime < milli) {
-		difference = (milli/delaytime); //divided by 250
 		delaytime = milli + delay;
 	}
 	else
@@ -150,8 +146,10 @@ bool drive_man::tick() {
 	//commandhist
 	}
 
-	if(obstvoid())
+	if(!overridemode)
 		execcom();
+	//else
+	//	execcom(overridecom);
 
 	return false;
 }
@@ -161,22 +159,66 @@ void drive_man::execcom() {
 		drivechip->writecom(currentpath);
 
 	if(currentpath[0] == 'M' && currentpath[1] == 'V') {
-		int estimove = difference * drivespeed;
-		if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
-			(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
-		else
-			(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
+		if(currentpath[3] == '9') {
+			int estimove = drivespeed;
+			if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
+				(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
+			else
+				(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
+		}
+		else if(currentpath[3] == '1' && currentpath[4] == '8') {
+			int estimove = drivespeed;
+			if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
+				(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
+			else
+				(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
+		}
 	}
 	else if(currentpath[0] == 'R' && currentpath[1] == 'R') {
-		float estang = turnspeed*difference;
+		float estang = turnspeed;
 		estiangle -= estang;
 	}
 	else if(currentpath[0] == 'R' && currentpath[1] == 'L'){
-		float estang = turnspeed*difference;
+		float estang = turnspeed;
 		estiangle += estang;
 	}
 	est = true;
 }
+
+void drive_man::execcom(std::string &setstring) {
+	if(setstring.size() != 0)
+		return;
+
+	if(drivechip != NULL)	 //Checking here so we can do simulations
+		drivechip->writecom(setstring);
+
+	if(setstring[0] == 'M' && setstring[1] == 'V') {
+		if(setstring[3] == '9') {
+			int estimove = drivespeed;
+			if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
+				(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
+			else
+				(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
+		}
+		else if(setstring[3] == '1' && setstring[4] == '8') {
+			int estimove = drivespeed;
+			if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
+				(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
+			else
+				(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
+		}
+	}
+	else if(setstring[0] == 'R' && setstring[1] == 'R') {
+		float estang = turnspeed;
+		estiangle -= estang;
+	}
+	else if(setstring[0] == 'R' && setstring[1] == 'L'){
+		float estang = turnspeed;
+		estiangle += estang;
+	}
+	est = true;
+}
+
 
 //TODO remove error-proneness (which came first)
 bool drive_man::GetEst(obj_point &GetMv, float &GetAng) {
@@ -191,28 +233,6 @@ bool drive_man::GetEst(obj_point &GetMv, float &GetAng) {
 	est = false;
 	return true;
 }
-
-//obsticalavoid
-//TODO Makesure doens't go off map
-//TODO make sure not in state mode
-bool drive_man::obstvoid() {
-	//Checking if can move forward
-	if(currentpath[0] == 'M' && currentpath[1] == 'V') {
-
-		if (!((front && left) || (front && right))) {
-			return false;
-		}
-		//else if(!right)
-		//	currentpath = "RL 20!";
-		//else
-		//	currentpath = "RR 20!";
-	}
-	return true;
-
-}
-
-
-
 
 drive_man::~drive_man() {
 

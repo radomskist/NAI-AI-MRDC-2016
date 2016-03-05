@@ -1,6 +1,6 @@
 #include "naibrain.h"
 
-naibrain::naibrain() : pfind(GetMap()), driveman(&pfind, wmap.GetRobot()), locsys(driveman, wmap.GetRobot()) {
+naibrain::naibrain() : pfind(GetMap()), driveman(&pfind, wmap.GetRobot()), locsys(&driveman, wmap.GetRobot()) {
 	kinect_manager = 0;
 	//Initializing kinect manager
 	//red = 175
@@ -25,7 +25,7 @@ naibrain::naibrain() : pfind(GetMap()), driveman(&pfind, wmap.GetRobot()), locsy
 		bcwebcam = NULL;
 		std::cout << "Webcam initialization failed: " << e.what() << std::endl;
 	}
-	states.push(new test_state(GetMap(), GetPfind()));
+	states.push(new first_door(GetMap(), GetPfind()));
 }
 
 naibrain::~naibrain() {
@@ -56,7 +56,7 @@ void naibrain::tick() {
 		//std::cout << "Adding planes" << std::endl;
 
 		wmap.AddPlanes(kinect_manager->GetPlanes());
-		float checkpoints[5] = {97336, 97436, 97536, 97636,97736}; //525 * 190 + 56*(i*100)
+		int checkpoints[5] = {97336, 97436, 97536, 97636,97736}; //525 * 190 + 56*(i*100)
 		for(int i = 0; i < 5; i++)
 			checkpoints[i] = kinect_manager->GetDist(checkpoints[i]);
 		wmap.checkplanes(checkpoints);
@@ -65,13 +65,33 @@ void naibrain::tick() {
 		//std::cout << "Path check" << std::endl;
 		front = kinect_manager->PathCheck(left,right);
 		//std::cout << "Drive manager check" << std::endl;
-		driveman.SetChecks(front,left,right);
+		locsys.SetComm(driveman.GetCurComm());
+		locsys.SetChecks(front,left,right);
 		//std::cout << "End" << std::endl;
 	}
-	states.top()->Process();
-	driveman.runcom(states.top()->commands());
-	states.top()->SetStat(driveman.tick());
 
+	/*Managing states*/
+	if(states.size() != 0) {
+		if(states.top()->IsExit()) {
+			base_state *newstate = states.top()->endstate();
+			states.pop();
+			if(newstate != NULL) {
+				states.push(newstate);
+				delete newstate;
+				}
+		}
+
+		states.top()->Process();
+		pfind.checkpath();
+
+		if(states.top()->commands().size() > 0)
+			driveman.runcom(states.top()->commands());
+
+		if(driveman.tick())
+			states.top()->SetStat(std::string("1"));
+	}
+
+	/*approximation*/
 	obj_point dinc;
 	float dang;
 	if(locsys.approximate(dinc, dang)) 

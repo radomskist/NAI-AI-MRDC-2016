@@ -1,12 +1,24 @@
 #include "Infoproc/states/base_state.h"
 
 base_state::base_state(const world_map *set_map) : wmap(set_map) {
-
-
+	comred = false;
+	sexit = 0;
 }
 
 std::string &base_state::commands() {
-	return commlist;
+	if(comred) {
+		comred = false;
+		return commlist;
+	}
+	else
+		std::string();
+}
+
+int base_state::IsExit() { 
+	return sexit; 
+}
+base_state *base_state::endstate() {
+	return NULL;
 }
 
 base_state::~base_state() {

@@ -12,7 +12,7 @@ imgd::imgd() : kdepth(512,424,3), filteredimg(424, 512, CV_8UC1) {
 
 	//TODO make load from config
 	horizontalchecky = 150; //How high should a line be to check if its the top of a wall
-	floory = 300; 
+	floory = 380; 
 	lineest = false; //Predict where lines might be?
 	pixdist = 10; //Distance between pixels when testing flatness of plane
 	slopeerrorrange = 5; //Range of error when seeing if plane is flat
@@ -30,6 +30,7 @@ imgd::~imgd() {
 
 bool imgd::ScanGround(bool& left, bool& right) {
 	unsigned int ydown = 512*floory;
+	unsigned int ydownless = 512*(floory-46);
 
 	//Getting average distance of floor
 	if(floordist == 0) {
@@ -45,22 +46,21 @@ bool imgd::ScanGround(bool& left, bool& right) {
 			return true;
 	}
 	
-
 	int count = 0;
-	for(int i = 0; i < 2; i++) 
-		count += (abs(averagepointsc(ydown + 102+56*i) - floordist) < 5);	//This might be dangerous
+	for(int i = 1; i < 3; i++) 
+		count += (abs(averagepointsc(ydownless + 56*i) - floordist) < 5);	//This might be dangerous
 
 	left = (count == 2);
 	count = 0;
-	for(int i = 0; i < 2; i++) 
-		count += (abs(averagepointsc(ydown + 354+56*i) - floordist) < 5);
+	for(int i = 1; i < 3; i++) 
+		count += (abs(averagepointsc(ydownless + 316+56*i) - floordist) < 5);
 
 	right = (count == 2);
 	count = 0;
-	for(int i = 0; i < 10; i++) 
-		count += (abs(averagepointsc(ydown + 186+14*i) - floordist) < 4);
+	for(int i = 0; i < 8; i++) 
+		count += (abs(averagepointsc(ydown + 32+56*i) - floordist) < ((i > 3 && i < 6) ? 2 : 3));
 
-	return (count > 6);	
+	return (count == 8);	
 }
 
 std::vector<std::array<cv::Point,4>> imgd::ProcessLines(std::vector<cv::Vec4i> &lines, std::vector<std::array<cv::Point,2>> &horizontal, std::vector<std::array<cv::Point,2>> &verticle) {
