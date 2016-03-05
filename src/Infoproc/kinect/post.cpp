@@ -188,6 +188,7 @@ std::vector<cv::Vec3i> postFind(cv::Mat &source)
   return lineOut;
 }
 
+/*
 int main()
 {
 
@@ -200,6 +201,6 @@ int main()
 
 
   return 0;
-}
+}*/
 
 
