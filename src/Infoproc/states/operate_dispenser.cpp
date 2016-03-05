@@ -13,10 +13,12 @@ int operate_dis::Process() {
 
 
 }
+
 base_state *operate_dis::endstate(){ //Which state to go into next? 
 
 
 }
+
 void operate_dis::SetStat(std::string) {
 
 }

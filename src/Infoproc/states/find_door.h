@@ -20,6 +20,7 @@ class first_door : public base_state {
 		bool readytoopen;
 		bool qrread;
 		bool readingqr;
+		bool turning;
 		path_finding &pfind;
 };
 

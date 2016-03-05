@@ -36,12 +36,13 @@ STATES:
 	-Scan state find object
 
 	NAIBRAIN STATE ORDER {
-		>Initial state (ALMOST DONE)
-			+need to make face door before QR scan
+		>Initial state (DONE! Needs testing)
 
 		while(dispensers used < total dispensers) {
-			>Go into room
+			>Go into room 
 				+maksure Goto can open doors on its own
+					-If next space has a door
+					-Go into door open space
 				+Goto nearest unused dispenser
 
 			>operate dispensers
