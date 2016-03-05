@@ -51,7 +51,6 @@ STATES:
 
 		while(dispensers used < total dispensers) {
 			>Go into room (initialized)
-				+Go inside
 				+Goto nearest unused dispenser
 
 			>operate dispensers (initialized)

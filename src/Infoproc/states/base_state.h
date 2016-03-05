@@ -28,9 +28,9 @@ class base_state {
 
 			OTHER:
 				RQ: Read QR code
-				F # @:  Find
-						# = Shape
-						@ = color
+				F @ #:  Find
+						@ = Shape
+						# = color (hue)
 		*/
 
 		virtual base_state *endstate(); //Which state to go into next?

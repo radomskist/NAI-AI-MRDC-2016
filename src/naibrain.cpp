@@ -74,27 +74,36 @@ void naibrain::tick() {
 	if(states.size() != 0) {
 		if(states.top()->IsExit()) {
 			base_state *newstate = states.top()->endstate();
+			delete states.top();
 			states.pop();
 			if(newstate != NULL) {
 				states.push(newstate);
-				delete newstate;
 				}
 			stateend = true;
 		}
 
 		states.top()->Process();
 		pfind.checkpath();
+		std::string command = states.top()->commands();
+		/*Processing state commands*/
+		if(command.size() > 2) {
+			std::string subcheck = command.substr(0,2);
 
-		if(states.top()->commands().size() > 0)
-			driveman.runcom(states.top()->commands());
+			if(subcheck == "RA" || subcheck == "MV")
+				driveman.runcom(states.top()->commands());
+			else if(subcheck == "SS") {
+				base_state *newstate = new scan_state(GetMap(), command.substr(3,command.size()));
+				states.push(newstate);
+			}
+			
+		}
 
 		int ticknum = driveman.tick();
 		if(ticknum == 1)
 			states.top()->SetStat(std::string("1"));
 		else if(ticknum == 2) {
 			base_state *newstate = new open_door(GetMap(), pfind);
-			states.push(new open_door(GetMap(), pfind));
-			delete newstate;
+			states.push(newstate);
 		}
 		else if(ticknum == 3) { /*in override mode*/
 			std::cout << "Drive manager overwritten" << std::endl;

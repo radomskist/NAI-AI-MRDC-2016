@@ -1,5 +1,5 @@
 #include "Infoproc/states/base_state.h"
-
+#include <iostream>
 base_state::base_state(const world_map *set_map) : wmap(set_map) {
 	comred = false;
 	sexit = 0;
