@@ -18,9 +18,10 @@ class first_door : public base_state {
 		bool scanning;
 		bool scanattempt;
 		bool readytoopen;
+		bool turndone;
+		bool turning;
 		bool qrread;
 		bool readingqr;
-		bool turning;
 		path_finding &pfind;
 };
 

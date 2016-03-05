@@ -7,6 +7,7 @@ first_door::first_door(const world_map* set_map, path_finding &set_pfind) : base
 	scanning = false;
 	readingqr = false;
 	turning = false;
+	turndone = false;
 }
 first_door::~first_door() {
 
@@ -65,15 +66,7 @@ int first_door::Process() {
 	}
 
 	//TODO makesure facing door
-
-	if(!qrread) {
-		commlist = "RQ;";
-		comred = true;
-		return 0;
-	}
-
-	//Exit
-	if(!turning) {
+	if(!turndone) {
 		float turnangle = 6.24 - wmap->GetRobot()->rot;
 		commlist = "RA+";
 		commlist.append(std::to_string(turnangle));
@@ -81,6 +74,13 @@ int first_door::Process() {
 		turning = true;
 		return 0;
 	}
+
+	if(!qrread) {
+		commlist = "RQ;";
+		comred = true;
+		return 0;
+	}
+	sexit = 1;
 }
 
 base_state *first_door::endstate() {
@@ -94,12 +94,13 @@ void first_door::SetStat(std::string set_state) {
 			scanning = false;
 			scanattempt = true;
 		}
+		else if(turning) {
+			turning = false;
+			turndone = true;
+		}
 		else if(readingqr){
 			readingqr = false;
 			qrread = true;
-		}
-		else if(turning) {
-			sexit = 1;
 		}
 	}
 }

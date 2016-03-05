@@ -10,7 +10,6 @@
 #include "Infoproc/localize.h"
 #include "Infoproc/driveman.h"
 #include "Infoproc/states/base_state.h"
-#include "Infoproc/states/test_state.h"
 #include "Infoproc/states/find_door.h"
 #include "Infoproc/states/argstate/scan_state.h"
 

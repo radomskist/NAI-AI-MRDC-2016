@@ -29,31 +29,33 @@ General:
 	-club laptop freezes after sleeping
 
 Kinect RGB
-	-Scan for key points
 	-Remember floor color for successful check
 
 STATES:
 	-Scan state find object
+		+Scan for key points
 
 	NAIBRAIN STATE ORDER {
 		>Initial state (DONE! Needs testing)
 
 		while(dispensers used < total dispensers) {
-			>Go into room 
-				+maksure Goto can open doors on its own
+			>Go into room (initialized)
+				+make sure Goto can open doors on its own
 					-If next space has a door
 					-Go into door open space
 				+Goto nearest unused dispenser
 
-			>operate dispensers
+			>operate dispensers (initialized)
 				+Line up dispenser
 				+get & check balls
 				+mark dispenser as used
 
-			>Return balls
+			>Return balls (initialized
 		}
 
-		>explore map (open doors and shit)
+		(extra)
+		>explore map 
+			+open doors,etc for extra points
 	}
 
 

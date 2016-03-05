@@ -15,7 +15,7 @@ int operate_dis::Process() {
 }
 
 base_state *operate_dis::endstate(){ //Which state to go into next? 
-
+	return new return_ball(wmap, pfind);
 
 }
 
