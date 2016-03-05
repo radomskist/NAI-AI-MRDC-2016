@@ -19,7 +19,7 @@ class path_finding {
 		bool pathstatus();
 		const std::vector<obj_point> &GetPath() const;
 		unsigned int GetPathID() const;
-		
+		bool doorcheck() const;
 
 	private:
 		//Coarse pathfinding

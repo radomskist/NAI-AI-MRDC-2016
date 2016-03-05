@@ -112,6 +112,7 @@ bool path_finding::coarsepathfind(obj_point gl) {
 		curpath.push_back(obj);
 		current = grid[current].parent;
 	}
+
 	return true;
 }
 
@@ -120,7 +121,7 @@ int path_finding::generate_grid(obj_point &gl){
 
 	for(int i = 0; i < 121; i++) {
 		grid[i].tags = gridhold[i].tags;
-		if((gridhold[i].tags & non_traversable) && gridhold[i].likelyness < 10)
+		if((gridhold[i].tags & non_traversable) && gridhold[i].likelyness < 10 || gridhold[i].likelyness == -2)
 			grid[i].tags |= ~non_traversable;
 	}
 
@@ -145,6 +146,27 @@ bool path_finding::contains(std::vector<int> search_vect, int tar){
 			return true;
 
 	return false;
+}
+
+bool path_finding::doorcheck() const {
+	obj_point nextgrid = robot->pos;
+
+	if(robot->rot < .09 )
+		robot->pos.x + 400;
+	else if (abs(robot->rot - 3.14) < .09)
+		robot->pos.x - 400;
+	else if (abs(robot->rot - 1.57) < .09)
+		robot->pos.y + 400;
+	else if (abs(robot->rot - 4.71) < .09 )
+		robot->pos.y - 400;
+	else return false;
+
+	int gridspace = (nextgrid.x / 400) + ((nextgrid.y / 400)*11);
+	if(gridspace < 0 && gridspace > 120)
+		return false;
+
+	return (grid[gridspace].tags & door);
+
 }
 
 bool path_finding::gotopoint(obj_point findpoint) {

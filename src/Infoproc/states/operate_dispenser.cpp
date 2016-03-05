@@ -11,6 +11,17 @@ operate_dis::~operate_dis() { }
 //Process information
 int operate_dis::Process() {
 
+	//Line up
+
+	//Drive foward
+
+	//reallign
+
+	//Loops
+		//turn
+
+		//Check ball color
+	//when none end
 
 }
 

@@ -28,7 +28,11 @@ class base_state {
 
 			OTHER:
 				RQ: Read QR code
-				*/
+				F # @:  Find
+						# = Shape
+						@ = color
+		*/
+
 		virtual base_state *endstate(); //Which state to go into next?
 		virtual void SetStat(std::string) {};
 

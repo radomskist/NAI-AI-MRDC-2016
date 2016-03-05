@@ -87,8 +87,15 @@ void naibrain::tick() {
 		if(states.top()->commands().size() > 0)
 			driveman.runcom(states.top()->commands());
 
-		if(driveman.tick())
+		int ticknum = driveman.tick();
+		if(ticknum == 1)
 			states.top()->SetStat(std::string("1"));
+		else if(ticknum == 2) {
+			base_state *newstate = new open_door(GetMap(), pfind);
+			states.push(new open_door(GetMap(), pfind));
+			delete newstate;
+			}
+
 	}
 
 	/*approximation*/

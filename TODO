@@ -23,6 +23,10 @@ TEST:
 	-Alternative to X forwarding
 		(VLC with Webm settings)
 
+	GOTO DOOR OPENING STATE
+		-Go into door open state
+
+
 NAI TODO:
 ==========================
 General:
@@ -35,14 +39,19 @@ STATES:
 	-Scan state find object
 		+Scan for key points
 
+	-Open door state (initialized)
+		>if door is facing us
+			>raise arm, go foward, lower arm, back up, use contour on door to see where it begins and ends
+			>when door ends in middle turn 20 degrees to the right and drive foward
+			>Could also just look for the arm
+		>Othewise ram into door
+
 	NAIBRAIN STATE ORDER {
 		>Initial state (DONE! Needs testing)
 
 		while(dispensers used < total dispensers) {
 			>Go into room (initialized)
-				+make sure Goto can open doors on its own
-					-If next space has a door
-					-Go into door open space
+				+Go inside
 				+Goto nearest unused dispenser
 
 			>operate dispensers (initialized)
@@ -50,7 +59,10 @@ STATES:
 				+get & check balls
 				+mark dispenser as used
 
-			>Return balls (initialized
+			>Return balls (initialized)
+				+Goto our ball box
+				+Open ball box
+				+Drop ball
 		}
 
 		(extra)
