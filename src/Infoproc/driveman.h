@@ -17,7 +17,7 @@ class drive_man {
 		~drive_man();
 		int tick(); //returns if doing a path
 		bool runcom(std::string&);
-		void override(bool);
+		void SetOverride(bool);
 		const std::string GetCurComm(); //get current command;
 
 		bool GetEst(obj_point &, float &);

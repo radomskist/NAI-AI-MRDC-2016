@@ -69,7 +69,7 @@ void naibrain::tick() {
 		locsys.SetChecks(front,left,right);
 		//std::cout << "End" << std::endl;
 	}
-
+	bool stateend = false;
 	/*Managing states*/
 	if(states.size() != 0) {
 		if(states.top()->IsExit()) {
@@ -79,6 +79,7 @@ void naibrain::tick() {
 				states.push(newstate);
 				delete newstate;
 				}
+			stateend = true;
 		}
 
 		states.top()->Process();
@@ -94,8 +95,12 @@ void naibrain::tick() {
 			base_state *newstate = new open_door(GetMap(), pfind);
 			states.push(new open_door(GetMap(), pfind));
 			delete newstate;
-			}
-
+		}
+		else if(ticknum == 3) { /*in override mode*/
+			std::cout << "Drive manager overwritten" << std::endl;
+			if(stateend)
+				driveman.SetOverride(false);
+		}
 	}
 
 	/*approximation*/

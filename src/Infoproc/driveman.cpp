@@ -35,15 +35,14 @@ bool drive_man::runcom(std::string &command) {
 	return false;
 }
 
-void drive_man::override(bool set) {
-	overridemode = set;
-}
 
 const std::string drive_man::GetCurComm() {
 	return currentpath;
 }
 
 int drive_man::tick() {
+	if(overridemode)
+		return 3;
 	//TODO readd override for when the path is completed
 	if(pfind->GetPath().size() == 0)
 		return 0;
@@ -148,15 +147,20 @@ int drive_man::tick() {
 	/*Is the a door coming up?*/
 	}
 	else if (pfind->doorcheck()) {
+
 		return 2;
 	}
 
-	if(!overridemode)
-		execcom();
+
+	execcom();
 	//else
 	//	execcom(overridecom);
 
 	return 0;
+}
+
+void drive_man::SetOverride(bool set_override) {
+	overridemode = set_override;
 }
 
 void drive_man::execcom() {
