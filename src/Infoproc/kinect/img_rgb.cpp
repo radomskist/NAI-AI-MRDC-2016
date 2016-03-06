@@ -27,14 +27,28 @@ imgrgb::imgrgb(unsigned char set_color) {
 	ballparam.maxConvexity = 1.0;
 
 	balldet = cv::SimpleBlobDetector::create(ballparam); 
+
+	zbarscan.set_config(zbar::ZBAR_NONE, zbar::ZBAR_CFG_ENABLE, 1);
+
 }
 
 imgrgb::~imgrgb() {
 
 }
 
-void imgrgb::qrscan( int *offset, std::string *code_text) {
+void imgrgb::qrscan(int *offset, std::string *code_text) {
 
+    zbar::Image zimage(krgb.width, 381, "Y800", krgb.data, krgb.width * 381);
+
+    // scan the image for barcodes
+    int n = zbarscan.scan(zimage);
+
+    // extract results
+    for(zbar::Image::SymbolIterator i = zimage.symbol_begin(); i != zimage.symbol_end(); ++i) {
+        // do something useful with results
+        std::cout << "decoded " << i->get_type_name()
+             << " symbol \"" << i->get_data() << '"' << std::endl;
+    }
 
 }
 

@@ -41,7 +41,7 @@ Kinect RGB
 	-Remember floor color for successful check
 
 STATES:
-	-QR READ STATE
+	-QR READ STATE (almost done)
 		+Reads QR code and lines up with it so the QR code is in the center of the camera.
 
 	-Scan state find object

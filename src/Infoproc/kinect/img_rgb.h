@@ -46,6 +46,8 @@ class imgrgb {
 		nimg krgb;
 		cv::Mat groundmat;
 		cv::Ptr<cv::SimpleBlobDetector> balldet;
+
+		zbar::ImageScanner zbarscan;
 };
 
 #endif
