@@ -4,6 +4,7 @@ scan_state::scan_state(const world_map *set_map, std::string set_args) : arg_sta
 	once = false;
 	angle = 0;
 	direction = true;
+	doneonce = false;
 	turndon = false;
 
 	std::vector<std::array<std::string,2>> tempargs = GetArgs();
@@ -22,9 +23,8 @@ scan_state::scan_state(const world_map *set_map, std::string set_args) : arg_sta
 				break;
 			case 'f': 
 				//searching for door
-				if(tempargs[i][1][0] == 'd') {
+				if(tempargs[i][1][0] == 'd')
 					commlist = "F S 90";
-				}
 				
 				break;
 		}
@@ -64,7 +64,12 @@ void scan_state::SetStat(std::string set) {
 		scandir = scandir.substr(0,2);
 
 		if(angle < 0.05) {
-			//TODO add scanning function if done and o
+			//Doing our scan once (TODO TEST)
+			if(once && !doneonce) {
+				doneonce = true;
+				comred = true;
+				return;
+			}
 			sexit = 1;
 			return;
 		}

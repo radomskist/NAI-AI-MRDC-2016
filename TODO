@@ -26,21 +26,29 @@ TEST:
 	GOTO DOOR OPENING STATE
 		-Go into door open state
 
+	-World map needs support for doors
+		>add entities to memory map grid
+		>Drive manager has to know what to do when gets to door (go into door open state)
+		>likelyness for doors
 
 NAI TODO:
 ==========================
 General:
-	-club laptop freezes after sleeping
+	-Make club laptop never sleep
+	-GOALS: if lost remember last goal and look for it
 
 Kinect RGB
 	-Remember floor color for successful check
 
 STATES:
+	-QR READ STATE
+		+Reads QR code and lines up with it so the QR code is in the center of the camera.
+
 	-Scan state find object
 		+Scan for key points
 
 	-Open door state (initialized)
-		>if door is facing us
+		>if door is facing us (might be done by ardiono)
 			>raise arm, go foward, lower arm, back up, use contour on door to see where it begins and ends
 			>when door ends in middle turn 20 degrees to the right and drive foward
 			>Could also just look for the arm
@@ -74,19 +82,22 @@ AI:
 	(MAYBE)
 		After the halfway mark make an override which instantly loads the entire actual map into NAIs memory
 
-	-Make sure drive manager doesn't get stuck if overshoots node
-	-Check if path is still valid
-	-If path was successful mark each space with -1 likelyness. Meaning there is 0 chance it is a wall.
-	-Verification of walls (qr codes) is -2, meaning it's 100% a wall
 	-Make sure to check if NAI gets stuck
-	-World map needs support for doors
-		>add entities to memory map grid
-		>Drive manager has to know what to do when gets to door (go into door open state)
-		>likelyness for doors
+		+Make sure drive manager doesn't get stuck if overshoots node (just recalculate path)
+		+Check if path is still valid
+	-likelyness
+		+If path was successful mark each space with -1 likelyness. Meaning there is 0 chance it is a wall.
+		+Verification of walls (qr codes) is -2, meaning it's 100% a wall
+
 	-Make sure objects located aren't outside of the map (if 0 on depth assume +4.5 meters)
+
+	-If no localization system then use keypoint system (things that should be near the goal)
+		+If we're off just find that keypoint and go to it
 
 Extras:
 =====================
+	(general)
+	-club laptop freezes after sleeping
 	(kinect)
 	-Need to fix kinect lense
 	-Double check rgb and depth allignment

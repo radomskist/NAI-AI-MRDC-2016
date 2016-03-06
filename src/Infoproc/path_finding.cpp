@@ -59,7 +59,7 @@ bool path_finding::coarsepathfind(obj_point gl) {
 	obj_point rob_pos_obj = robot->pos;
 
 	 // divide get_robot.pos().x and y by 400 and tag the square it's in as the starting square, save the number to so you can just use that
-	int rob_pos=((rob_pos_obj.x/400)+((int)(rob_pos_obj.y/400)*width));
+	int rob_pos=((rob_pos_obj.x * .0025)+((int)(rob_pos_obj.y * .0025)*width));
 	grid[rob_pos].tags |= (is_robot | gopened);
 	open_set.push(rob_pos);
 

@@ -33,6 +33,11 @@ imgrgb::~imgrgb() {
 
 }
 
+void imgrgb::qrscan( int *offset, std::string *code_text) {
+
+
+}
+
 void imgrgb::findground(cv::Mat &hsvin) {
 	cv::Mat img3;
 	cv::Mat img2;
