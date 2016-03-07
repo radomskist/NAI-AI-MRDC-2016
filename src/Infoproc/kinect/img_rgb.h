@@ -2,7 +2,6 @@
 #define _NAIBRAIN_EYE_IMG_RGB
 
 #pragma once
-
 #include "utils/nimg.h"
 #include "utils/ntime.hpp"
 #include "Infoproc/objects.hpp"
@@ -14,10 +13,8 @@
 #include <opencv2/photo.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
-
+#include <zbar.h>
 /****************************************************************
-   AUTHOR:		Steven Radomski
-
    FUNCTION:	This will process the kinect RGB image
 
    NOTES:		N/A
@@ -31,7 +28,7 @@ class imgrgb {
 
 		void ProcessImg(unsigned char *);
 		nimg *GetImg();
-
+		void qrscan( int *, std::string *);
 		//TODO filter the image for green (QR code), blue (QR code), black (Posts), and our ball color
 		void ScanForKeypoints() {};
 
@@ -49,6 +46,8 @@ class imgrgb {
 		nimg krgb;
 		cv::Mat groundmat;
 		cv::Ptr<cv::SimpleBlobDetector> balldet;
+
+		zbar::ImageScanner zbarscan;
 };
 
 #endif

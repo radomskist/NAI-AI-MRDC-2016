@@ -8,6 +8,8 @@ first_door::first_door(const world_map* set_map, path_finding &set_pfind) : base
 	readingqr = false;
 	turning = false;
 	turndone = false;
+	infrontdoor = false;
+	startingpos = false;
 }
 first_door::~first_door() {
 
@@ -18,7 +20,14 @@ first_door::~first_door() {
 void first_door::intialize() {
 	const std::vector<obj_cube>& entities = wmap->GetEnts();
 
-	if(!scanattempt){
+	//TODO test
+	if(!startingpos) {
+		startingpos = true;
+		pfind.gotopoint(obj_point(200,2200,50));
+		return;
+		}
+
+	else if(!scanattempt){
 		commlist = "SS a:0;f:d;";
 		comred = true;
 		return;
@@ -56,7 +65,7 @@ void first_door::intialize() {
 		return;
 	}
 	//Door not found
-	pfind.gotopoint(obj_point(600,2200,50));
+	pfind.gotopoint(obj_point(600,2600,50));
 }
 
 int first_door::Process() {
@@ -90,7 +99,9 @@ base_state *first_door::endstate() {
 void first_door::SetStat(std::string set_state) {
 	/*are we checking if a scan attempt is done?*/
 	if(set_state[0] != '0') {
-		if(scanning) {
+		if(!infrontdoor) 
+			infrontdoor = true;
+		else if(scanning) {
 			scanning = false;
 			scanattempt = true;
 		}

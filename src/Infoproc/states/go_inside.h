@@ -16,6 +16,7 @@ class go_inside : public base_state {
 		base_state *endstate();
 	protected:
 		path_finding &pfind;
+		bool inside;
 };
 
 #endif

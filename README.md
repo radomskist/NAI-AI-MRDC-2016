@@ -35,10 +35,11 @@ http://opencv.org/downloads.html
 
 http://opencv.org/
 
-Zbar-Tools (Future dependency):
+Zbar-Tools:
 
 http://zbar.sourceforge.net/
 
+	sudo apt-get install libzbar-dev
 	sudo apt-get install zbar-tools
 
 

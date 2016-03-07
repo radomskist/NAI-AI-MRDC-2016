@@ -21,7 +21,7 @@ void localizer::SetChecks(bool set_front, bool set_left, bool _setright) {
 	//Checking if can move forward
 	if((drivecomm)[0] == 'M' && (drivecomm)[1] == 'V') {
 		if (!set_front) {
-			driveman->override(true);
+			driveman->SetOverride(true);
 			return;
 		}
 		//else if(!right)
@@ -29,7 +29,7 @@ void localizer::SetChecks(bool set_front, bool set_left, bool _setright) {
 		//else
 		//	drivecomm = "RR 20!";
 	}
-	driveman->override(false);	
+	driveman->SetOverride(false);	
 
 }
 

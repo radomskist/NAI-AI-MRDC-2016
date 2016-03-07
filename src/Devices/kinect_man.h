@@ -40,6 +40,7 @@ class kinectman {
 		bool ProcessImages(); //Proccess the images and sets the buffer values
 		bool PathCheck(bool &, bool&);
 		std::vector<obj_plane>& GetPlanes();
+		float qrscan( int *, std::string *);
 
 		float GetDist(float);
 		nimg *GetDepthImg();

@@ -15,9 +15,9 @@ class drive_man {
 	public:
 		drive_man(const path_finding *, const obj_cube *);
 		~drive_man();
-		bool tick(); //returns if doing a path
+		int tick(); //returns if doing a path
 		bool runcom(std::string&);
-		void override(bool);
+		void SetOverride(bool);
 		const std::string GetCurComm(); //get current command;
 
 		bool GetEst(obj_point &, float &);
@@ -27,6 +27,7 @@ class drive_man {
 		inline bool obstvoid(); //obsticalavoid
 		inline void execcom(); //execute command
 		inline void execcom(std::string &);
+		inline bool doorcheck();
 		//inline void execcom(std::string&,); //execute command without rest of class
 
 		ccomm *drivechip; /*Arduino chip*/

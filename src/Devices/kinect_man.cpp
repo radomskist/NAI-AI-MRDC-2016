@@ -59,6 +59,12 @@ kinectman::kinectman(unsigned char set_color) : rgb_proc(set_color) {
 }
 
 
+float kinectman::qrscan( int * offcenter, std::string *code_text) {
+	rgb_proc.qrscan(offcenter,code_text);
+
+	//return kinect distance;
+}
+
 bool kinectman::PathCheck(bool &left , bool& right) {
 
 	//If RGB fails do a second scan

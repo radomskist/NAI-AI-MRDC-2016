@@ -35,18 +35,17 @@ bool drive_man::runcom(std::string &command) {
 	return false;
 }
 
-void drive_man::override(bool set) {
-	overridemode = set;
-}
 
 const std::string drive_man::GetCurComm() {
 	return currentpath;
 }
 
-bool drive_man::tick() {
+int drive_man::tick() {
+	if(overridemode)
+		return 3;
 	//TODO readd override for when the path is completed
 	if(pfind->GetPath().size() == 0)
-		return false;
+		return 0;
 
 	//Is it a new path or is path finished?
 	if(pfind->GetPathID() != cpathid) { //If new path
@@ -55,13 +54,13 @@ bool drive_man::tick() {
 	}
 
 	if(currentnode == 0) 
-		return true;
+		return 1;
 	
 
 	const std::vector<obj_point> &curpath = pfind->GetPath();
 	/***Checking if path is valid***/
 	if(curpath.size() < 2)
-		return false;
+		return 0;
 
 	difference = 0;
 	unsigned int milli = GetMilli();
@@ -69,7 +68,7 @@ bool drive_man::tick() {
 		delaytime = milli + delay;
 	}
 	else
-		return false;
+		return 0;
 
 	/*if we're rotating see if we're on track or not*/
 	if((currentpath[0] == 'R')) 
@@ -84,7 +83,7 @@ bool drive_man::tick() {
 
 		currentnode--;
 		if(currentnode == 0)
-			return true;
+			return 1;
 
 		if(abs(curpath[currentnode].x - curpath[currentnode-1].x) != 0)
 			curpath[currentnode].x < curpath[currentnode-1].x ? dir = 0 : dir = 3.14;
@@ -144,14 +143,24 @@ bool drive_man::tick() {
 		/******************************************/
 	/*logging where we're going*/
 	//commandhist
+
+	/*Is the a door coming up?*/
+	}
+	else if (pfind->doorcheck()) {
+
+		return 2;
 	}
 
-	if(!overridemode)
-		execcom();
+
+	execcom();
 	//else
 	//	execcom(overridecom);
 
-	return false;
+	return 0;
+}
+
+void drive_man::SetOverride(bool set_override) {
+	overridemode = set_override;
 }
 
 void drive_man::execcom() {
