@@ -11,7 +11,7 @@ read_qr::~read_qr() {
 int read_qr::Process() {
 
 	//Request to scan image see how far off from the center we are
-	float distz; //dist from bot
+	float distz = 0; //dist from bot
 	int distfc = 0; //distance from center
 	std::string code; //qr code
 
@@ -21,4 +21,5 @@ int read_qr::Process() {
 		//Strafe to line up with image
 
 	}
+
 }
