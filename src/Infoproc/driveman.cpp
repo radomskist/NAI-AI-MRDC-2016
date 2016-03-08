@@ -9,12 +9,14 @@ drive_man::drive_man(const path_finding * set_pfind, const obj_cube *set_rob) : 
 	estimv.y = 0;
 	cpathid = 0;
 	est = false;
-	overridemode = false;
+	overridemode = 0;
 
 	/*Callibrations*/
 	delay = 150; // in milliseconds
-	drivespeed = 183*.001*delay; //speed per seconds converted for delay
-	turnspeed = .56*.001*delay;
+	//drivespeed = 183*.001*delay; //speed per seconds converted for delay
+	//turnspeed = .56*.001*delay;
+	drivespeed = 183*.003*delay; //speed per seconds converted for delay
+	turnspeed = .56*.003*delay;
 	turntol = .09; //Turning tolerance before considered to be straight
 
 	try {
@@ -27,10 +29,30 @@ drive_man::drive_man(const path_finding * set_pfind, const obj_cube *set_rob) : 
 }
 
 
+std::string drive_man::ArdState() {
+	std::string ardstuff;
+	if(drivechip != NULL)	 //Checking here so we can do simulations
+		ardstuff = drivechip->readall();
+
+	if(ardstuff.size() > 0)
+		std::cout << ardstuff << std::endl;
+
+	if(ardstuff == "q") {
+		overridecom = "";
+		overridemode = 0;
+	}
+
+	return ardstuff;
+}
 //Overriding commands
 bool drive_man::runcom(std::string &command) {
-	if(command.empty() || drivechip == NULL)
+	if(command.size() < 2 || drivechip == NULL)
 		return false;
+	
+	if(command[0] == 'R' && command[1] == 'r') {
+		drivechip->writecom(command);
+		overridemode = 2; //Doing a command that the arduino tells us to end
+	}
 
 	return false;
 }
@@ -74,12 +96,12 @@ int drive_man::tick() {
 	if((currentpath[0] == 'R')) 
 		if(fabs(dir - robot->rot) < turntol) {
 			commandhist.push_back(std::string("MV!"));
-			currentpath = "MV 90!";
+			currentpath = "MV 157!";
 		}
 
 	/*Are we in new node?*/
-	if(((dir < .09  || abs(dir - 3.14) < .09)&& (abs(curpath[currentnode-1].x - robot->pos.x) < 20))
-	 || ((abs(dir - 1.57) < .09 || abs(dir - 4.71) < .09 ) && (abs(curpath[currentnode-1].y - robot->pos.y) < 20))) {
+	if(((dir < .09  || abs(dir - 3.14) < .09)&& (abs(curpath[currentnode-1].x - robot->pos.x) < 50))
+	 || ((abs(dir - 1.57) < .09 || abs(dir - 4.71) < .09 ) && (abs(curpath[currentnode-1].y - robot->pos.y) < 50))) {
 
 		currentnode--;
 		if(currentnode == 0)
@@ -96,7 +118,7 @@ int drive_man::tick() {
 		/*driving foward if within tolerance*/
 		if(abs(dircompare) < turntol) {
 			commandhist.push_back(std::string("MV!"));
-			currentpath = "MV 90!";
+			currentpath = "MV 157!";
 		}
 
 		/*****************************************
@@ -159,7 +181,7 @@ int drive_man::tick() {
 	return 0;
 }
 
-void drive_man::SetOverride(bool set_override) {
+void drive_man::SetOverride(int set_override) {
 	overridemode = set_override;
 }
 
@@ -167,21 +189,23 @@ void drive_man::execcom() {
 	if(drivechip != NULL)	 //Checking here so we can do simulations
 		drivechip->writecom(currentpath);
 
+	std::cout << currentpath << std::endl;
 	if(currentpath[0] == 'M' && currentpath[1] == 'V') {
-		if(currentpath[3] == '9') {
+		if(currentpath[3] == '1' && currentpath[4] == '5' && currentpath[5] == '7') {
 			int estimove = drivespeed;
 			if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
 				(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
 			else
 				(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
 		}
+		/* TODO STRAFFING
 		else if(currentpath[3] == '1' && currentpath[4] == '8') {
 			int estimove = drivespeed;
 			if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
 				(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
 			else
 				(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
-		}
+		}*/
 	}
 	else if(currentpath[0] == 'R' && currentpath[1] == 'R') {
 		float estang = turnspeed;
@@ -202,20 +226,22 @@ void drive_man::execcom(std::string &setstring) {
 		drivechip->writecom(setstring);
 
 	if(setstring[0] == 'M' && setstring[1] == 'V') {
-		if(setstring[3] == '9') {
+		std::cout << setstring << std::endl;
+		if(setstring[3] == '1' && setstring[4] == '5' && setstring[5] == '7') {
 			int estimove = drivespeed;
 			if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
 				(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
 			else
 				(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
 		}
-		else if(setstring[3] == '1' && setstring[4] == '8') {
+		/* TODO: STRAFFING
+		else if(setstring[3] == '1' && setstring[4] == '5' setstring[5] == '7')  {
 			int estimove = drivespeed;
 			if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
 				(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
 			else
 				(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
-		}
+		}*/
 	}
 	else if(setstring[0] == 'R' && setstring[1] == 'R') {
 		float estang = turnspeed;

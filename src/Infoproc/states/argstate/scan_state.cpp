@@ -30,10 +30,11 @@ scan_state::scan_state(const world_map *set_map, std::string set_args) : arg_sta
 		}
 	}
 
+	std::cout << "SCANNIN" << std::endl;
 	float setang = 0;
 	//Turning left
 	if(!direction) {
-		scandir = std::string("RA+");
+		scandir = std::string("Rr+");
 		if(wmap->GetRobot()->rot < angle || abs(wmap->GetRobot()->rot - angle) < .05)
 			angle = wmap->GetRobot()->rot + 6.28 - angle;
 	}
@@ -41,13 +42,13 @@ scan_state::scan_state(const world_map *set_map, std::string set_args) : arg_sta
 		if(wmap->GetRobot()->rot > angle || abs(wmap->GetRobot()->rot - angle) < .05)
 			angle = wmap->GetRobot()->rot + 6.28 - angle;
 
-		scandir = std::string("RA-");
+		scandir = std::string("Rr-");
 	}
 
 
-	if(angle >= 3.14) {
-		scandir.append("1.57");
-		angle -= 1.57;
+	if(angle >= 314) {
+		scandir.append("157");
+		angle -= 157;
 	}
 	else {
 		angle = 0;
@@ -60,10 +61,11 @@ scan_state::scan_state(const world_map *set_map, std::string set_args) : arg_sta
 }
 
 void scan_state::SetStat(std::string set) {
+	std::cout << set << std::endl;
 	if(set[0] != '0') {
 		scandir = scandir.substr(0,2);
 
-		if(angle < 0.05) {
+		if(angle < 5) {
 			//Doing our scan once (TODO TEST)
 			if(once && !doneonce) {
 				doneonce = true;
@@ -73,9 +75,9 @@ void scan_state::SetStat(std::string set) {
 			sexit = 1;
 			return;
 		}
-		else if(angle >= 3.14) {
-			scandir.append("1.57");
-			angle -= 1.57;
+		else if(angle >= 314) {
+			scandir.append("157");
+			angle -= 157;
 		}
 		else {
 			angle = 0;

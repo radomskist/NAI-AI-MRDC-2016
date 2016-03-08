@@ -89,7 +89,7 @@ void naibrain::tick() {
 		if(command.size() > 2) {
 			std::string subcheck = command.substr(0,2);
 
-			if(subcheck == "RA" || subcheck == "MV")
+			if(subcheck == "RA" || subcheck == "MV" || subcheck == "Rr")
 				driveman.runcom(states.top()->commands());
 			else if(subcheck == "SS") {
 				base_state *newstate = new scan_state(GetMap(), command.substr(3,command.size()));

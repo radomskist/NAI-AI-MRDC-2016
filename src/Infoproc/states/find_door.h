@@ -15,6 +15,7 @@ class first_door : public base_state {
 		void SetStat(std::string);
 		base_state *endstate();
 	protected:
+		int mode;
 		bool startingpos;
 		bool infrontdoor;
 		bool scanning;

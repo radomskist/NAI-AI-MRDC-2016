@@ -30,7 +30,7 @@ imgd::~imgd() {
 
 bool imgd::ScanGround(bool& left, bool& right) {
 	unsigned int ydown = 512*floory;
-	unsigned int ydownless = 512*(floory-46);
+	unsigned int ydownless = 512*(floory-20);
 
 	//Getting average distance of floor
 	if(floordist == 0) {
@@ -58,9 +58,10 @@ bool imgd::ScanGround(bool& left, bool& right) {
 	right = (count == 2);
 	count = 0;
 	for(int i = 0; i < 8; i++) 
-		count += (abs(averagepointsc(ydown + 32+56*i) - floordist) < ((i > 3 && i < 6) ? 2 : 3));
+		count += (abs(averagepointsc(ydown + 32+56*i) - floordist) < ((i > 3 && i < 6) ? 2 : 4));
 
-	return (count == 8);	
+
+	return (count >= 7);	
 }
 
 std::vector<std::array<cv::Point,4>> imgd::ProcessLines(std::vector<cv::Vec4i> &lines, std::vector<std::array<cv::Point,2>> &horizontal, std::vector<std::array<cv::Point,2>> &verticle) {

@@ -16,8 +16,9 @@ class drive_man {
 		drive_man(const path_finding *, const obj_cube *);
 		~drive_man();
 		int tick(); //returns if doing a path
+		std::string ArdState(); //seeing what the ardiuno has to say
 		bool runcom(std::string&);
-		void SetOverride(bool);
+		void SetOverride(int);
 		const std::string GetCurComm(); //get current command;
 
 		bool GetEst(obj_point &, float &);
@@ -45,7 +46,7 @@ class drive_man {
 		int currentnode; //Current node we're in
 
 		/*override*/
-		bool overridemode;
+		int overridemode; //0 = no override, 1 = needs to be set to 0, 2 is set after reads something from arduino
 		std::string overridecom;
 
 		/*estimation*/

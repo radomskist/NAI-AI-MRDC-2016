@@ -1,15 +1,7 @@
 #include "Infoproc/states/find_door.h"
 
 first_door::first_door(const world_map* set_map, path_finding &set_pfind) : base_state(set_map), pfind(set_pfind) {
-	readytoopen = false;
-	qrread = false;
-	scanattempt = false;
-	scanning = false;
-	readingqr = false;
-	turning = false;
-	turndone = false;
-	infrontdoor = false;
-	startingpos = false;
+	mode = 0;
 }
 first_door::~first_door() {
 
@@ -21,17 +13,22 @@ void first_door::intialize() {
 	const std::vector<obj_cube>& entities = wmap->GetEnts();
 
 	//TODO test
-	if(!startingpos) {
-		startingpos = true;
+//	if(mode == 0) {
+if(mode == 2) {
+		mode++;
 		pfind.gotopoint(obj_point(200,2200,50));
 		return;
 		}
 
-	else if(!scanattempt){
+//	else if(mode == 2){
+if(mode == 0) {
 		commlist = "SS a:0;f:d;";
 		comred = true;
 		return;
 	}
+
+	if(mode < 4)
+		return;
 
 	//Seeing if scan picked up door
 	for(int i = 0; i < entities.size(); i++) {
@@ -57,7 +54,7 @@ void first_door::intialize() {
 			continue;
 
 		if(pfind.gotopoint(obj_point(gx,gy,50)))
-			readytoopen = true;
+			mode++;
 		else
 			//failed do scan
 			std::cout << "TODO: SCAN WHEN FAILED" << std::endl;
@@ -66,25 +63,25 @@ void first_door::intialize() {
 	}
 	//Door not found
 	pfind.gotopoint(obj_point(600,2600,50));
+	mode++;
 }
 
 int first_door::Process() {
-	if(!readytoopen && !scanning) {
+	if(mode < 5) {
 		intialize();
 		return 0;
 	}
 
 	//TODO makesure facing door
-	if(!turndone) {
-		float turnangle = 6.24 - wmap->GetRobot()->rot;
+	if(mode == 5) {
+		float turnangle = (6.24 - wmap->GetRobot()->rot) * 100;
 		commlist = "RA+";
 		commlist.append(std::to_string(turnangle));
-		comred = true;
-		turning = true;
+		mode++;
 		return 0;
 	}
 
-	if(!qrread) {
+	if(mode == 7) {
 		commlist = "RQ;";
 		comred = true;
 		return 0;
@@ -98,21 +95,11 @@ base_state *first_door::endstate() {
 
 void first_door::SetStat(std::string set_state) {
 	/*are we checking if a scan attempt is done?*/
+	std::cout << set_state << std::endl;
 	if(set_state[0] != '0') {
-		if(!infrontdoor) 
-			infrontdoor = true;
-		else if(scanning) {
-			scanning = false;
-			scanattempt = true;
-		}
-		else if(turning) {
-			turning = false;
-			turndone = true;
-		}
-		else if(readingqr){
-			readingqr = false;
-			qrread = true;
-		}
+
+		mode++;
+		std::cout << set_state << std::endl;
 	}
 }
 
