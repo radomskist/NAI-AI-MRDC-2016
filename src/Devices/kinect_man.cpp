@@ -58,6 +58,19 @@ kinectman::kinectman(unsigned char set_color) : rgb_proc(set_color) {
 	std::cout << "\nNaiEye: Video initialized!" << std::endl;
 }
 
+float kinectman::findobj(int * offset, unsigned char fhue, unsigned char fsat) { 
+	//Door barcode
+	//fhue = 65 
+	//fsat = 75
+	cv::Point2f objpos = rgb_proc.FindObjColor(fhue,fsat);
+
+	if(objpos.x == -1)
+		return -1;
+
+	*offset = objpos.x - 256;
+	return depth_proc.GetDist(objpos.x + (objpos.y*512));
+
+}
 
 float kinectman::qrscan( int * offcenter, std::string *code_text) {
 	rgb_proc.qrscan(offcenter,code_text);

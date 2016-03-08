@@ -10,6 +10,7 @@ imgrgb::imgrgb(unsigned char set_color) {
 	krgb.depth = 4;
 	krgb.data = new unsigned char[krgb.width*krgb.height*krgb.depth];
 	groundmat = cv::Mat::zeros(380,512,CV_8UC1);
+	objloc = cv::Mat::zeros(380,512,CV_8UC1);
 	floorcolor = 0;
 	floortol = 8;
 
@@ -138,32 +139,48 @@ void imgrgb::findground(cv::Mat &hsvin) {
 	img3.release();
 }
 
-int imgrgb::FindObjColor(unsigned char objhue,unsigned char objsat,unsigned char objvalue) {
+cv::Point2f imgrgb::FindObjColor(unsigned char objhue,unsigned char objsat) {
 	cv::Mat colorfilter;
 	cv::Mat colorfilter1;
+	objloc.release();
+	objloc = cv::Mat::zeros(380,512,CV_8UC1);
 
-	cv::inRange(hsvchan[0], 55, 70,colorfilter);
-	cv::inRange(hsvchan[1], 50, 100,colorfilter1);
+	cv::inRange(hsvchan[0], objhue - 12, objhue + 12,colorfilter);
+	cv::inRange(hsvchan[1], objsat - 25, objsat + 25,colorfilter1);
 	cv::bitwise_and(colorfilter,colorfilter1,colorfilter);
 	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4,4)));
 	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5,5)));
 	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(6,6)));
 
-	hsvchan[1] = cv::Scalar(0,0,0);
-	hsvchan[0] = colorfilter;
-	
 	std::vector<std::vector<cv::Point>> contours;
 	std::vector<cv::Vec4i> hierarchy;
 	cv::findContours(colorfilter,contours,hierarchy,cv::CHAIN_APPROX_NONE,cv::RETR_LIST);
 	
 	int maxsize = -1;
 	int ipos = -1;
-	for(int i = 0; i < contours.size(); i++)
-		if(maxsize < cv::contourArea(contours[i]))
+	for(int i = 0; i < contours.size(); i++) {
+		int csize = cv::contourArea(contours[i]);
+		if(maxsize < cv::contourArea(contours[i])) {
+			maxsize = csize;
 			ipos = i;
+			}
+	}
+
+	if(ipos == -1) {
+		colorfilter.release();
+		colorfilter1.release();
+		return cv::Point2f(-1,-1);
+	}
+
+	cv::Moments conmoments = cv::moments(contours[ipos]);
+	cv::Point2f centerofsquare((conmoments.m10/conmoments.m00), (conmoments.m01/conmoments.m00));
+	circle(objloc, centerofsquare ,20, cv::Scalar(255,255,255),-1,8,0);
+
+	//TODO strafe until x is decently close to center
 
 	colorfilter.release();
 	colorfilter1.release();
+	return centerofsquare;
 }
 
 //return forward
@@ -269,37 +286,37 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 	//cv::Mat circlesstuff;
 	//findballs(hsvchan[0], circlesstuff);
 
-
-	FindObjColor(71,100,220);
 	int bob;
 	std::string fag;
 	int resolution = krgb.width*381;
 	for(int i = 0; i < resolution; i++) {
 
-
+		/*
 		krgb.data[i*4] = hsvchan[0].data[i];
 		krgb.data[i*4 + 1] = hsvchan[1].data[i];
 		krgb.data[i*4 + 2] = hsvchan[0].data[i];
-		/*
+		*/
 		krgb.data[i*4] = rgbin.data[i*4];
 		krgb.data[i*4 + 1] = rgbin.data[i*4+1];
 		krgb.data[i*4 + 2] = rgbin.data[i*4+2];
-		*/
+
 
 		//if(cannystuff.data[i])
 		//	krgb.data[i*4 + 2] = cannystuff.data[i];	
 
 		//krgb.data[i*4 + 3] = 0;
+		if(objloc.data[i])
+			krgb.data[i*4 + 1] = objloc.data[i];
 		/*if(circlesstuff.data[i]) {
 			krgb.data[i*4] = 0;
 			krgb.data[i*4 + 1] = circlesstuff.data[i];
 			krgb.data[i*4 + 2] = 0;
-		}
+		}*/
 		else if(groundmat.data[i]) {
 			krgb.data[i*4] = groundmat.data[i];
 			krgb.data[i*4 + 1] = 0;
 			krgb.data[i*4 + 2] = 0;
-		}*/
+		}
 	}
 	//cannystuff.release();
 	img.release();

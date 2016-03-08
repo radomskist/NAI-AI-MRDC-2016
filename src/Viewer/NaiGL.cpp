@@ -350,7 +350,7 @@ void naigl::setplanes(const std::vector<obj_wall> &add_newplane) {
 	for(int i = 0; i < 18; i++)
 		cubecolorverts.push_back(1.0f);
 
-
+	std::cout << "NEWPLANE: " << add_newplane.size() << std::endl;
 	for(int i = 0; i < add_newplane.size(); i++){
 		if(!add_newplane[i].draw)
 			continue;
@@ -454,8 +454,8 @@ void naigl::setplanes(const std::vector<obj_wall> &add_newplane) {
 		planebuffer[0]);
 	
 	planelength = sizeof(float) * cubeverts.size();
-	glBufferSubData(GL_ARRAY_BUFFER,0, sizeof(ground), ground);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(ground), planelength, &cubeverts[0]);
+	glBufferSubData(GL_ARRAY_BUFFER,0, sizeof(float) * 18, ground);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(float) * 18, planelength, &cubeverts[0]);
 	glBindBuffer(GL_ARRAY_BUFFER,
 		planebuffer[1]);
 	glBufferSubData(GL_ARRAY_BUFFER,0, planelength, &cubecolorverts[0]);

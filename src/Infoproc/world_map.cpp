@@ -101,7 +101,8 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 
 			//rounding x
 			if(mod > 200)
-				tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025 + dirmodx);// making sure it goes into the next grid
+//				tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025 + dirmodx);// making sure it goes into the next grid
+				tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025);
 			else
 				tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025 );
 
@@ -109,7 +110,8 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 			mod = (int)(setplanes[j].p[i*3].y) % 400;
 			//rounding y
 			if(mod > 200) 
-				tempplane.p[i*3].y = (int)(setplanes[j].p[i*3].y*.0025 + dirmody);// making sure it goes into the next grid
+//				tempplane.p[i*3].y = (int)(setplanes[j].p[i*3].y*.0025 + dirmody);// making sure it goes into the next grid
+				tempplane.p[i*3].y = (int)(setplanes[j].p[i*3].y*.0025);
 			else
 				tempplane.p[i*3].y = (int)(setplanes[j].p[i*3].y*.0025);// making sure it goes into the next grid
 
@@ -189,7 +191,7 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 }
 
 
-//Removing any planes that fail the test
+//Removing any planes that fail the testwidth
 void world_map::checkplanes(int pointvalues[5]) {
 	//for(int i = 0; i < 5; i++)
 	//	std::cout << pointvalues[i] << std::endl;
@@ -198,13 +200,14 @@ void world_map::checkplanes(int pointvalues[5]) {
 	//TODO: this can be error prone, needs heavy testing
 
 	//TODO diagonal planes
+	pointvalues[2] *= 0.32808399;
 	int dirx = 0;
 	int diry = 0;
 	int robx = robot.pos.x *.0025;
 	int roby = robot.pos.y * .0025;
 	int basepos = robx + roby*width;
 
-	if(abs(robot.rot - 4.71) < .1)
+/*	if(abs(robot.rot - 4.71) < .1)
 		diry = -1;
 	else if (abs(robot.rot - 1.57) < .1) 
 		diry = 1;
@@ -212,7 +215,7 @@ void world_map::checkplanes(int pointvalues[5]) {
 		dirx = -1;
 	else if (robot.rot < .05) 
 		dirx = 1;
-	else return;
+	else return;*/
 
 	bool edgehit = false;
 	int dist = 0;
@@ -220,23 +223,22 @@ void world_map::checkplanes(int pointvalues[5]) {
 	int distleft = 0;
 	int distright = 0;
 	while(!edgehit) {
-		if(grid[pos].tags & non_traversable) {
-			break;
-		}
+		pos = basepos + dirx*robx + (diry*roby)* width;
+		dist = abs(grid[pos].x - robx) + abs(grid[pos].y - roby);
 
-		if(dirx < 0 && basepos + robx*dirx > 0)
-			dirx -= 1;
-		else if (dirx > 0 && dirx < (width - 2)) 
+		if(grid[pos].tags & non_traversable)
+			break;
+
+		if (robot.rot < .05 && dirx < (width - 2)) 
 			dirx += 1;
-		else if (diry > 0 && diry < (width - 2))
+		else if(abs(robot.rot - 3.14) < .1 && robx * dirx > 0)
+			dirx -= 1;
+		else if (abs(robot.rot - 1.57) < .1 && diry < (width - 2))
 			diry += 1;
-		else if(diry < 0 && basepos + roby*diry*width > 0) 
+		else if(abs(robot.rot - 4.71) < .1 && basepos + (roby * diry)*width > 0) 
 			diry -= 1;
 		else
 			return;
-
-		pos = basepos + dirx*robx + (diry*roby* width);
-		dist = abs(grid[pos].x - robx) + abs(grid[pos].y - roby);
 	}
 
 	dist *= 400;
@@ -244,18 +246,18 @@ void world_map::checkplanes(int pointvalues[5]) {
 	//negative values are gaurenteed values
 	if(grid[pos].likelyness < 0)
 		return;
-
 	//too far away
-	if(pointvalues[2] - dist > 200) {
-		grid[pos].likelyness -= 2;
-		if(grid[pos].likelyness < 0)
+
+	if(abs(pointvalues[2] - dist) > 200) {
+		grid[pos].likelyness -= 4;
+		if(grid[pos].likelyness < 0) {
 			grid[pos].likelyness = 0;
+			updategrid();
+		}
 	}
 	//Within range
-	else if(abs(pointvalues[2] - dist) > 200) {
-		grid[pos].likelyness += 2;
-		if(grid[pos].likelyness < 0)
-			grid[pos].likelyness = 0;
+	else if(abs(pointvalues[2] - dist) < 200) {
+		grid[pos].likelyness += 4;
 		return;
 	}
 	//Too close
@@ -285,18 +287,21 @@ const grid_space *world_map::GetGrid() const {
 void world_map::updategrid() {
 	mapversion++;
 	for(std::vector<obj_wall>::iterator i = plane_list.begin(); i != plane_list.end(); i++) {
-		unsigned int spot = (i->pos.x + (i->pos.y)*width);
-		grid[spot].tags |= non_traversable;
-		if(grid[spot].likelyness > 15)
-			i->draw = true;
 
+		unsigned int spot = (i->pos.x + (i->pos.y)*width);
+		if(grid[spot].likelyness >= 10) {
+			i->draw = true;
+			grid[spot].tags |= non_traversable;
+		}
 		//Removing walls that fail
 		else if (grid[spot].likelyness < 10) {
+			std::cout << "Erasing" << std::endl;
+			i->draw = false;
 			plane_list.erase(i);
-			grid[spot].tags |= ~non_traversable;
+			grid[spot].tags &= ~non_traversable;
+			i--;
 		}
 	}
-
 }
 
 
