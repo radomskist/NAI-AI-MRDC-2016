@@ -9,6 +9,7 @@ drive_man::drive_man(const path_finding * set_pfind, const obj_cube *set_rob) : 
 	estimv.y = 0;
 	cpathid = 0;
 	est = false;
+	obstical = false;
 	overridemode = 0;
 	continuestring = "g"; // string to keep going
 
@@ -30,6 +31,12 @@ drive_man::drive_man(const path_finding * set_pfind, const obj_cube *set_rob) : 
 }
 
 
+void drive_man::SetObst(bool set_obst) {
+	obstical = set_obst;
+
+}
+
+
 std::string drive_man::ArdState() {
 	std::string ardstuff;
 	if(drivechip != NULL)	 //Checking here so we can do simulations
@@ -38,7 +45,7 @@ std::string drive_man::ArdState() {
 	if(ardstuff.size() > 0)
 		std::cout << ardstuff << std::endl;
 
-	if(ardstuff == "q") {
+	if(ardstuff == "q" && overridemode == 2) {
 		overridecom = "";
 		overridemode = 0;
 	}
@@ -48,7 +55,7 @@ std::string drive_man::ArdState() {
 //Overriding commands
 bool drive_man::runcom(std::string &rcommand) {
 
-	if(rcommand.size() < 2 || drivechip == NULL)
+	if((rcommand.size() < 2 || drivechip == NULL) && !overridemode)
 		return false;
 
 	if(rcommand[0] == 'R' && rcommand[1] == 'r') {
@@ -68,7 +75,7 @@ bool drive_man::runcom(std::string &rcommand) {
 		overridecom = rcommand.substr(0,divider) + "!";
 		movedist = std::stoi(rcommand.substr(divider,rcommand.size()));
 		std::cout << "Override drive command: " << currentpath << " distance:" << movedist  << std::endl;
-		drivechip->writecom(currentpath);
+		execcom(currentpath);
 		overridemode = 4; //wait till command is over
 		return true;
 	}
@@ -84,9 +91,7 @@ int drive_man::tick() {
 	if(overridemode) {
 		if(overridemode == 2)
 			drivechip->writecom(continuestring);
-		if(overridemode == 4) {
-			drivechip->writecom(overridecom);
-
+		else if(overridemode == 4) {
 			unsigned int milli = GetMilli();
 			if(delaytime < milli) {
 				delaytime = milli + delay;
@@ -94,15 +99,20 @@ int drive_man::tick() {
 			else
 				return 3;
 
+			drivechip->writecom(overridecom);
 			movedist -= drivespeed;
 
-				if(movedist <= 0){
-					overridecom = "";
-					overridemode = 0;
-				}
+			if(movedist <= 0){
+				overridecom = "";
+				overridemode = 0;
+				return 1;
 			}
+		}
 		return 3;
 	}
+
+	if(obstical)
+		return 2;
 	//TODO readd override for when the path is completed
 	if(pfind->GetPath().size() == 0)
 		return 0;
@@ -220,6 +230,7 @@ int drive_man::tick() {
 }
 
 void drive_man::SetOverride(int set_override) {
+	std::cout << "OH BABY" << std::endl;
 	overridemode = set_override;
 }
 
@@ -227,7 +238,6 @@ void drive_man::execcom() {
 	if(drivechip != NULL)	 //Checking here so we can do simulations
 		drivechip->writecom(currentpath);
 
-	std::cout << currentpath << std::endl;
 	if(currentpath[0] == 'M' && currentpath[1] == 'V') {
 		if(currentpath[3] == '1' && currentpath[4] == '5' && currentpath[5] == '7') {
 			int estimove = drivespeed;

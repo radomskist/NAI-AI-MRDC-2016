@@ -6,7 +6,7 @@ scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman
 	direction = true;
 	init = false;
 	liningup = false;
-	mode = 0;
+	mode = 1;
 
 	std::vector<std::array<std::string,2>> tempargs = GetArgs();
 	for(int i = 0; i < tempargs.size(); i++) {
@@ -61,28 +61,32 @@ scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman
 void scan_state::SetStat(std::string set) {
 
 	if(set[0] != '0') {
-		scandir = scandir.substr(0,2);
 
-		mode++;
-		if(angle < 5) {
-			//Doing our scan once (TODO TEST)
-			if(once && mode == 1) {
-				comred = true;
-				return;
+		if(mode == 0 && angle > 5) {
+			scandir = scandir.substr(0,2);
+
+			std::cout << "ANGLE: " <<  angle << std::endl;
+
+			if(angle >= 314) {
+				scandir.append("157!");
+				angle -= 157;
 			}
+			else {
+				angle = 0;
+				scandir.append(std::to_string(angle) + "!");
+			}
+			commlist = scandir;
+		}
+		else if(mode == 0 && angle < 5)
+			mode++;
+		else if(mode == 1) {
+			if(liningup)
+				liningup = false;
+		}
+		else if(mode == 2) {
 			sexit = 1;
 			return;
 		}
-		else if(angle >= 314) {
-			scandir.append("157!");
-			angle -= 157;
-		}
-		else {
-			angle = 0;
-			scandir.append(std::to_string(angle) + "!");
-		}
-		if(liningup)
-			liningup = false;
 	}
 }
 
@@ -118,6 +122,8 @@ void scan_state::processscan() {
 		liningup = true;
 		comred = true;
 	}
+		else
+			mode = 2;
 }
 
 int scan_state::Process() { //Process information
@@ -127,7 +133,7 @@ int scan_state::Process() { //Process information
 	}
 
 	//TODO process 45 degree angles
-	if(!once && !liningup) 
+	if(!once && !liningup && mode == 1) 
 		processscan();
 
 	return sexit;

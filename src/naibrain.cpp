@@ -115,7 +115,6 @@ void naibrain::tick() {
 			states.push(newstate);
 		}
 		else if(ticknum == 3) { /*in override mode*/
-
 			if(stateend)
 				driveman.SetOverride(0);
 		}

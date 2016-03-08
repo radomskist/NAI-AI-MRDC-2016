@@ -19,6 +19,7 @@ class drive_man {
 		std::string ArdState(); //seeing what the ardiuno has to say
 		bool runcom(std::string&);
 		void SetOverride(int);
+		void SetObst(bool);
 		const std::string GetCurComm(); //get current command;
 
 		bool GetEst(obj_point &, float &);
@@ -49,6 +50,7 @@ class drive_man {
 		int overridemode; //0 = no override, 1 = needs to be set to 0, 2 is set after reads something from arduino
 		std::string overridecom;
 		int movedist; //driving override movedist
+		bool obstical;
 
 		/*estimation*/
 		bool est;
