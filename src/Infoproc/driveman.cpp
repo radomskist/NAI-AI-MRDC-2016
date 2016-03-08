@@ -10,6 +10,7 @@ drive_man::drive_man(const path_finding * set_pfind, const obj_cube *set_rob) : 
 	cpathid = 0;
 	est = false;
 	overridemode = 0;
+	continuestring = "g"; // string to keep going
 
 	/*Callibrations*/
 	delay = 150; // in milliseconds
@@ -41,17 +42,20 @@ std::string drive_man::ArdState() {
 		overridecom = "";
 		overridemode = 0;
 	}
-
 	return ardstuff;
 }
+
 //Overriding commands
-bool drive_man::runcom(std::string &command) {
-	if(command.size() < 2 || drivechip == NULL)
+bool drive_man::runcom(std::string &rcommand) {
+
+	if(rcommand.size() < 2 || drivechip == NULL)
 		return false;
-	
-	if(command[0] == 'R' && command[1] == 'r') {
-		drivechip->writecom(command);
-		overridemode = 2; //Doing a command that the arduino tells us to end
+
+	if(rcommand[0] == 'R' && rcommand[1] == 'r') {
+		std::cout << "Override 2 command: " << rcommand << std::endl;
+		drivechip->writecom(rcommand);
+		overridemode = 2; //wait till command is over
+		return true;
 	}
 
 	return false;
@@ -63,8 +67,12 @@ const std::string drive_man::GetCurComm() {
 }
 
 int drive_man::tick() {
-	if(overridemode)
+	if(overridemode) {
+		if(overridemode == 2)
+			drivechip->writecom(continuestring);
+
 		return 3;
+	}
 	//TODO readd override for when the path is completed
 	if(pfind->GetPath().size() == 0)
 		return 0;

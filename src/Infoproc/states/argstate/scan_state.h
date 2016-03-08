@@ -30,12 +30,13 @@ class scan_state : public arg_state {
 		void SetStat(std::string);
 
 	protected:
+		bool init;
 		bool once; //only scan the dir
-		bool turndon;
-		bool doneonce;
+		int mode;
 		float angle; //angle to turn to relative to current rot in radians
 		float direction; //true for right, false for left
 		std::string scandir;
+		std::string scantarg;
 };
 
 #endif

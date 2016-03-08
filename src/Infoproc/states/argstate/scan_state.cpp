@@ -4,8 +4,8 @@ scan_state::scan_state(const world_map *set_map, std::string set_args) : arg_sta
 	once = false;
 	angle = 0;
 	direction = true;
-	doneonce = false;
-	turndon = false;
+	init = false;
+	mode = 0;
 
 	std::vector<std::array<std::string,2>> tempargs = GetArgs();
 	for(int i = 0; i < tempargs.size(); i++) {
@@ -24,14 +24,12 @@ scan_state::scan_state(const world_map *set_map, std::string set_args) : arg_sta
 			case 'f': 
 				//searching for door
 				if(tempargs[i][1][0] == 'd')
-					commlist = "F S 90";
+					scantarg = "F S 90";
 				
 				break;
 		}
 	}
 
-	std::cout << "SCANNIN" << std::endl;
-	float setang = 0;
 	//Turning left
 	if(!direction) {
 		scandir = std::string("Rr+");
@@ -45,30 +43,28 @@ scan_state::scan_state(const world_map *set_map, std::string set_args) : arg_sta
 		scandir = std::string("Rr-");
 	}
 
-
-	if(angle >= 314) {
-		scandir.append("157");
+	if(angle >= 3.14) {
+		scandir.append("157!");
 		angle -= 157;
 	}
-	else {
-		angle = 0;
-		scandir.append(std::to_string(angle));
-	}
+	else 
+		scandir.append(std::to_string(100*angle).substr(0,3) + "!");
 
 	//Telling the brain to rotate
-	commlist = scandir;
+	//commlist = scandir;
+	commlist = scantarg;
 	comred = true;
 }
 
 void scan_state::SetStat(std::string set) {
-	std::cout << set << std::endl;
+
 	if(set[0] != '0') {
 		scandir = scandir.substr(0,2);
 
+		mode++;
 		if(angle < 5) {
 			//Doing our scan once (TODO TEST)
-			if(once && !doneonce) {
-				doneonce = true;
+			if(once && mode == 1) {
 				comred = true;
 				return;
 			}
@@ -76,12 +72,12 @@ void scan_state::SetStat(std::string set) {
 			return;
 		}
 		else if(angle >= 314) {
-			scandir.append("157");
+			scandir.append("157!");
 			angle -= 157;
 		}
 		else {
 			angle = 0;
-			scandir.append(std::to_string(angle));
+			scandir.append(std::to_string(angle) + "!");
 		}
 	}
 }
@@ -92,7 +88,11 @@ scan_state::~scan_state() {
 }
 
 int scan_state::Process() { //Process information
-	//TODO scan direction
+	if(!init && comred == false) {
+		init = true;
+		commlist = scantarg;
+	}
+
 	//TODO process 45 degree angles
 	if(!once)
 		comred = true;

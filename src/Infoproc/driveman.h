@@ -57,6 +57,7 @@ class drive_man {
 		int difference; //difference between delay and milliseconds
 		obj_point estimv;
 
+		std::string continuestring;
 };
 
 #endif

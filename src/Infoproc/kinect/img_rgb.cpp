@@ -26,7 +26,26 @@ imgrgb::imgrgb(unsigned char set_color) {
 	ballparam.minConvexity = .95;
 	ballparam.maxConvexity = 1.0;
 
-	balldet = cv::SimpleBlobDetector::create(ballparam); 
+	balldet = cv::SimpleBlobDetector::create(ballparam);
+
+	cv::SimpleBlobDetector::Params squareparam;
+	squareparam.minDistBetweenBlobs = 30.0f;
+	squareparam.filterByInertia = true;
+	squareparam.filterByConvexity = false;
+	squareparam.filterByColor = true;
+	squareparam.filterByCircularity = false;
+	squareparam.filterByArea = true;
+	squareparam.minCircularity = .65;
+	squareparam.maxCircularity = .85;
+	squareparam.minArea = 5.0f;
+	squareparam.maxArea = 600.0f;
+	squareparam.blobColor = 255;
+	squareparam.minInertiaRatio = 0.95f;
+	squareparam.maxInertiaRatio =  1.0f;
+	squareparam.minConvexity = .95;
+	squareparam.maxConvexity = 1.0; 
+
+	squaredet = cv::SimpleBlobDetector::create(squareparam);
 
 	zbarscan.set_config(zbar::ZBAR_NONE, zbar::ZBAR_CFG_ENABLE, 1);
 
@@ -38,11 +57,11 @@ imgrgb::~imgrgb() {
 
 void imgrgb::qrscan(int *offset, std::string *code_text) {
 
-    zbar::Image zimage(krgb.width, 381, "Y800", krgb.data, krgb.width * 381);
+    zbar::Image zimage(512, 424, "Y800",  (char*)hsvchan[0].data, 512 * 424);
 
     // scan the image for barcodes
     int n = zbarscan.scan(zimage);
-
+	std::cout << n << std::endl;
     // extract results
     for(zbar::Image::SymbolIterator i = zimage.symbol_begin(); i != zimage.symbol_end(); ++i) {
         // do something useful with results
@@ -119,6 +138,34 @@ void imgrgb::findground(cv::Mat &hsvin) {
 	img3.release();
 }
 
+int imgrgb::FindObjColor(unsigned char objhue,unsigned char objsat,unsigned char objvalue) {
+	cv::Mat colorfilter;
+	cv::Mat colorfilter1;
+
+	cv::inRange(hsvchan[0], 55, 70,colorfilter);
+	cv::inRange(hsvchan[1], 50, 100,colorfilter1);
+	cv::bitwise_and(colorfilter,colorfilter1,colorfilter);
+	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4,4)));
+	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5,5)));
+	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(6,6)));
+
+	hsvchan[1] = cv::Scalar(0,0,0);
+	hsvchan[0] = colorfilter;
+	
+	std::vector<std::vector<cv::Point>> contours;
+	std::vector<cv::Vec4i> hierarchy;
+	cv::findContours(colorfilter,contours,hierarchy,cv::CHAIN_APPROX_NONE,cv::RETR_LIST);
+	
+	int maxsize = -1;
+	int ipos = -1;
+	for(int i = 0; i < contours.size(); i++)
+		if(maxsize < cv::contourArea(contours[i]))
+			ipos = i;
+
+	colorfilter.release();
+	colorfilter1.release();
+}
+
 //return forward
 bool imgrgb::GroundCheck(bool &left, bool &right) {
 	int ypos = floory * 512;
@@ -193,6 +240,9 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 	//Image needs to be scaled down
 	//1920 -> 512, 1080 -> 381 with black pixels on the bottom, total 424
 	//3.75x, 2.47x
+	hsvchan[0].release();
+	hsvchan[1].release();
+	hsvchan[2].release();
 	cv::Mat rgbin;
 	cv::Mat HSVin;
 	cv::Mat img(1080,1920, CV_8UC4, rgbbuff);
@@ -210,33 +260,37 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 	cv::flip(img, rgbin, 1);
 
 	cv::cvtColor(rgbin,HSVin,CV_BGR2HSV);
-	cv::Mat channels[3];
-	cv::split(HSVin, channels);
+	cv::split(HSVin, hsvchan);
 	cv::Mat HVIMG;
 
 	/*finding the ground*/
-	HVIMG = channels[1]* .65 + channels[2]*.35;
+	HVIMG = hsvchan[1]* .65 + hsvchan[2]*.35;
 	findground(HVIMG);
-	cv::Mat circlesstuff;
-	findballs(channels[0], circlesstuff);
+	//cv::Mat circlesstuff;
+	//findballs(hsvchan[0], circlesstuff);
 
+
+	FindObjColor(71,100,220);
+	int bob;
+	std::string fag;
 	int resolution = krgb.width*381;
 	for(int i = 0; i < resolution; i++) {
+
+
+		krgb.data[i*4] = hsvchan[0].data[i];
+		krgb.data[i*4 + 1] = hsvchan[1].data[i];
+		krgb.data[i*4 + 2] = hsvchan[0].data[i];
 		/*
-		krgb.data[i*4] = channels[0].data[i];
-		krgb.data[i*4 + 1] = channels[0].data[i];
-		krgb.data[i*4 + 2] = channels[0].data[i];
-		*/
 		krgb.data[i*4] = rgbin.data[i*4];
 		krgb.data[i*4 + 1] = rgbin.data[i*4+1];
 		krgb.data[i*4 + 2] = rgbin.data[i*4+2];
-
+		*/
 
 		//if(cannystuff.data[i])
 		//	krgb.data[i*4 + 2] = cannystuff.data[i];	
 
 		//krgb.data[i*4 + 3] = 0;
-		if(circlesstuff.data[i]) {
+		/*if(circlesstuff.data[i]) {
 			krgb.data[i*4] = 0;
 			krgb.data[i*4 + 1] = circlesstuff.data[i];
 			krgb.data[i*4 + 2] = 0;
@@ -245,14 +299,11 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 			krgb.data[i*4] = groundmat.data[i];
 			krgb.data[i*4 + 1] = 0;
 			krgb.data[i*4 + 2] = 0;
-		}
+		}*/
 	}
 	//cannystuff.release();
 	img.release();
 	rgbin.release();
-	channels[0].release();
-	channels[1].release();
-	channels[2].release();
 	HVIMG.release();
 	//matcircle.release();
 

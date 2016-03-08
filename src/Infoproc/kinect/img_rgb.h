@@ -35,6 +35,9 @@ class imgrgb {
 		//return forward
 		bool GroundCheck(bool &, bool&);
 
+		int FindObjColor(unsigned char,unsigned char,unsigned char);
+
+
 	private:
 		int floortol;
 		unsigned int floory;
@@ -45,7 +48,9 @@ class imgrgb {
 		unsigned char floorcolor;
 		nimg krgb;
 		cv::Mat groundmat;
+		cv::Mat hsvchan[3];
 		cv::Ptr<cv::SimpleBlobDetector> balldet;
+		cv::Ptr<cv::SimpleBlobDetector> squaredet;
 
 		zbar::ImageScanner zbarscan;
 };
