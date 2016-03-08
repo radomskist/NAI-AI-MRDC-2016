@@ -1,6 +1,6 @@
 #include "Infoproc/states/argstate/scan_state.h"
 
-scan_state::scan_state(const world_map *set_map, std::string set_args) : arg_state(set_map,set_args) {
+scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman& set_kinect) : arg_state(set_map,set_args), kinect_manager(set_kinect) {
 	once = false;
 	angle = 0;
 	direction = true;

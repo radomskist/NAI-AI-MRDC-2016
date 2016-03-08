@@ -41,7 +41,7 @@ class kinectman {
 		bool PathCheck(bool &, bool&);
 		std::vector<obj_plane>& GetPlanes();
 
-		float findobj(int*); 
+		float findobj(int *, unsigned char, unsigned char);
 		float qrscan(int*, std::string *);
 
 		float GetDist(float);

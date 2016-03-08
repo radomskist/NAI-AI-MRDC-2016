@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include "Infoproc/world_map.h"
+#include "Devices/kinect_man.h"
 #include "Infoproc/states/argstate/arg_base.h"
 
 /*arguments
@@ -23,7 +24,7 @@ f:obj details;
 class scan_state : public arg_state {
 
 	public:
-		scan_state(const world_map*, std::string);
+		scan_state(const world_map*, std::string, kinectman&);
 		~scan_state();
 
 		int Process(); //Process information
@@ -37,6 +38,7 @@ class scan_state : public arg_state {
 		float direction; //true for right, false for left
 		std::string scandir;
 		std::string scantarg;
+		kinectman &kinect_manager;
 };
 
 #endif

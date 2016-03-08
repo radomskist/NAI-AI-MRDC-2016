@@ -95,14 +95,15 @@ void naibrain::tick() {
 			/*states*/
 			else if(subcheck[0] == 'S') {
 				//Scan state
-				if(subcheck[1] == 'S') {
-					base_state *newstate = new scan_state(GetMap(), command.substr(3,command.size()));
-					states.push(newstate);
-				}
+				if(subcheck[1] == 'S')
+					if(kinect_manager != NULL) {
+						base_state *newstate = new scan_state(GetMap(), command.substr(3,command.size()),*kinect_manager);
+						states.push(newstate);
+					}
 			}
 			//FIND 
 			else if(subcheck[0] == 'f') {
-				std::cout << " find shit " << std::endl;
+
 			}
 		}
 

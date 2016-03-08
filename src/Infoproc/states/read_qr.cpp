@@ -1,6 +1,6 @@
 #include "Infoproc/states/read_qr.h"
 
-read_qr::read_qr(const world_map* set_map, kinectman& set_rgb) : base_state(set_map), kinectmanager(set_rgb) {
+read_qr::read_qr(const world_map* set_map) : base_state(set_map) {
 
 }
 
@@ -15,7 +15,7 @@ int read_qr::Process() {
 	int distfc = 0; //distance from center
 	std::string code; //qr code
 
-	distz = kinectmanager.qrscan(&distfc, &code);
+	//distz = kinectmanager.qrscan(&distfc, &code);
 
 	if(abs(distfc) > 40) {
 		//Strafe to line up with image
