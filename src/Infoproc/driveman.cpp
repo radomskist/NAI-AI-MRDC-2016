@@ -57,7 +57,21 @@ bool drive_man::runcom(std::string &rcommand) {
 		overridemode = 2; //wait till command is over
 		return true;
 	}
+	else if(rcommand[0] == 'M' && rcommand[1] == 'V') {
 
+		int divider;
+		for(int i = 3; i < rcommand.size(); i++)
+			if(rcommand[i] == ' ') {
+				divider = i;
+				break;
+			}
+		overridecom = rcommand.substr(0,divider) + "!";
+		movedist = std::stoi(rcommand.substr(divider,rcommand.size()));
+		std::cout << "Override drive command: " << currentpath << " distance:" << movedist  << std::endl;
+		drivechip->writecom(currentpath);
+		overridemode = 4; //wait till command is over
+		return true;
+	}
 	return false;
 }
 
@@ -70,7 +84,23 @@ int drive_man::tick() {
 	if(overridemode) {
 		if(overridemode == 2)
 			drivechip->writecom(continuestring);
+		if(overridemode == 4) {
+			drivechip->writecom(overridecom);
 
+			unsigned int milli = GetMilli();
+			if(delaytime < milli) {
+				delaytime = milli + delay;
+			}
+			else
+				return 3;
+
+			movedist -= drivespeed;
+
+				if(movedist <= 0){
+					overridecom = "";
+					overridemode = 0;
+				}
+			}
 		return 3;
 	}
 	//TODO readd override for when the path is completed

@@ -150,7 +150,6 @@ cv::Point2f imgrgb::FindObjColor(unsigned char objhue,unsigned char objsat) {
 	cv::bitwise_and(colorfilter,colorfilter1,colorfilter);
 	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4,4)));
 	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5,5)));
-	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(6,6)));
 
 	std::vector<std::vector<cv::Point>> contours;
 	std::vector<cv::Vec4i> hierarchy;
@@ -286,14 +285,12 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 	//cv::Mat circlesstuff;
 	//findballs(hsvchan[0], circlesstuff);
 
-	int bob;
-	std::string fag;
 	int resolution = krgb.width*381;
 	for(int i = 0; i < resolution; i++) {
 
 		/*
 		krgb.data[i*4] = hsvchan[0].data[i];
-		krgb.data[i*4 + 1] = hsvchan[1].data[i];
+		krgb.data[i*4 + 1] = hsvchan[0].data[i];
 		krgb.data[i*4 + 2] = hsvchan[0].data[i];
 		*/
 		krgb.data[i*4] = rgbin.data[i*4];

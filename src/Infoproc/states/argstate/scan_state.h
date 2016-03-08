@@ -31,6 +31,10 @@ class scan_state : public arg_state {
 		void SetStat(std::string);
 
 	protected:
+		inline void processscan();
+		unsigned char shue,ssat;
+		bool liningup;
+		int offset;
 		bool init;
 		bool once; //only scan the dir
 		int mode;

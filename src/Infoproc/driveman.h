@@ -48,6 +48,7 @@ class drive_man {
 		/*override*/
 		int overridemode; //0 = no override, 1 = needs to be set to 0, 2 is set after reads something from arduino
 		std::string overridecom;
+		int movedist; //driving override movedist
 
 		/*estimation*/
 		bool est;

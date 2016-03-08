@@ -68,7 +68,7 @@ float kinectman::findobj(int * offset, unsigned char fhue, unsigned char fsat) {
 		return -1;
 
 	*offset = objpos.x - 256;
-	return depth_proc.GetDist(objpos.x + (objpos.y*512));
+	return (depth_proc.GetDist(objpos.x + (objpos.y*512)) * 0.32808399);
 
 }
 

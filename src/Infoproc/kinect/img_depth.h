@@ -29,7 +29,6 @@ class imgd {
 		imgd();
 		~imgd();
 
-
 		float GetDist(unsigned int);
 		void ProcessImg(unsigned char *,std::vector<obj_plane> &);
 		nimg *GetImg();

@@ -5,6 +5,7 @@ scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman
 	angle = 0;
 	direction = true;
 	init = false;
+	liningup = false;
 	mode = 0;
 
 	std::vector<std::array<std::string,2>> tempargs = GetArgs();
@@ -23,8 +24,10 @@ scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman
 				break;
 			case 'f': 
 				//searching for door
-				if(tempargs[i][1][0] == 'd')
-					scantarg = "F S 90";
+				if(tempargs[i][1][0] == 'd'){
+					shue = 65;
+					ssat = 75;
+				}
 				
 				break;
 		}
@@ -51,8 +54,7 @@ scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman
 		scandir.append(std::to_string(100*angle).substr(0,3) + "!");
 
 	//Telling the brain to rotate
-	//commlist = scandir;
-	commlist = scantarg;
+	commlist = scandir;
 	comred = true;
 }
 
@@ -79,6 +81,8 @@ void scan_state::SetStat(std::string set) {
 			angle = 0;
 			scandir.append(std::to_string(angle) + "!");
 		}
+		if(liningup)
+			liningup = false;
 	}
 }
 
@@ -87,15 +91,44 @@ scan_state::~scan_state() {
 	
 }
 
+void scan_state::processscan() {
+	float dist = kinect_manager.findobj(&offset,shue,ssat);
+	std::cout << dist << " away and " << offset << "missaligned." << std::endl;
+
+	int strafeamount;
+	std::string strafedir;
+	strafeamount = (offset * 0.00390625) + (dist * 0.113777778); //1/256,percentage of offset, 512/4500 cam width / depth distance
+
+	if(offset > 0)
+		strafedir = " 0 ";
+	else
+		strafedir = " 314 ";
+
+	/*if(strafeamount > 20) {
+		commlist = "MV";
+		commlist.append(strafedir);
+		commlist.append(std::to_string(strafeamount));
+		commlist.append("!");
+		liningup = true;
+		comred = true;
+	}
+	else*/ if (dist > 700) {
+		commlist = "MV";
+		commlist.append(" 157 100!");
+		liningup = true;
+		comred = true;
+	}
+}
+
 int scan_state::Process() { //Process information
 	if(!init && comred == false) {
 		init = true;
-		commlist = scantarg;
+		commlist = "";
 	}
 
 	//TODO process 45 degree angles
-	if(!once)
-		comred = true;
+	if(!once && !liningup) 
+		processscan();
 
 	return sexit;
 }

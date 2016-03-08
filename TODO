@@ -31,10 +31,18 @@ TEST:
 		>Drive manager has to know what to do when gets to door (go into door open state)
 		>likelyness for doors
 
+
+TODO AT COURSE:
+	>Make sure shadows don't throw things off (Object finding)
+	>Check to make sure floor doesn't trip things up
+	>Reconfigure movespeed so it's accurate to the course
+
+
 NAI TODO:
 ==========================
 General:
 	-Make club laptop never sleep
+	-Bug with walls rendering
 	-GOALS: if lost remember last goal and look for it
 
 Kinect RGB

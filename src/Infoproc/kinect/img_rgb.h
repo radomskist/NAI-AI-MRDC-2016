@@ -28,7 +28,7 @@ class imgrgb {
 
 		void ProcessImg(unsigned char *);
 		nimg *GetImg();
-		void qrscan( int *, std::string *);
+		void qrscan(int *, std::string *);
 		//TODO filter the image for green (QR code), blue (QR code), black (Posts), and our ball color
 		void ScanForKeypoints() {};
 
