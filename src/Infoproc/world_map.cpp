@@ -100,18 +100,16 @@ void world_map::AddPlanes(std::vector<obj_plane> &setplanes) {
 			}
 
 			//rounding x
-			if(mod > 200)
-//				tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025 + dirmodx);// making sure it goes into the next grid
-				tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025);
+			if(mod > 100)
+				tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025 + dirmodx);// making sure it goes into the next grid
 			else
 				tempplane.p[i*3].x = (int)(setplanes[j].p[i*3].x*.0025 );
 
 
 			mod = (int)(setplanes[j].p[i*3].y) % 400;
 			//rounding y
-			if(mod > 200) 
-//				tempplane.p[i*3].y = (int)(setplanes[j].p[i*3].y*.0025 + dirmody);// making sure it goes into the next grid
-				tempplane.p[i*3].y = (int)(setplanes[j].p[i*3].y*.0025);
+			if(mod > 100) 
+				tempplane.p[i*3].y = (int)(setplanes[j].p[i*3].y*.0025 + dirmody);// making sure it goes into the next grid
 			else
 				tempplane.p[i*3].y = (int)(setplanes[j].p[i*3].y*.0025);// making sure it goes into the next grid
 

@@ -46,6 +46,7 @@ std::string drive_man::ArdState() {
 		std::cout << ardstuff << std::endl;
 
 	if(ardstuff == "q" && overridemode == 2) {
+		estiangle = dir;
 		overridecom = "";
 		overridemode = 0;
 	}
@@ -89,8 +90,16 @@ const std::string drive_man::GetCurComm() {
 
 int drive_man::tick() {
 	if(overridemode) {
-		if(overridemode == 2)
-			drivechip->writecom(continuestring);
+		if(overridemode == 2) {
+			/*For simulations*/
+			if(drivechip == NULL) {
+				estiangle = dir;
+				overridemode = 0;
+				return 1;
+			}
+			else
+				drivechip->writecom(continuestring);
+		}
 		else if(overridemode == 4) {
 			unsigned int milli = GetMilli();
 			if(delaytime < milli) {
@@ -99,13 +108,24 @@ int drive_man::tick() {
 			else
 				return 3;
 
-			drivechip->writecom(overridecom);
-			movedist -= drivespeed;
+			if(overridecom[0] == 'M' && overridecom[1] == 'V') {
+				if(overridecom[3] == '1' && overridecom[4] == '5' && overridecom[5] == '7') {
+					int estimove = drivespeed;
+					if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
+						(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
+					else
+						(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
+				}
+			}
 
 			if(movedist <= 0){
 				overridecom = "";
 				overridemode = 0;
 				return 1;
+			}
+			else {
+				drivechip->writecom(overridecom);
+				movedist -= drivespeed;
 			}
 		}
 		return 3;
@@ -175,8 +195,9 @@ int drive_man::tick() {
 			int moveto;
 			int anchor = 0; //halfway across circle
 			std::stringstream ss;
-
-			/*Greater than 180*/
+			ss << "Rr " << (robot->rot - dir) << "!";
+			overridemode = 2;
+			/*Greater than 180
 			if(robot->rot > 3.14) {
 				anchor = robot->rot - 3.14;
 				if(robot->rot > dir && dir > anchor) {
@@ -192,7 +213,7 @@ int drive_man::tick() {
 					ss << "RR " << ((3.14+robot->rot) - (3.14+dir));
 				}
 			}
-			/*Less than 180*/
+			//Less than 180
 			else {
 				anchor = robot->rot + 3.14;
 				if(robot->rot < dir && dir < anchor) {
@@ -207,7 +228,7 @@ int drive_man::tick() {
 					currentpath = "RR 20!";
 					ss << "RR " << ((3.14+dir) - (3.14+robot->rot));
 				}
-			}
+			}*/
 			commandhist.push_back(ss.str());
 		}
 		/******************************************/
@@ -230,7 +251,6 @@ int drive_man::tick() {
 }
 
 void drive_man::SetOverride(int set_override) {
-	std::cout << "OH BABY" << std::endl;
 	overridemode = set_override;
 }
 

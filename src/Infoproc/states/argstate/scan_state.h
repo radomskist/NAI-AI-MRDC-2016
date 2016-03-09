@@ -34,6 +34,7 @@ class scan_state : public arg_state {
 		inline void processscan();
 		unsigned char shue,ssat;
 		bool liningup;
+		bool close;
 		int offset;
 		bool init;
 		bool once; //only scan the dir

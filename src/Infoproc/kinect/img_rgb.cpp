@@ -145,20 +145,32 @@ cv::Point2f imgrgb::FindObjColor(unsigned char objhue,unsigned char objsat) {
 	objloc.release();
 	objloc = cv::Mat::zeros(380,512,CV_8UC1);
 
+	//filtering out all the colors
 	cv::inRange(hsvchan[0], objhue - 12, objhue + 12,colorfilter);
 	cv::inRange(hsvchan[1], objsat - 25, objsat + 25,colorfilter1);
 	cv::bitwise_and(colorfilter,colorfilter1,colorfilter);
 	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4,4)));
 	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5,5)));
 
+	//outlining whats left
 	std::vector<std::vector<cv::Point>> contours;
 	std::vector<cv::Vec4i> hierarchy;
 	cv::findContours(colorfilter,contours,hierarchy,cv::CHAIN_APPROX_NONE,cv::RETR_LIST);
 	
 	int maxsize = -1;
 	int ipos = -1;
+
+	//Returning largest square shaped block (due to small noise)
 	for(int i = 0; i < contours.size(); i++) {
 		int csize = cv::contourArea(contours[i]);
+
+		//making sure ration of bounding rectangle is square-like
+		cv::Rect boundrect = boundingRect(contours[i]);
+		float bratio = boundrect.width/(float)boundrect.height;
+
+		if(bratio < .85 || bratio > 1.15)
+			continue;
+
 		if(maxsize < cv::contourArea(contours[i])) {
 			maxsize = csize;
 			ipos = i;
@@ -175,7 +187,6 @@ cv::Point2f imgrgb::FindObjColor(unsigned char objhue,unsigned char objsat) {
 	cv::Point2f centerofsquare((conmoments.m10/conmoments.m00), (conmoments.m01/conmoments.m00));
 	circle(objloc, centerofsquare ,20, cv::Scalar(255,255,255),-1,8,0);
 
-	//TODO strafe until x is decently close to center
 
 	colorfilter.release();
 	colorfilter1.release();
@@ -308,12 +319,12 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 			krgb.data[i*4] = 0;
 			krgb.data[i*4 + 1] = circlesstuff.data[i];
 			krgb.data[i*4 + 2] = 0;
-		}*/
+		}
 		else if(groundmat.data[i]) {
 			krgb.data[i*4] = groundmat.data[i];
 			krgb.data[i*4 + 1] = 0;
 			krgb.data[i*4 + 2] = 0;
-		}
+		}*/
 	}
 	//cannystuff.release();
 	img.release();
