@@ -27,7 +27,7 @@ scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman
 				//searching for door
 				if(tempargs[i][1][0] == 'd'){
 					shue = 65;
-					ssat = 75;
+					ssat = 130;
 				}
 				
 				break;
@@ -100,13 +100,14 @@ scan_state::~scan_state() {
 void scan_state::processscan() {
 	float dist = kinect_manager.findobj(&offset,shue,ssat);
 
-	if(dist == -1)
+	if(dist == -1) {
 		std::cout << "QR code failed" << std::endl;
-
+		return;
+	}
 	int strafeamount;
 	std::string strafedir;
 	int modifier = 1;
-	if(close || (dist < 225 && dist != 0)) {
+	if(close || (dist < 300 && dist != 0)) {
 		close = true;
 		modifier = .5;
 	}

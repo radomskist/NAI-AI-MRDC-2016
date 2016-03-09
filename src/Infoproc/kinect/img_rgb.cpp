@@ -146,13 +146,14 @@ cv::Point2f imgrgb::FindObjColor(unsigned char objhue,unsigned char objsat) {
 	objloc = cv::Mat::zeros(380,512,CV_8UC1);
 
 	//filtering out all the colors
-	cv::inRange(hsvchan[0], objhue - 12, objhue + 12,colorfilter);
-	cv::inRange(hsvchan[1], objsat - 25, objsat + 25,colorfilter1);
+	cv::inRange(hsvchan[0], objhue - 20, objhue + 20,colorfilter);
+	cv::inRange(hsvchan[1], objsat - 50, objsat + 50,colorfilter1);
 	cv::bitwise_and(colorfilter,colorfilter1,colorfilter);
 	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4,4)));
-	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5,5)));
-
+	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(7,7)));
+	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4,4)));
 	//outlining whats left
+	hsvchan[0] = colorfilter.clone();
 	std::vector<std::vector<cv::Point>> contours;
 	std::vector<cv::Vec4i> hierarchy;
 	cv::findContours(colorfilter,contours,hierarchy,cv::CHAIN_APPROX_NONE,cv::RETR_LIST);
@@ -171,7 +172,10 @@ cv::Point2f imgrgb::FindObjColor(unsigned char objhue,unsigned char objsat) {
 		if(bratio < .85 || bratio > 1.15)
 			continue;
 
-		if(maxsize < cv::contourArea(contours[i])) {
+		//Seeing how filled the box is and how large it is by scaling size by fullness
+		csize *= (1 - (csize/(boundrect.width *  boundrect.height)) *.75);
+
+		if(maxsize < csize) {
 			maxsize = csize;
 			ipos = i;
 			}
@@ -304,6 +308,7 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 		krgb.data[i*4 + 1] = hsvchan[0].data[i];
 		krgb.data[i*4 + 2] = hsvchan[0].data[i];
 		*/
+
 		krgb.data[i*4] = rgbin.data[i*4];
 		krgb.data[i*4 + 1] = rgbin.data[i*4+1];
 		krgb.data[i*4 + 2] = rgbin.data[i*4+2];

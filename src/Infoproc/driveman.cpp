@@ -109,12 +109,16 @@ int drive_man::tick() {
 				return 3;
 
 			if(overridecom[0] == 'M' && overridecom[1] == 'V') {
+				int drivedir = overridecom.substr(3,7) - 157;
+				drivedir -= (dir * 100);
+
+				
 				if(overridecom[3] == '1' && overridecom[4] == '5' && overridecom[5] == '7') {
 					int estimove = drivespeed;
-					if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
-						(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
+					if(drivedir < 5 || abs(drivedir - 1.57) < 5)
+						(abs(drivedir - 1.57) < 5) ? estimv.y += estimove : estimv.y -= estimove;
 					else
-						(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
+						(drivedir < 5) ? estimv.x += estimove : estimv.x -= estimove;
 				}
 			}
 
