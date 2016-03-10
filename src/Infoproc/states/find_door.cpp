@@ -98,13 +98,6 @@ void first_door::SetStat(std::string set_state) {
 	/*are we checking if a scan attempt is done?*/
 	std::cout << set_state << std::endl;
 	if(set_state[0] != '0') {
-
 		mode++;
-		std::cout << "++++++++++++++++++++" << std::endl;
-		std::cout << "STATE SET TO " << mode << std::endl;
 	}
 }
-
-
-
-

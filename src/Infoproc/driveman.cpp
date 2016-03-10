@@ -17,7 +17,7 @@ drive_man::drive_man(const path_finding * set_pfind, const obj_cube *set_rob) : 
 	delay = 150; // in milliseconds
 	//drivespeed = 183*.001*delay; //speed per seconds converted for delay
 	//turnspeed = .56*.001*delay;
-	drivespeed = 183*.001*delay; //speed per seconds converted for delay
+	drivespeed = 170*.001*delay; //speed per seconds converted for delay
 	turnspeed = .56*.001*delay;
 	turntol = .09; //Turning tolerance before considered to be straight
 
