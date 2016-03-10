@@ -39,17 +39,16 @@ void drive_man::SetObst(bool set_obst) {
 
 std::string drive_man::ArdState() {
 	std::string ardstuff;
+
 	if(drivechip != NULL)	 //Checking here so we can do simulations
 		ardstuff = drivechip->readall();
 
-	if(ardstuff.size() > 0)
-		std::cout << ardstuff << std::endl;
+	if(ardstuff.size() <= 0)
+		return ardstuff;
 
-	if(ardstuff == "q" && overridemode == 2) {
-		estiangle = dir;
+	if(ardstuff[0] == 'q' && overridemode == 2) 
 		overridecom = "";
-		overridemode = 0;
-	}
+
 	return ardstuff;
 }
 
@@ -61,12 +60,12 @@ bool drive_man::runcom(std::string &rcommand) {
 
 	if(rcommand[0] == 'R' && rcommand[1] == 'r') {
 		std::cout << "Override 2 command: " << rcommand << std::endl;
-		drivechip->writecom(rcommand);
+		overridecom = rcommand;
+		drivechip->writecom(overridecom);
 		overridemode = 2; //wait till command is over
 		return true;
 	}
 	else if(rcommand[0] == 'M' && rcommand[1] == 'V') {
-
 		int divider;
 		for(int i = 3; i < rcommand.size(); i++)
 			if(rcommand[i] == ' ') {
@@ -90,18 +89,26 @@ const std::string drive_man::GetCurComm() {
 }
 
 int drive_man::tick() {
-	if(overridemode) {
-		if(overridemode == 2) {
-			/*For simulations*/
-			if(drivechip == NULL) {
-				estiangle = dir;
+	switch (overridemode) {
+			ArdState();
+		case 0 :
+			break;
+
+		case 2 : {
+			if(drivechip == NULL || overridecom.size() == 0) { /*Drivechip == NULL For simulations*/
+				est = true;
+				estiangle = dir - robot->rot;
 				overridemode = 0;
 				return 1;
 			}
-			else
+			else 
 				drivechip->writecom(continuestring);
+
+			return 3;
+			break;
 		}
-		else if(overridemode == 4) {
+
+		case 4 : {
 			unsigned int milli = GetMilli();
 			if(delaytime < milli) {
 				delaytime = milli + delay;
@@ -111,7 +118,7 @@ int drive_man::tick() {
 
 			if(overridecom[0] == 'M' && overridecom[1] == 'V') {
 				int drivedir = std::stoi(overridecom.substr(3,7));
-				drivedir += (dir * 100);
+				drivedir += ((robot->rot - 1.57)* 100);
 
 				if(abs(drivedir - 471) < 5 || abs(drivedir - 157) < 5)
 					 (abs(drivedir - 157) < 5) ? estimv.y += drivespeed : estimv.y -= drivespeed;
@@ -128,8 +135,18 @@ int drive_man::tick() {
 				drivechip->writecom(overridecom);
 				movedist -= drivespeed;
 			}
+			return 3;
+			break;
 		}
-		return 3;
+
+		default: 
+			//ERROR!
+			overridecom = "";
+			overridemode = 0;
+			std::cout << "==============================" << std::endl;
+			std::cout << "ERROR: Incorrect override mode" << std::endl;
+			return 3;
+			break;
 	}
 
 	if(obstical)
@@ -260,21 +277,13 @@ void drive_man::execcom() {
 		drivechip->writecom(currentpath);
 
 	if(currentpath[0] == 'M' && currentpath[1] == 'V') {
-		if(currentpath[3] == '1' && currentpath[4] == '5' && currentpath[5] == '7') {
-			int estimove = drivespeed;
-			if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
-				(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
-			else
-				(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
-		}
-		/* TODO STRAFFING
-		else if(currentpath[3] == '1' && currentpath[4] == '8') {
-			int estimove = drivespeed;
-			if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
-				(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
-			else
-				(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
-		}*/
+		int drivedir = std::stoi(currentpath.substr(3,7));
+		drivedir += ((robot->rot - 1.57)* 100);
+
+		if(abs(drivedir - 471) < 5 || abs(drivedir - 157) < 5)
+			 (abs(drivedir - 157) < 5) ? estimv.y += drivespeed : estimv.y -= drivespeed;
+		else if (abs(drivedir) < 5 || abs(drivedir - 314) < 5)
+			abs(drivedir < 5) ? estimv.x += drivespeed : estimv.x -= drivespeed;
 	}
 	else if(currentpath[0] == 'R' && currentpath[1] == 'R') {
 		float estang = turnspeed;
@@ -295,21 +304,13 @@ void drive_man::execcom(std::string &setstring) {
 		drivechip->writecom(setstring);
 
 	if(setstring[0] == 'M' && setstring[1] == 'V') {
-		if(setstring[3] == '1' && setstring[4] == '5' && setstring[5] == '7') {
-			int estimove = drivespeed;
-			if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
-				(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
-			else
-				(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
-		}
-		/* TODO: STRAFFING
-		else if(setstring[3] == '1' && setstring[4] == '5' setstring[5] == '7')  {
-			int estimove = drivespeed;
-			if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)
-				(abs(dir - 1.57) < .05) ? estimv.y += estimove : estimv.y -= estimove;
-			else
-				(dir < .05) ? estimv.x += estimove : estimv.x -= estimove;
-		}*/
+		int drivedir = std::stoi(setstring.substr(3,7));
+		drivedir += ((robot->rot - 1.57)* 100);
+
+		if(abs(drivedir - 471) < 5 || abs(drivedir - 157) < 5)
+			 (abs(drivedir - 157) < 5) ? estimv.y += drivespeed : estimv.y -= drivespeed;
+		else if (abs(drivedir) < 5 || abs(drivedir - 314) < 5)
+			abs(drivedir < 5) ? estimv.x += drivespeed : estimv.x -= drivespeed;
 	}
 	else if(setstring[0] == 'R' && setstring[1] == 'R') {
 		float estang = turnspeed;

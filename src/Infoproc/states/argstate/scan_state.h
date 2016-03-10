@@ -44,6 +44,7 @@ class scan_state : public arg_state {
 		float direction; //true for right, false for left
 		std::string scandir;
 		std::string scantarg;
+		std::string endcom;
 		kinectman &kinect_manager;
 };
 

@@ -20,11 +20,10 @@ class base_state {
 					# = angle in radians to drive at (relative to robot. 1.57 = forward)
 					D = Distance to move
 			STATES:
-				
+				S = State to execute next
+
 				SS @ = Scan State
 					@ = scan attributes (look at scan_state.h)
-
-				S = State to execute next
 
 			OTHER:
 				RQ: Read QR code

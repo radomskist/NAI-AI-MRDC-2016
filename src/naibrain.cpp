@@ -91,6 +91,7 @@ void naibrain::tick() {
 
 			/*movement*/
 			if(subcheck == "RA" || subcheck == "MV" || subcheck == "Rr")
+				//TODO Disable wall detection while Rr or Ra
 				driveman.runcom(command);
 			/*states*/
 			else if(subcheck[0] == 'S') {
@@ -108,6 +109,8 @@ void naibrain::tick() {
 		}
 
 		int ticknum = driveman.tick();
+		std::string state = driveman.ArdState();
+
 		if(ticknum == 1)
 			states.top()->SetStat(std::string("1"));
 		else if(ticknum == 2) {

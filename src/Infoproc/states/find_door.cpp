@@ -22,7 +22,7 @@ if(mode == 2) {
 
 //	else if(mode == 2){
 if(mode == 0) {
-		commlist = "SS a:0;f:d;o:1;";
+		commlist = "SS a:157;f:d;o:1;d:l;";
 		comred = true;
 		mode = 2;
 		return;

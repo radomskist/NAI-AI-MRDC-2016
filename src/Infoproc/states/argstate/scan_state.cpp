@@ -7,7 +7,7 @@ scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman
 	init = false;
 	liningup = false;
 	close = false;
-	mode = 1;
+	mode = 0;
 	failcount = 0;
 
 	std::vector<std::array<std::string,2>> tempargs = GetArgs();
@@ -29,6 +29,7 @@ scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman
 				if(tempargs[i][1][0] == 'd'){
 					shue = 65;
 					ssat = 100;
+					endcom = "RQ";
 				}
 				
 				break;
@@ -37,7 +38,7 @@ scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman
 
 	//Turning left
 	if(!once) {
-		if(!direction) {
+		if(direction) {
 			scandir = std::string("Rr+");
 			if(wmap->GetRobot()->rot < angle || abs(wmap->GetRobot()->rot - angle) < .05)
 				angle = wmap->GetRobot()->rot + 6.28 - angle;
@@ -49,14 +50,26 @@ scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman
 			scandir = std::string("Rr-");
 		}
 	}
+	else {
+		if(direction)
+			scandir = std::string("Rr+");
+		else
+			scandir = std::string("Rr-");
+	}
 
-	if(angle >= 3.14) {
+	if(angle == 0) {
+		commlist = "";
+		mode == 1;
+		return;
+	}
+	else if(!once && angle >= 314) {
 		scandir.append("157!");
 		angle -= 157;
 	}
-	else 
-		scandir.append(std::to_string(100*angle).substr(0,3) + "!");
-
+	else {
+		scandir.append(std::to_string(angle).substr(0,3) + "!");
+		angle = 0;
+	}
 	//Telling the brain to rotate
 	commlist = scandir;
 	comred = true;
@@ -65,7 +78,6 @@ scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman
 void scan_state::SetStat(std::string set) {
 
 	if(set[0] != '0') {
-
 		if(mode == 0 && angle > 5) {
 			scandir = scandir.substr(0,2);
 
@@ -86,8 +98,12 @@ void scan_state::SetStat(std::string set) {
 				liningup = false;
 		}
 		else if(mode == 2) {
-			std::cout << "==========================\nSCANNING DONE" << std::endl;
-			std::cout << "exit " << std::endl;
+			if(endcom.size() != 0)
+				commlist = endcom;
+			else
+				mode++;
+		}
+		else if(mode == 3) {
 			sexit = 1;
 			return;
 		}
@@ -103,7 +119,7 @@ void scan_state::processscan() {
 	float dist = kinect_manager.findobj(&offset,shue,ssat);
 
 	if(dist == -1) {
-		std::cout << "QR code failed" << std::endl;
+		std::cout << "Obj scan failed" << std::endl;
 		return;
 	}
 	int strafeamount;
@@ -129,9 +145,6 @@ void scan_state::processscan() {
 	else
 		strafedir = " 0 ";
 
-	std::cout << dist << " away and " << offset << "missaligned." << "  Straffing: " << strafeamount << std::endl;
-	std::cout <<"STRAFFING: " << strafeamount << std::endl;
-
 	if((close && strafeamount > 2) || (strafeamount > 37)) {
 		commlist = "MV";
 		commlist.append(strafedir);
@@ -146,27 +159,15 @@ void scan_state::processscan() {
 		liningup = true;
 		comred = true;
 	}
-	else {
-		std::cout << "==========================\nSCANNING DONE" << std::endl;
-		std::cout << "exit " << std::endl;
+	else 
 		sexit = 1;
-	}
 }
 
 int scan_state::Process() { //Process information
-	if(!init && comred == false) {
-		init = true;
-		commlist = "";
-	}
-
 	//TODO process 45 degree angles
 	if(!liningup && mode == 1) 
 		processscan();
 
 	return sexit;
 }
-
-
-
-
 
