@@ -33,6 +33,7 @@ class scan_state : public arg_state {
 	protected:
 		inline void processscan();
 		unsigned char shue,ssat;
+		int failcount;
 		bool liningup;
 		bool close;
 		int offset;

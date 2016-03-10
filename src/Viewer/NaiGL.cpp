@@ -350,7 +350,7 @@ void naigl::setplanes(const std::vector<obj_wall> &add_newplane) {
 	for(int i = 0; i < 18; i++)
 		cubecolorverts.push_back(1.0f);
 
-	std::cout << "NEWPLANE: " << add_newplane.size() << std::endl;
+	//std::cout << "NEWPLANE: " << add_newplane.size() << std::endl;
 	for(int i = 0; i < add_newplane.size(); i++){
 		if(!add_newplane[i].draw)
 			continue;

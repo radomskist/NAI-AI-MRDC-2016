@@ -24,6 +24,7 @@ if(mode == 2) {
 if(mode == 0) {
 		commlist = "SS a:0;f:d;o:1;";
 		comred = true;
+		mode = 2;
 		return;
 	}
 
@@ -99,7 +100,8 @@ void first_door::SetStat(std::string set_state) {
 	if(set_state[0] != '0') {
 
 		mode++;
-		std::cout << set_state << std::endl;
+		std::cout << "++++++++++++++++++++" << std::endl;
+		std::cout << "STATE SET TO " << mode << std::endl;
 	}
 }
 

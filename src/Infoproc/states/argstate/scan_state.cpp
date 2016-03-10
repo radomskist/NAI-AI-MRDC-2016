@@ -8,6 +8,7 @@ scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman
 	liningup = false;
 	close = false;
 	mode = 1;
+	failcount = 0;
 
 	std::vector<std::array<std::string,2>> tempargs = GetArgs();
 	for(int i = 0; i < tempargs.size(); i++) {
@@ -27,7 +28,7 @@ scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman
 				//searching for door
 				if(tempargs[i][1][0] == 'd'){
 					shue = 65;
-					ssat = 130;
+					ssat = 100;
 				}
 				
 				break;
@@ -85,6 +86,7 @@ void scan_state::SetStat(std::string set) {
 				liningup = false;
 		}
 		else if(mode == 2) {
+			std::cout << "==========================\nSCANNING DONE" << std::endl;
 			std::cout << "exit " << std::endl;
 			sexit = 1;
 			return;
@@ -106,11 +108,19 @@ void scan_state::processscan() {
 	}
 	int strafeamount;
 	std::string strafedir;
-	int modifier = 1;
-	if(close || (dist < 300 && dist != 0)) {
+	float modifier = .5;
+
+	if(close)
+		modifier = .25;
+
+	//Checking if failed twice due to random values
+	if(dist < 300)
+		failcount++;
+	else
+		failcount = 0;
+
+	if(failcount > 2)
 		close = true;
-		modifier = .5;
-	}
 
 	strafeamount = abs(offset*modifier); //1/256,percentage of offset, 512/4500 cam width / depth distance
 
@@ -120,25 +130,27 @@ void scan_state::processscan() {
 		strafedir = " 0 ";
 
 	std::cout << dist << " away and " << offset << "missaligned." << "  Straffing: " << strafeamount << std::endl;
+	std::cout <<"STRAFFING: " << strafeamount << std::endl;
 
-
-	if(strafeamount > 20) {
-		std::cout << strafeamount << std::endl;
+	if((close && strafeamount > 2) || (strafeamount > 37)) {
 		commlist = "MV";
 		commlist.append(strafedir);
-		commlist.append(std::to_string(strafeamount*.5));
+		commlist.append(std::to_string(strafeamount));
 		commlist.append("!");
 		liningup = true;
 		comred = true;
 	}
-	else if (!close && (dist > 225 || dist == 0)) {
+	else if (dist > 200 || (!close && dist == 0)) {
 		commlist = "MV";
-		commlist.append(" 157 100!");
+		commlist.append(" 157 50!");
 		liningup = true;
 		comred = true;
 	}
-	else
-		mode = 2;
+	else {
+		std::cout << "==========================\nSCANNING DONE" << std::endl;
+		std::cout << "exit " << std::endl;
+		sexit = 1;
+	}
 }
 
 int scan_state::Process() { //Process information

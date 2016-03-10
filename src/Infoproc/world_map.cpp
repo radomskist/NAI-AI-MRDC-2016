@@ -293,7 +293,6 @@ void world_map::updategrid() {
 		}
 		//Removing walls that fail
 		else if (grid[spot].likelyness < 10) {
-			std::cout << "Erasing" << std::endl;
 			i->draw = false;
 			plane_list.erase(i);
 			grid[spot].tags &= ~non_traversable;

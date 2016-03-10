@@ -17,8 +17,8 @@ drive_man::drive_man(const path_finding * set_pfind, const obj_cube *set_rob) : 
 	delay = 150; // in milliseconds
 	//drivespeed = 183*.001*delay; //speed per seconds converted for delay
 	//turnspeed = .56*.001*delay;
-	drivespeed = 183*.003*delay; //speed per seconds converted for delay
-	turnspeed = .56*.003*delay;
+	drivespeed = 183*.001*delay; //speed per seconds converted for delay
+	turnspeed = .56*.001*delay;
 	turntol = .09; //Turning tolerance before considered to be straight
 
 	try {
@@ -73,6 +73,7 @@ bool drive_man::runcom(std::string &rcommand) {
 				divider = i;
 				break;
 			}
+
 		overridecom = rcommand.substr(0,divider) + "!";
 		movedist = std::stoi(rcommand.substr(divider,rcommand.size()));
 		std::cout << "Override drive command: " << currentpath << " distance:" << movedist  << std::endl;
@@ -109,17 +110,13 @@ int drive_man::tick() {
 				return 3;
 
 			if(overridecom[0] == 'M' && overridecom[1] == 'V') {
-				int drivedir = overridecom.substr(3,7) - 157;
-				drivedir -= (dir * 100);
+				int drivedir = std::stoi(overridecom.substr(3,7));
+				drivedir += (dir * 100);
 
-				
-				if(overridecom[3] == '1' && overridecom[4] == '5' && overridecom[5] == '7') {
-					int estimove = drivespeed;
-					if(drivedir < 5 || abs(drivedir - 1.57) < 5)
-						(abs(drivedir - 1.57) < 5) ? estimv.y += estimove : estimv.y -= estimove;
-					else
-						(drivedir < 5) ? estimv.x += estimove : estimv.x -= estimove;
-				}
+				if(abs(drivedir - 471) < 5 || abs(drivedir - 157) < 5)
+					 (abs(drivedir - 157) < 5) ? estimv.y += drivespeed : estimv.y -= drivespeed;
+				else if (abs(drivedir) < 5 || abs(drivedir - 314) < 5)
+					abs(drivedir < 5) ? estimv.x += drivespeed : estimv.x -= drivespeed;
 			}
 
 			if(movedist <= 0){
@@ -298,7 +295,6 @@ void drive_man::execcom(std::string &setstring) {
 		drivechip->writecom(setstring);
 
 	if(setstring[0] == 'M' && setstring[1] == 'V') {
-		std::cout << setstring << std::endl;
 		if(setstring[3] == '1' && setstring[4] == '5' && setstring[5] == '7') {
 			int estimove = drivespeed;
 			if(abs(dir - 4.71) < .05 || abs(dir - 1.57) < .05)

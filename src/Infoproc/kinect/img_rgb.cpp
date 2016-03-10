@@ -147,11 +147,11 @@ cv::Point2f imgrgb::FindObjColor(unsigned char objhue,unsigned char objsat) {
 
 	//filtering out all the colors
 	cv::inRange(hsvchan[0], objhue - 20, objhue + 20,colorfilter);
-	cv::inRange(hsvchan[1], objsat - 50, objsat + 50,colorfilter1);
+	cv::inRange(hsvchan[1], objsat - 50, objsat + 30,colorfilter1);
 	cv::bitwise_and(colorfilter,colorfilter1,colorfilter);
-	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4,4)));
-	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(7,7)));
-	cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4,4)));
+	//cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4,4)));
+	//cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(7,7)));
+	//cv::morphologyEx(colorfilter, colorfilter, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4,4)));
 	//outlining whats left
 	hsvchan[0] = colorfilter.clone();
 	std::vector<std::vector<cv::Point>> contours;
@@ -169,11 +169,11 @@ cv::Point2f imgrgb::FindObjColor(unsigned char objhue,unsigned char objsat) {
 		cv::Rect boundrect = boundingRect(contours[i]);
 		float bratio = boundrect.width/(float)boundrect.height;
 
-		if(bratio < .85 || bratio > 1.15)
+		if(bratio < .9 || bratio > 1.1)
 			continue;
 
 		//Seeing how filled the box is and how large it is by scaling size by fullness
-		csize *= (1 - (csize/(boundrect.width *  boundrect.height)) *.75);
+		csize *= (1 - (csize/(boundrect.width *  boundrect.height))*.9);
 
 		if(maxsize < csize) {
 			maxsize = csize;
@@ -294,15 +294,16 @@ void imgrgb::ProcessImg(unsigned char *rgbbuff) {
 	cv::split(HSVin, hsvchan);
 	cv::Mat HVIMG;
 
+	
 	/*finding the ground*/
 	HVIMG = hsvchan[1]* .65 + hsvchan[2]*.35;
 	findground(HVIMG);
+	//FindObjColor(65,100); TESTING QR FINDER
 	//cv::Mat circlesstuff;
 	//findballs(hsvchan[0], circlesstuff);
 
 	int resolution = krgb.width*381;
 	for(int i = 0; i < resolution; i++) {
-
 		/*
 		krgb.data[i*4] = hsvchan[0].data[i];
 		krgb.data[i*4 + 1] = hsvchan[0].data[i];
