@@ -48,7 +48,7 @@ class world_map {
 		void checkplanes(int[5]);
 		void updategrid();
 
-		void addobjs(std::vector<obj_base>&);
+		void addobjs(std::vector<obj_cube>&);
 		void gentest();
 		void SetRobotAttr(obj_point,float);
 		void AddPlanes(std::vector<obj_plane> &);

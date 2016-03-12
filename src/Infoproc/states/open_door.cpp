@@ -1,9 +1,17 @@
 #include "Infoproc/states/open_door.h"
 
 
+/***********************
+
+
+ARDUINO TEAM IS DOING DOOR OPENING
+FOR THIS YEAR
+
+
+*************************/
+
 open_door::open_door(const world_map* set_wmap, path_finding& set_pfind) : base_state(set_wmap), pfind(set_pfind) {
 	//TODO check for doors in ajacent doors, and face it. if none exit with -1
-
 }
 
 open_door::~open_door() {

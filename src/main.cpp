@@ -40,7 +40,6 @@ int main(int argc, char** argv)
 			std::cout << "No webcam" << std::endl;
 			return -12;
 		}
-
 		imgwin opencv_win(imageref[0]->width, imageref[0]->height, imageref[0]->depth);
 
 		while(opencv_win.running()) {
@@ -134,7 +133,7 @@ int main(int argc, char** argv)
 		sleep(2); //letting kinect warm up
 		multiwin MainWin;
 		const world_map *wmap = mainbrain.GetMap();
-		unsigned int kmode = KDEP | KRGB | KFREEZE;
+		unsigned int kmode = KDEP | KRGB | KFREEZE | BCCAM;
 
 		mainbrain.gentest();
 		std::vector<obj_cube> addcube;
@@ -152,9 +151,9 @@ int main(int argc, char** argv)
 				glwin->makecurrent();
 				mapversion = wmap->GetMapVersion();
 				glwin->setplanes(wmap->GetPlanes());
-				glwin->setpath(mainbrain.GetPfind().GetPath());
 				//glwin->makecurrent();
 			}
+			glwin->setpath(mainbrain.GetPfind().GetPath());
 			std::vector<obj_cube> cubelist = wmap->GetEnts();
 			cubelist.push_back(*newbot);
 			glwin->makecurrent();

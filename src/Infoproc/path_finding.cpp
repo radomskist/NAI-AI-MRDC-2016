@@ -148,24 +148,39 @@ bool path_finding::contains(std::vector<int> search_vect, int tar){
 	return false;
 }
 
-bool path_finding::doorcheck() const {
-	obj_point nextgrid = robot->pos;
+int path_finding::doorcheck() const {
+	int cx = robot->pos.x * .0025;
+	int cy = robot->pos.y * .0025;
 
 	if(robot->rot < .09 )
-		robot->pos.x + 400;
+		cx += 1;
 	else if (abs(robot->rot - 3.14) < .09)
-		robot->pos.x - 400;
+		cx -= 1;
 	else if (abs(robot->rot - 1.57) < .09)
-		robot->pos.y + 400;
+		cy += 1;
 	else if (abs(robot->rot - 4.71) < .09 )
-		robot->pos.y - 400;
-	else return false;
+		cy -= 1;
+	else 
+		return false;
+	int gridspace = (cx) + ((cy)*11);
 
-	int gridspace = (nextgrid.x / 400) + ((nextgrid.y / 400)*11);
 	if(gridspace < 0 && gridspace > 120)
 		return false;
 
-	return (grid[gridspace].tags & door);
+	if(grid[gridspace].tags & door) {
+		std::vector<obj_cube> entslist = wmap->GetEnts();
+		float doorrot = 0;
+		for(int i = 0; i < entslist.size(); i++) {
+			if(entslist[i].GetName() == "door" && (int)(((entslist[i].pos.x * .0025) + ((int)(entslist[i].pos.y*.0025))*11))== gridspace) {
+				doorrot = abs(robot->rot - entslist[i].rot);
+				break;
+			}
+		}
+		if(doorrot > 2.9) //slightly higher lower pi to account for errors
+			return 2;
+		else
+			return 1;
+	}
 
 }
 

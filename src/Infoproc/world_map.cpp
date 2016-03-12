@@ -205,16 +205,6 @@ void world_map::checkplanes(int pointvalues[5]) {
 	int roby = robot.pos.y * .0025;
 	int basepos = robx + roby*width;
 
-/*	if(abs(robot.rot - 4.71) < .1)
-		diry = -1;
-	else if (abs(robot.rot - 1.57) < .1) 
-		diry = 1;
-	else if (abs(robot.rot - 3.14) < .1) 
-		dirx = -1;
-	else if (robot.rot < .05) 
-		dirx = 1;
-	else return;*/
-
 	bool edgehit = false;
 	int dist = 0;
 	int pos = basepos;
@@ -289,16 +279,20 @@ void world_map::updategrid() {
 		unsigned int spot = (i->pos.x + (i->pos.y)*width);
 		if(grid[spot].likelyness >= 10) {
 			i->draw = true;
-			grid[spot].tags |= non_traversable;
+			grid[spot].tags = non_traversable;
 		}
 		//Removing walls that fail
 		else if (grid[spot].likelyness < 10) {
 			i->draw = false;
 			plane_list.erase(i);
-			grid[spot].tags &= ~non_traversable;
+			grid[spot].tags = ~non_traversable;
 			i--;
 		}
 	}
+
+	for(std::vector<obj_cube>::iterator i = entities_list.begin(); i != entities_list.end(); i++) 
+		if(i->GetName() == "door") 
+			grid[(int)(i->pos.x *.0025) + ((int)(i->pos.y *.0025)*11)].tags = (door & ~non_traversable); 
 }
 
 
@@ -311,12 +305,19 @@ void world_map::gentest() {
 	//so 400 units is 4 feet
 
 	//Creating a new plane	
-	obj_wall newplane = obj_wall();
-	newplane.pos.y = 1;
+	obj_wall newplane;
+	newplane.pos.y = 2;
 	newplane.width = 200;
 	newplane.pos.z = 150;
 	newplane.height = 150;
-	for(int i = 2; i < 6; i++) {
+	for(int i = 3; i < 8; i++) {
+		newplane.pos.x = i;
+		unsigned int spot = (newplane.pos.x + (newplane.pos.y)*width);
+		grid[spot].likelyness = 500;
+		plane_list.push_back(newplane);
+	}
+	newplane.pos.y = 8;
+	for(int i = 3; i < 8; i++) {
 		newplane.pos.x = i;
 		unsigned int spot = (newplane.pos.x + (newplane.pos.y)*width);
 		grid[spot].likelyness = 500;
@@ -324,12 +325,27 @@ void world_map::gentest() {
 	}
 
 	newplane.pos.x = 2;
-	for(int i = 1; i < 5; i++) {
+	for(int i = 2; i < 9; i++) {
 		newplane.pos.y = i;
 		unsigned int spot = (newplane.pos.x + (newplane.pos.y)*width);
 		grid[spot].likelyness = 500;
 		plane_list.push_back(newplane);
 	}
+
+	newplane.pos.x = 8;
+	for(int i = 2; i < 9; i++) {
+		newplane.pos.y = i;
+		unsigned int spot = (newplane.pos.x + (newplane.pos.y)*width);
+		grid[spot].likelyness = 500;
+		plane_list.push_back(newplane);
+	}
+
+	newplane.pos.y = 5;
+	newplane.pos.x = 5;
+	//newplane.pos.y = i;
+	unsigned int spot = (5 + (5)*width);
+	grid[spot].likelyness = 500;
+	plane_list.push_back(newplane);
 
 	//Adding test door
 	obj_cube testdoor("door");
@@ -342,7 +358,7 @@ void world_map::gentest() {
 	testdoor.pos.z = 150;
 	testdoor.pos.x = 1000;
 	testdoor.pos.y = 2200;
-	grid[5 + (11*3)].tags &= (door & ~non_traversable); 
+	grid[2 + (11*5)].tags &= (door & ~non_traversable); 
 
 	entities_list.push_back(testdoor);
 	updategrid();
@@ -367,8 +383,19 @@ const std::vector<obj_wall> &world_map::GetPlanes() const {
 	return plane_list;
 }
 
-void world_map::addobjs(std::vector<obj_base> &add_obj) {
-	
+void world_map::addobjs(std::vector<obj_cube> &add_obj) {
+	for(int i = 0; i < add_obj.size(); i++) {
+		if(add_obj[i].GetName() == "wall") {
+			obj_wall newplane;
+			newplane.pos.x = add_obj[i].pos.x;
+			newplane.pos.y = add_obj[i].pos.y;
+			unsigned int spot = (newplane.pos.x + (newplane.pos.y)*width);
+			grid[spot].likelyness = -2;
+			plane_list.push_back(newplane);
+		}
+		else
+			entities_list.push_back(add_obj[i]);
+	}
 }
 
 

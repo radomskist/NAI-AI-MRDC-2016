@@ -18,16 +18,27 @@ class nwebc {
 	public:
 		nwebc(int);
 		~nwebc();
-		nimg *GetImg();
+		virtual nimg *GetImg();
 
-	private:
+	protected:
 		cv::Mat img;
 		nimg camimg;
 		cv::VideoCapture *cap;
 };
 
+class bcam :public nwebc {
+	public:
+		bcam(int);
+		~bcam();
+		nimg *GetImg();
+		void SetColor(unsigned char, unsigned char);
+	private:
+		unsigned char color, sat;
+
+};
+
 namespace naiwebc { 
-nwebc *createwebcam(std::string); //simple factory function for creating webcams
+nwebc *createwebcam(std::string,int); //simple factory function for creating webcams
 //void listwebcams(); maybe in the future
 }
 

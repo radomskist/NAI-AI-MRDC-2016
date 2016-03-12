@@ -5,6 +5,7 @@
 class base_state {
 
 	public:
+		base_state();
 		base_state(const world_map*);
 		~base_state();
 
@@ -19,6 +20,8 @@ class base_state {
 				MV # D = move
 					# = angle in radians to drive at (relative to robot. 1.57 = forward)
 					D = Distance to move
+				ST: 
+					straighten with wall
 			STATES:
 				S = State to execute next
 

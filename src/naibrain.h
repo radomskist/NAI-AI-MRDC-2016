@@ -12,6 +12,7 @@
 #include "Infoproc/states/open_door.h"
 #include "Infoproc/states/base_state.h"
 #include "Infoproc/states/find_door.h"
+#include "Infoproc/states/read_qr.h"
 #include "Infoproc/states/argstate/scan_state.h"
 
 #include "utils/nimg.h"
@@ -37,8 +38,9 @@ class naibrain {
 		bool KStatus(); /*returns whether or not kinect is working*/
 
 	private:
-		unsigned char ballcolor;
+		unsigned char ballcolor,ballsaturation;
 
+		bool usingwebcam;
 		/*devices*/
 		kinectman* kinect_manager; /*kinect manager object*/
  		std::vector<nimg*> Images; /*List of images from sensors*/

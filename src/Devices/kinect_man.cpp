@@ -72,6 +72,10 @@ float kinectman::findobj(int * offset, unsigned char fhue, unsigned char fsat) {
 
 }
 
+int kinectman::straighten() {
+	return depth_proc.straighten();
+}
+
 float kinectman::qrscan( int * offcenter, std::string *code_text) {
 	rgb_proc.qrscan(offcenter,code_text);
 

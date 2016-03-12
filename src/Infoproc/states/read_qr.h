@@ -6,13 +6,14 @@
 class read_qr : public base_state {
 
 	public:
-		read_qr(const world_map*, kinectman&);
+		read_qr(world_map&, kinectman&);
 		~read_qr();
 
 		int Process();
 
 	protected:
 		kinectman &kinect_manager;
+		world_map& nonconstwmap;
 };
 
 #endif

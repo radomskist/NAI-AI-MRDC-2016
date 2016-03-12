@@ -1,13 +1,19 @@
 #include "naibrain.h"
+int disnum = 0;
 
 naibrain::naibrain() : pfind(GetMap()), driveman(&pfind, wmap.GetRobot()), locsys(&driveman, wmap.GetRobot()) {
 	kinect_manager = 0;
+	usingwebcam = false;
 	//Initializing kinect manager
 	//red = 175
 	//blue = ~100
 	//green = 50
 	//painted green = 86
-	ballcolor = 89;
+
+	//GREEN BALL CONFIGURATION
+	ballcolor = 120;
+	ballsaturation = 60;
+
 	try {
 		kinect_manager = new kinectman(ballcolor);
 	}
@@ -19,7 +25,8 @@ naibrain::naibrain() : pfind(GetMap()), driveman(&pfind, wmap.GetRobot()), locsy
 
 	//Initializing webcam
 	try {
-		bcwebcam = naiwebc::createwebcam("USB Camera (046d:08ad)");
+		bcwebcam = naiwebc::createwebcam("USB Camera (046d:08ad)",1);
+		reinterpret_cast<bcam*>(bcwebcam)->SetColor(ballcolor,ballsaturation);
 	}
 	catch (nfail &e) {
 		bcwebcam = NULL;
@@ -46,16 +53,17 @@ path_finding &naibrain::GetPfind(){
 }
 
 void naibrain::gentest() {
-	wmap.gentest();
+	if(kinect_manager == NULL)
+		wmap.gentest();
 
 }
 void naibrain::tick() {
+
 	if(kinect_manager != NULL) {
 		//std::cout<< "Kinect" << std::endl;
 		kinect_manager->ProcessImages();
 		//std::cout << "Adding planes" << std::endl;
 
-		wmap.AddPlanes(kinect_manager->GetPlanes());
 		int checkpoints[5] = {97336, 97436, 97536, 97636,97736}; //525 * 190 + 56*(i*100)
 		for(int i = 0; i < 5; i++)
 			checkpoints[i] = kinect_manager->GetDist(checkpoints[i]);
@@ -93,6 +101,10 @@ void naibrain::tick() {
 			if(subcheck == "RA" || subcheck == "MV" || subcheck == "Rr")
 				//TODO Disable wall detection while Rr or Ra
 				driveman.runcom(command);
+			else if(subcheck == "ST") {
+				driveman.straighten(kinect_manager->straighten());
+				driveman.runcom(command);
+			}
 			/*states*/
 			else if(subcheck[0] == 'S') {
 				//Scan state
@@ -106,17 +118,26 @@ void naibrain::tick() {
 			else if(subcheck[0] == 'f') {
 
 			}
+			else if(subcheck == "QR") 
+				if(kinect_manager != NULL) {
+					std::cout << "WR" << std::endl;
+					base_state *newstate = new read_qr(wmap, *kinect_manager);
+					states.push(newstate);
+				}
+			else if(subcheck == "OS")
+				std::cout << "OPEN SESAME" << std::endl;
 		}
-
+	
 		int ticknum = driveman.tick();
 		std::string state = driveman.ArdState();
 
+		//TODO MAKE SURE DOESNT CAUSE ERRORS!
+		//Disable plane finding while rotating
+		if(ticknum != 5 && kinect_manager != NULL) 
+			wmap.AddPlanes(kinect_manager->GetPlanes());
+
 		if(ticknum == 1)
 			states.top()->SetStat(std::string("1"));
-		else if(ticknum == 2) {
-			base_state *newstate = new open_door(GetMap(), pfind);
-			states.push(newstate);
-		}
 		else if(ticknum == 3) { /*in override mode*/
 			if(stateend)
 				driveman.SetOverride(0);
@@ -144,8 +165,20 @@ std::vector<nimg*>  &naibrain::GetImages(unsigned int imgmask) {
 	}
 
 	//Processing webcams
-	if((imgmask & BCCAM) && bcwebcam != NULL)
+	if (bcwebcam == NULL)
+		return Images;
+
+	if(usingwebcam) {
+		bcwebcam->GetImg()->flags = (KDEP & KFREEZE);
 		Images.push_back(bcwebcam->GetImg());
+	}
+	else {
+		bcwebcam->GetImg()->flags = BCCAM;
+		if((imgmask & BCCAM))
+			Images.push_back(bcwebcam->GetImg());
+	}
+
+
 
 	return Images;
 

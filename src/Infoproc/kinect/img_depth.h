@@ -34,6 +34,7 @@ class imgd {
 		nimg *GetImg();
 		bool ScanGround(bool&,bool&);
 		void FloorCheck();
+		int straighten();
 		float averagepoints(unsigned int);
 
 	private:

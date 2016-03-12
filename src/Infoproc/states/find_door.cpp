@@ -12,17 +12,17 @@ first_door::~first_door() {
 void first_door::intialize() {
 	const std::vector<obj_cube>& entities = wmap->GetEnts();
 
-	//TODO test
+	//For testing
 //	if(mode == 0) {
-if(mode == 2) {
+	if(mode == 2){
 		mode++;
 		pfind.gotopoint(obj_point(200,2200,50));
 		return;
 		}
-
 //	else if(mode == 2){
-if(mode == 0) {
-		commlist = "SS a:157;f:d;o:1;d:l;";
+	else if(mode == 0){
+		//commlist = "SS a:157;f:d;o:1;d:l;";
+		commlist = "SS a:0;f:d;o:1;";
 		comred = true;
 		mode = 2;
 		return;
@@ -64,7 +64,7 @@ if(mode == 0) {
 	}
 	//Door not found
 	pfind.gotopoint(obj_point(600,2600,50));
-	mode++;
+	mode = 1;
 }
 
 int first_door::Process() {
@@ -81,13 +81,8 @@ int first_door::Process() {
 		mode++;
 		return 0;
 	}
-
-	if(mode == 7) {
-		commlist = "RQ;";
-		comred = true;
-		return 0;
-	}
-	sexit = 1;
+	if(mode == 7)
+		sexit = 1;
 }
 
 base_state *first_door::endstate() {
@@ -96,7 +91,6 @@ base_state *first_door::endstate() {
 
 void first_door::SetStat(std::string set_state) {
 	/*are we checking if a scan attempt is done?*/
-	std::cout << set_state << std::endl;
 	if(set_state[0] != '0') {
 		mode++;
 	}

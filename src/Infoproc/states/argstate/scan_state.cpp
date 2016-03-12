@@ -9,7 +9,6 @@ scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman
 	close = false;
 	mode = 0;
 	failcount = 0;
-
 	std::vector<std::array<std::string,2>> tempargs = GetArgs();
 	for(int i = 0; i < tempargs.size(); i++) {
 		switch(tempargs[i][0][0]) {
@@ -29,7 +28,7 @@ scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman
 				if(tempargs[i][1][0] == 'd'){
 					shue = 65;
 					ssat = 100;
-					endcom = "RQ";
+					endcom = "QR";
 				}
 				
 				break;
@@ -97,12 +96,8 @@ void scan_state::SetStat(std::string set) {
 			if(liningup)
 				liningup = false;
 		}
-		else if(mode == 2) {
-			if(endcom.size() != 0)
-				commlist = endcom;
-			else
-				mode++;
-		}
+		else if(mode == 2) 
+			mode++;
 		else if(mode == 3) {
 			sexit = 1;
 			return;
@@ -122,12 +117,13 @@ void scan_state::processscan() {
 		std::cout << "Obj scan failed" << std::endl;
 		return;
 	}
+
 	int strafeamount;
 	std::string strafedir;
 	float modifier = .5;
 
 	if(close)
-		modifier = .25;
+		modifier = .15;
 
 	//Checking if failed twice due to random values
 	if(dist < 300)
@@ -145,11 +141,16 @@ void scan_state::processscan() {
 	else
 		strafedir = " 0 ";
 
-	if((close && strafeamount > 2) || (strafeamount > 37)) {
+	if((close && strafeamount > 4) || (strafeamount > 37)) {
 		commlist = "MV";
 		commlist.append(strafedir);
 		commlist.append(std::to_string(strafeamount));
 		commlist.append("!");
+		liningup = true;
+		comred = true;
+	}
+	else if(kinect_manager.straighten()) {
+		commlist = "ST";
 		liningup = true;
 		comred = true;
 	}
@@ -159,8 +160,16 @@ void scan_state::processscan() {
 		liningup = true;
 		comred = true;
 	}
-	else 
-		sexit = 1;
+	else if(close) {
+		std::cout << "exit mode" << std::endl;
+		if(endcom.size() != 0) {
+			commlist = endcom;
+			comred = true;
+			mode++;
+		}
+		else
+			mode += 2;
+	}
 }
 
 int scan_state::Process() { //Process information

@@ -3,6 +3,7 @@
 drive_man::drive_man(const path_finding * set_pfind, const obj_cube *set_rob) :  pfind(set_pfind), robot(set_rob) {
 	delaytime = GetMilli();
 	dir = 0;
+	turnamount = 0;
 	currentnode = 0;
 	estiangle = 0;
 	estimv.x = 0;
@@ -10,6 +11,7 @@ drive_man::drive_man(const path_finding * set_pfind, const obj_cube *set_rob) : 
 	cpathid = 0;
 	est = false;
 	obstical = false;
+	isturning = false;
 	overridemode = 0;
 	continuestring = "g"; // string to keep going
 
@@ -17,8 +19,8 @@ drive_man::drive_man(const path_finding * set_pfind, const obj_cube *set_rob) : 
 	delay = 150; // in milliseconds
 	//drivespeed = 183*.001*delay; //speed per seconds converted for delay
 	//turnspeed = .56*.001*delay;
-	drivespeed = 170*.001*delay; //speed per seconds converted for delay
-	turnspeed = .56*.001*delay;
+	drivespeed = 170*.004*delay; //speed per seconds converted for delay
+	turnspeed = .56*.004*delay;
 	turntol = .09; //Turning tolerance before considered to be straight
 
 	try {
@@ -46,7 +48,7 @@ std::string drive_man::ArdState() {
 	if(ardstuff.size() <= 0)
 		return ardstuff;
 
-	if(ardstuff[0] == 'q' && overridemode == 2) 
+	if(ardstuff[0] == 'q' && (overridemode == 2 || overridemode == 6)) 
 		overridecom = "";
 
 	return ardstuff;
@@ -80,6 +82,11 @@ bool drive_man::runcom(std::string &rcommand) {
 		overridemode = 4; //wait till command is over
 		return true;
 	}
+	else if(rcommand[0] == 'S' && rcommand[1] == 'T') {
+		std::cout << "Straightening" << std::endl;
+		overridemode = 8;
+		return true;
+	}
 	return false;
 }
 
@@ -99,12 +106,14 @@ int drive_man::tick() {
 				est = true;
 				estiangle = dir - robot->rot;
 				overridemode = 0;
-				return 1;
-			}
-			else 
-				drivechip->writecom(continuestring);
 
-			return 3;
+				if(!isturning) 
+					return 5;
+
+				isturning = false;
+				/*check for door*/
+				overridemode = 7;
+			}
 			break;
 		}
 
@@ -136,6 +145,78 @@ int drive_man::tick() {
 				movedist -= drivespeed;
 			}
 			return 3;
+			break;
+		}
+
+		case 6 : {
+			if(overridecom.size() == 0) { /*Drivechip == NULL For simulations*/
+				est = true;
+				overridemode = 0;
+				if(abs(dir - 471) < 5 || abs(dir - 157) < 5)
+					 (abs(dir - 157) < 5) ? estimv.y += 200 : estimv.y -= 200;
+				else if (abs(dir) < 5 || abs(dir - 314) < 5)
+					abs(dir < 5) ? estimv.x += 200 : estimv.x -= 200;
+			}
+			else if(drivechip != NULL)
+				drivechip->writecom(continuestring);
+
+			return 5;
+			break;
+		}
+
+		case 7 : {
+			int find;
+			if (!(find = pfind->doorcheck())) {
+				overridemode = 0;
+				return 5;
+			}
+
+			overridemode = 6;
+			if(drivechip == NULL) {
+				if(find == 2)
+					std::cout << "Open door." << std::endl;
+				else
+					std::cout << "Ram door." << std::endl;
+				return 6;
+			}
+			else {
+				//is it facing us?
+				if(find == 1) {
+					std::string opensesame("OS!");
+					drivechip->writecom(opensesame);
+				}
+				//else ram
+				else {
+					std::string ramcommand("MV 157 400");
+					runcom(ramcommand);
+					return 4;
+				}
+			}
+		}
+		case 8: {
+			if(abs(turnamount) < .5) {
+				overridemode = 0;
+				return 1;
+			}
+
+			unsigned int milli2 = GetMilli();
+			if(delaytime < milli2)
+				delaytime = milli2 + delay;
+
+			turnamount -= turnspeed;
+			std::string newstr;
+			if(turnamount < 0)
+				newstr = "RL 20";
+			else
+				newstr = "RR 20";
+
+			if(drivechip != NULL) 
+				drivechip->writecom(newstr);
+			else {
+				std::cout << "Straighening" << std::endl;
+				overridemode = 0;
+			}
+			
 			break;
 		}
 
@@ -178,12 +259,11 @@ int drive_man::tick() {
 	else
 		return 0;
 
-	/*if we're rotating see if we're on track or not*/
+	/*if we're rotating see if we're on track or not
 	if((currentpath[0] == 'R')) 
-		if(fabs(dir - robot->rot) < turntol) {
 			commandhist.push_back(std::string("MV!"));
 			currentpath = "MV 157!";
-		}
+		}*/
 
 	/*Are we in new node?*/
 	if(((dir < .09  || abs(dir - 3.14) < .09)&& (abs(curpath[currentnode-1].x - robot->pos.x) < 50))
@@ -197,7 +277,6 @@ int drive_man::tick() {
 			curpath[currentnode].x < curpath[currentnode-1].x ? dir = 0 : dir = 3.14;
 		else
 			curpath[currentnode].y < curpath[currentnode-1].y ? dir = 1.57 : dir = 4.71;
-
 
 		//Getting direction
 		float dircompare = abs(dir - robot->rot);
@@ -215,57 +294,54 @@ int drive_man::tick() {
 			std::stringstream ss;
 			ss << "Rr " << (robot->rot - dir) << "!";
 			overridemode = 2;
-			/*Greater than 180
-			if(robot->rot > 3.14) {
-				anchor = robot->rot - 3.14;
-				if(robot->rot > dir && dir > anchor) {
-					currentpath = "RR 20!";
-					ss << "RR " << robot->rot - dir;
-				}
-				else if (robot->rot < dir){
-					currentpath = "RL 20!";
-					ss << "RL " << dir - robot->rot;
-				}
-				else {
-					currentpath = "RL 20!";
-					ss << "RR " << ((3.14+robot->rot) - (3.14+dir));
-				}
-			}
-			//Less than 180
-			else {
-				anchor = robot->rot + 3.14;
-				if(robot->rot < dir && dir < anchor) {
-					currentpath = "RL 20!";
-					ss << "RL " << dir - robot->rot;
-				}
-				else if (robot->rot > dir){
-					currentpath = "RR 20!";
-					ss << "RR " << robot->rot - dir;
-				}
-				else {
-					currentpath = "RR 20!";
-					ss << "RR " << ((3.14+dir) - (3.14+robot->rot));
-				}
-			}*/
+			isturning = true;
 			commandhist.push_back(ss.str());
 		}
 		/******************************************/
-	/*logging where we're going*/
-	//commandhist
+		/*logging where we're going*/
+		//commandhist
 
-	/*Is the a door coming up?*/
+		/*Is the a door coming up?*/
+		int find;
+		if (currentnode >  1 && (find = pfind->doorcheck())) {
+			overridemode = 6;
+
+			if(drivechip == NULL) {
+				if(find == 2)
+					std::cout << "Open door." << std::endl;
+				else
+					std::cout << "Ram door." << std::endl;
+				return 6;
+			}
+			else {
+				//Is it facing us?
+				if(find == 2) {
+					std::string opensesame("OS!");
+					drivechip->writecom(opensesame);
+					return 4;
+				}
+				//else ram
+				else {
+					std::string ramcommand("MV 157 400");
+					runcom(ramcommand);
+					return 4;
+				}
+			}
+		}
 	}
-	else if (pfind->doorcheck()) {
-
-		return 2;
-	}
-
-
 	execcom();
 	//else
 	//	execcom(overridecom);
 
 	return 0;
+}
+
+void drive_man::straighten(int set_check) {	
+	if(set_check < 4)
+		return;
+
+	turnamount = set_check;
+	overridemode = 8;
 }
 
 void drive_man::SetOverride(int set_override) {

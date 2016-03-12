@@ -56,9 +56,7 @@ ccomm::ccomm(int set_file) {
 bool ccomm::writecom(std::string &writestr) {
 	if(write(file, writestr.c_str(), writestr.size()) < 0)
 		return false;
-
 	return true;
-
 }
 
 std::string ccomm::readall() {

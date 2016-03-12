@@ -480,7 +480,9 @@ inline unsigned char imgd::averagepointsc(unsigned int point) {
 	return total;
 }
 
-
+int imgd::straighten() {
+	return (averagepointsc(384 + 242*512) - averagepointsc(128 + 242*512));
+}
 inline float imgd::averagepoints(unsigned int point) {
 	//Checking if in range
 	if(kdepth.width - (point / kdepth.width) < 3 || (point / kdepth.width) < 3)

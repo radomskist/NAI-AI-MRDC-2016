@@ -22,6 +22,7 @@ class drive_man {
 		void SetObst(bool);
 		const std::string GetCurComm(); //get current command;
 
+		void straighten(int);
 		bool GetEst(obj_point &, float &);
 
 	private:
@@ -53,6 +54,8 @@ class drive_man {
 		bool obstical;
 
 		/*estimation*/
+		int turnamount;
+		bool isturning;
 		bool est;
 		float turntol; //Tolerance for turning degree
 		float drivespeed, turnspeed; //Approximately how fast we move

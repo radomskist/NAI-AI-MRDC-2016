@@ -4,6 +4,7 @@
 #include "Infoproc/states/operate_dispenser.h"
 #include "Infoproc/path_finding.h"
 #include "Infoproc/states/base_state.h"
+#include "Infoproc/states/find_door.h"
 
 class return_ball : public base_state {
 
@@ -16,6 +17,8 @@ class return_ball : public base_state {
 		base_state *endstate();
 	protected:
 		path_finding &pfind;
+		int mode;
+		const obj_cube *robot;
 };
 
 #endif

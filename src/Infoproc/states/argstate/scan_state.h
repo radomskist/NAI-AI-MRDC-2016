@@ -18,6 +18,7 @@ o:(1 or 0);
 	One scan, true or false. Whether or not it should just scan the direction or scan the areas between (one for only the direction)
 f:obj details; 
 	d = QR code: look for door qr code
+	s = QR code: look for dispenser qr code
 	Find, TODO: commands b = ball, s = dispenser, b = score bin
 */
 

@@ -37,6 +37,7 @@ class kinectman {
 		kinectman(unsigned char);
 		~kinectman();
 
+		int straighten();
 		bool ProcessImages(); //Proccess the images and sets the buffer values
 		bool PathCheck(bool &, bool&);
 		std::vector<obj_plane>& GetPlanes();
