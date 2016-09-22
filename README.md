@@ -1,7 +1,7 @@
 # NAI-ComputerVision
 
 ##Notice
-This system was written from the ground up between Janurary 2016 and March 10th 2016 mostly by one person. There also might be some things that where hastily written at the competition due to last minute changes. This is repo is mainly to archive the status of NAI when it arrived at MRDC.
+This system was rewritten from the ground up between Janurary 2016 and March 10th 2016 mostly by one person. There also might be some things that where hastily written at the competition due to last minute changes. This is repo is mainly to archive the status of NAI when it arrived at MRDC.
 
 ##Requires:
 Open Kinect 2:
