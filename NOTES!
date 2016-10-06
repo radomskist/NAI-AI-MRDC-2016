@@ -1,7 +1,0 @@
-TODO: Log amount of time it takes for processes?
-
-Needs to be run as root or will not open kinect due to privilage.
-
-HSV vs RGB
-
-SEPERATE DRAWING FROM IMAGE PROCESSING!!!!!
