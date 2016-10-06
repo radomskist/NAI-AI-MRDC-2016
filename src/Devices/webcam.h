@@ -1,3 +1,15 @@
+/*****************************************************************
+	* Author: Steven Radomski radomskist@yahoo.com
+	*
+	* Copyright (C) 2017 Steven Radomski
+	* 
+	* This file was part of the 2016 NIU robotics AI robot project
+	* 
+	* This code cannot be copied or used without the permission of
+	* the author
+	*
+	*
+*****************************************************************/
 #ifndef NAI_WEBCAM
 #define NAI_WEBCAM
 
@@ -14,6 +26,10 @@
 #include <linux/videodev2.h>
 #include <unistd.h>
 
+/*
+	* This class is primarily intended to manage any extra
+	* web-cameras the project might have
+*/
 class nwebc {
 	public:
 		nwebc(int);
@@ -37,6 +53,7 @@ class bcam :public nwebc {
 
 };
 
+/*This is a factory method for creating a new webcam*/
 namespace naiwebc { 
 nwebc *createwebcam(std::string,int); //simple factory function for creating webcams
 //void listwebcams(); maybe in the future

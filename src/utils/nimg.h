@@ -1,6 +1,19 @@
+/*****************************************************************
+	* Author: Steven Radomski radomskist@yahoo.com
+	*
+	* Copyright (C) 2017 Steven Radomski
+	* 
+	* This file was part of the 2016 NIU robotics AI robot project
+	* 
+	* This code cannot be copied or used without the permission of
+	* the author
+	*
+	*
+*****************************************************************/
 #ifndef NAI_IMG_STRUCT
 #define NAI_IMG_STRUCT
 
+/*This is a wrapper for images processed through the project*/
 //TODO overload bracket operators and make all data protected
 enum SensorFlags {
 	KRGB = 0x01,	//Kinect rgb

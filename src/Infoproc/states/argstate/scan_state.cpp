@@ -1,3 +1,15 @@
+/*****************************************************************
+	* Author: Steven Radomski radomskist@yahoo.com
+	*
+	* Copyright (C) 2017 Steven Radomski
+	* 
+	* This file was part of the 2016 NIU robotics AI robot project
+	* 
+	* This code cannot be copied or used without the permission of
+	* the author
+	*
+	*
+*****************************************************************/
 #include "Infoproc/states/argstate/scan_state.h"
 
 scan_state::scan_state(const world_map *set_map, std::string set_args, kinectman& set_kinect) : arg_state(set_map,set_args), kinect_manager(set_kinect) {

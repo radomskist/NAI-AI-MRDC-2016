@@ -1,3 +1,15 @@
+/*****************************************************************
+	* Author: Steven Radomski radomskist@yahoo.com
+	*
+	* Copyright (C) 2017 Steven Radomski
+	* 
+	* This file was part of the 2016 NIU robotics AI robot project
+	* 
+	* This code cannot be copied or used without the permission of
+	* the author
+	*
+	*
+*****************************************************************/
 #ifndef NAI_STATE_BASE
 #define NAI_STATE_BASE
 #include "Infoproc/world_map.h"

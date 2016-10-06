@@ -1,3 +1,15 @@
+/*****************************************************************
+	* Author: Steven Radomski radomskist@yahoo.com
+	*
+	* Copyright (C) 2017 Steven Radomski
+	* 
+	* This file was part of the 2016 NIU robotics AI robot project
+	* 
+	* This code cannot be copied or used without the permission of
+	* the author
+	*
+	*
+*****************************************************************/
 #ifndef _NAIBRAIN_EYE_KINECT
 #define _NAIBRAIN_EYE_KINECT
 
@@ -28,6 +40,8 @@
    FUNCTION:	This will manage all the kinect processes
 
    NOTES:		N/A
+
+	TODO: Make a basic sensor so code can operate without kinect
 
 ****************************************************************/
 enum {NAI_DIS_CAM, NAI_DIS_DEP, NAI_DIS_MIX} nai_dismode; /*Modes in enum form*/
